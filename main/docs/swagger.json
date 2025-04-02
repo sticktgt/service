@@ -1,0 +1,103 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/work": {
+            "post": {
+                "description": "Метод для отладки работы с git-ом",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Тестовый метод соединения с git",
+                "parameters": [
+                    {
+                        "description": "Параметры вызова",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.GitRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Вызов прошел успешно",
+                        "schema": {
+                            "$ref": "#/definitions/main.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "main.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "err": {
+                    "type": "string",
+                    "example": "detailed error message"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "An error occurred"
+                },
+                "processID": {
+                    "type": "string",
+                    "example": "GUID"
+                }
+            }
+        },
+        "main.GitRequest": {
+            "type": "object",
+            "properties": {
+                "repoName": {
+                    "type": "string",
+                    "example": "https://github.com/Lockdain/metamart.git"
+                },
+                "repoPassword": {
+                    "type": "string",
+                    "example": "password or token"
+                },
+                "repoUser": {
+                    "type": "string",
+                    "example": "elon@neof44.ru"
+                }
+            }
+        },
+        "main.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Executed successfully"
+                },
+                "processID": {
+                    "type": "string",
+                    "example": "GUID"
+                }
+            }
+        }
+    }
+}

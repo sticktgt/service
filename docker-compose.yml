@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  microservice:
+    build: .
+    image: 
+      gservice:0.0.1    
+    ports:
+      - "8080:8080"

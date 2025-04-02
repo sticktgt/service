@@ -1,0 +1,68 @@
+definitions:
+  main.ErrorResponse:
+    properties:
+      err:
+        example: detailed error message
+        type: string
+      message:
+        example: An error occurred
+        type: string
+      processID:
+        example: GUID
+        type: string
+    type: object
+  main.GitRequest:
+    properties:
+      repoName:
+        example: https://github.com/Lockdain/metamart.git
+        type: string
+      repoPassword:
+        example: password or token
+        type: string
+      repoUser:
+        example: elon@neof44.ru
+        type: string
+    type: object
+  main.SuccessResponse:
+    properties:
+      message:
+        example: Executed successfully
+        type: string
+      processID:
+        example: GUID
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /work:
+    post:
+      consumes:
+      - application/json
+      description: Метод для отладки работы с git-ом
+      parameters:
+      - description: Параметры вызова
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.GitRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Вызов прошел успешно
+          schema:
+            $ref: '#/definitions/main.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Тестовый метод соединения с git
+swagger: "2.0"
