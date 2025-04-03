@@ -1,0 +1,14 @@
+git:
+  authorName: "Vladimir Semenov"
+  authorEmail: "sticktgt@gmail.com"
+repository1:
+  path: "https://github.com/sticktgt/temp-projects.git"
+  branch: "master"
+  localPath: "./temp-projects"
+  username: sticktgt@gmail.com
+repository2:
+  path: "https://github.com/sticktgt/files.git"
+  localPath: "./files"
+  branch: "main"
+  username: sticktgt@gmail.com
+executeHelmTemplate: true

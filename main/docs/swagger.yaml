@@ -11,7 +11,7 @@ definitions:
         example: GUID
         type: string
     type: object
-  main.GitRequest:
+  main.GitCheckRequest:
     properties:
       repoName:
         example: https://github.com/Lockdain/metamart.git
@@ -21,6 +21,21 @@ definitions:
         type: string
       repoUser:
         example: elon@neof44.ru
+        type: string
+    type: object
+  main.GitCopyRequest:
+    properties:
+      fileName:
+        example: filename to copy
+        type: string
+      fsubFolderName:
+        example: subfolder for file
+        type: string
+      repo1Password:
+        example: password or token
+        type: string
+      repo2Password:
+        example: password or token
         type: string
     type: object
   main.SuccessResponse:
@@ -35,7 +50,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /work:
+  /gitcheck:
     post:
       consumes:
       - application/json
@@ -46,7 +61,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/main.GitRequest'
+          $ref: '#/definitions/main.GitCheckRequest'
       produces:
       - application/json
       responses:
@@ -65,4 +80,34 @@ paths:
           schema:
             $ref: '#/definitions/main.ErrorResponse'
       summary: Тестовый метод соединения с git
+  /gitcopy:
+    post:
+      consumes:
+      - application/json
+      description: Метод для отладки работы с git-ом
+      parameters:
+      - description: Параметры вызова
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.GitCopyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Вызов прошел успешно
+          schema:
+            $ref: '#/definitions/main.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Тестовый метод копирования файла из одного git-репозитория в другой
 swagger: "2.0"

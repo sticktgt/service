@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/work": {
+        "/gitcheck": {
             "post": {
                 "description": "Метод для отладки работы с git-ом",
                 "consumes": [
@@ -32,7 +32,53 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.GitRequest"
+                            "$ref": "#/definitions/main.GitCheckRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Вызов прошел успешно",
+                        "schema": {
+                            "$ref": "#/definitions/main.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/gitcopy": {
+            "post": {
+                "description": "Метод для отладки работы с git-ом",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Тестовый метод копирования файла из одного git-репозитория в другой",
+                "parameters": [
+                    {
+                        "description": "Параметры вызова",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.GitCopyRequest"
                         }
                     }
                 ],
@@ -80,7 +126,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.GitRequest": {
+        "main.GitCheckRequest": {
             "type": "object",
             "properties": {
                 "repoName": {
@@ -94,6 +140,27 @@ const docTemplate = `{
                 "repoUser": {
                     "type": "string",
                     "example": "elon@neof44.ru"
+                }
+            }
+        },
+        "main.GitCopyRequest": {
+            "type": "object",
+            "properties": {
+                "fileName": {
+                    "type": "string",
+                    "example": "filename to copy"
+                },
+                "fsubFolderName": {
+                    "type": "string",
+                    "example": "subfolder for file"
+                },
+                "repo1Password": {
+                    "type": "string",
+                    "example": "password or token"
+                },
+                "repo2Password": {
+                    "type": "string",
+                    "example": "password or token"
                 }
             }
         },
