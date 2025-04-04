@@ -90,8 +90,17 @@ func ProcessCopyGitFunction(params GitCopyFunctionParams) (err error) {
 
 	projectSubfolder := prepareProjectFolderName(volumeRepo2Subdir, params.SubFolderName)
 
+	// Check if the subfolder exists, if not, create it
+	if _, err := os.Stat(projectSubfolder); os.IsNotExist(err) {
+		err = os.MkdirAll(projectSubfolder, os.ModePerm)
+		if err != nil {
+			log.WithField("processID", params.ProcessID).Errorf("Unable to create subfolder: %v", err)
+			return err
+		}
+	}
+
 	// Delete the local file if it already exists
-	localFilePath := projectSubfolder + "/" + params.FileName // ???
+	localFilePath := projectSubfolder + "/" + params.FileName
 	if _, err := os.Stat(localFilePath); err == nil {
 		err = os.Remove(localFilePath)
 		if err != nil {
@@ -112,20 +121,20 @@ func ProcessCopyGitFunction(params GitCopyFunctionParams) (err error) {
 			log.WithField("processID", params.ProcessID).Error("unable to delete temporary repository folder", err)
 		}
 	}()
+	/*
+		w, err := repo.Worktree()
+		if err != nil {
+			log.WithField("processID", params.ProcessID).Errorf("failed to get worktree: %v", err)
+			return err
+		}
 
-	w, err := repo.Worktree()
-	if err != nil {
-		log.WithField("processID", params.ProcessID).Errorf("failed to get worktree: %v", err)
-		return err
-	}
-
-	status, err := w.Status()
-	if err != nil {
-		log.WithField("processID", params.ProcessID).Errorf("failed to get status: %v", err)
-		return err
-	}
-	log.WithField("processID", params.ProcessID).Infof("The repo status is: %v", status)
-
+		status, err := w.Status()
+		if err != nil {
+			log.WithField("processID", params.ProcessID).Errorf("failed to get status: %v", err)
+			return err
+		}
+		log.WithField("processID", params.ProcessID).Infof("The repo status is: %v", status)
+	*/
 	err = git.CommitAndPush(authRepo2, "commit "+params.ProcessID, repo, projectSubfolder, params.Repo2Branch, params.ProcessID, params.SubFolderName)
 	if err != nil {
 		log.WithField("processID", params.ProcessID).Error("Error commiting resources to GIT:", err)

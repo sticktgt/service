@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"gservice/configuration"
 	"os"
-	pth "path"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -121,32 +121,60 @@ func CommitAndPush(auth GitAuth, commitMessage string, repo *git.Repository, loc
 	}
 
 	ignoreMatcher, _ := loadGitIgnore(localPath)
-
-	err = filepath.Walk(localPath, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		relPath, _ := filepath.Rel(localPath, path)
-		if ignoreMatcher != nil && ignoreMatcher.MatchesPath(relPath) {
-			return nil
-		}
-
-		filePath := pth.Join(projectFolder, relPath)
-		if !info.IsDir() {
-			log.WithField("processID", processID).Info("Adding file: ", filePath)
-			_, err := worktree.Add(filePath)
-			if err != nil {
-				log.WithField("processID", processID).Errorf("Warning: Failed to add file %s: %v", filePath, err)
-			}
-		}
-		return nil
-	})
+	/*
+	 ******************************
+	 */
+	status_t, err := worktree.Status()
 	if err != nil {
-		log.WithField("processID", processID).Errorf("failed to walk directory: %v", err)
+		log.WithField("processID", processID).Errorf("failed to get status: %v", err)
 		return err
 	}
 
+	for file, fileStatus := range status_t {
+		if fileStatus.Worktree != git.Unmodified {
+			// possibly not needed
+			if ignoreMatcher != nil && ignoreMatcher.MatchesPath(file) {
+				continue
+			}
+			log.WithField("processID", processID).Info("Adding file: ", file)
+			_, err := worktree.Add(file)
+			if err != nil {
+				log.WithField("processID", processID).Errorf("Warning: Failed to add file %s: %v", file, err)
+			}
+		}
+	}
+
+	/*
+	 ******************************
+	 */
+
+	/*
+		err = filepath.Walk(localPath, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			relPath, _ := filepath.Rel(localPath, path)
+
+			if ignoreMatcher != nil && ignoreMatcher.MatchesPath(relPath) {
+				return nil
+			}
+
+			filePath := pth.Join(projectFolder, relPath)
+			if !info.IsDir() {
+				log.WithField("processID", processID).Info("Adding file: ", filePath)
+				_, err := worktree.Add(filePath)
+				if err != nil {
+					log.WithField("processID", processID).Errorf("Warning: Failed to add file %s: %v", filePath, err)
+				}
+			}
+			return nil
+		})
+		if err != nil {
+			log.WithField("processID", processID).Errorf("failed to walk directory: %v", err)
+			return err
+		}
+	*/
 	status, err := worktree.Status()
 	if err != nil {
 		log.WithField("processID", processID).Errorf("failed to get status: %v", err)
@@ -211,7 +239,8 @@ func loadGitIgnore(repoPath string) (*gitignore.GitIgnore, error) {
 	if err != nil {
 		return nil, err
 	}
-	return gitignore.CompileIgnoreLines(string(content)), nil
+	lines := strings.Split(string(content), "\n")
+	return gitignore.CompileIgnoreLines(lines...), nil
 }
 
 func NewGitCache(repoURL, localPath string, branch string) *GitCache {
