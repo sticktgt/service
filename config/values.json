@@ -1,0 +1,49 @@
+{
+  "chart": {
+    "name": "sdep-chart",
+    "version": "0.1.0",
+    "description": "Simple Seldon model deployment"
+  },
+  "Environment": "TEST",  
+  "DeploymentName": "test-deployment",
+  "Namespace": "default",
+  "Predictors": [
+    {
+      "Name": "default",
+      "Traffic": 100,
+      "Replicas": 1,
+      "SvcOrchEnv": [],
+      "ComponentContainers": [
+        {
+          "Name": "classifier",
+          "Image": "seldonio/sklearn-iris:0.1",
+          "Env": [],
+          "Resources": null,
+          "Liveness": {
+            "Path": "/health/ping",
+            "Port": "http",
+            "InitialDelaySeconds": 5,
+            "PeriodSeconds": 10,
+            "FailureThreshold": 3,
+            "SuccessThreshold": 1
+          },
+          "Readiness": {
+            "Path": "/health/ping",
+            "Port": "http",
+            "InitialDelaySeconds": 5,
+            "PeriodSeconds": 10,
+            "FailureThreshold": 3,
+            "SuccessThreshold": 1
+          }
+        }
+      ],
+      "Graph": {
+        "Name": "classifier",
+        "Type": "MODEL",
+        "Implementation": "SKLEARN_SERVER",
+        "ModelUri": "gs://seldon-models/sklearn/iris",
+        "Children": []
+      }
+    }
+  ]
+}

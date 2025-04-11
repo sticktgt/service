@@ -1,0 +1,330 @@
+files:
+  - path: Chart.yaml
+    template: true
+    content: |
+      apiVersion: v2
+      name: {{ .Chart.Name }}
+      version: {{ .Chart.Version }}
+      description: {{ .Chart.Description }}
+      type: application
+
+  - path: values.yaml
+    template: true
+    content: |
+      Chart:
+        Name: {{ .Chart.Name }}
+        Version: {{ .Chart.Version }}
+        Description: {{ .Chart.Description }}
+
+      DeploymentName: {{ .DeploymentName }}
+      Namespace: {{ .Namespace }}
+
+      Predictors:
+      {{- range .Predictors }}
+        - Name: {{ .Name }}
+          Graph:
+            Name: {{ .Graph.Name }}
+            Type: {{ .Graph.Type }}
+            {{- if .Graph.Implementation }}
+            Implementation: {{ .Graph.Implementation }}
+            {{- end }}
+            {{- if .Graph.EndpointType }}
+            EndpointType: {{ .Graph.EndpointType }}
+            {{- end }}
+            {{- if .Graph.Parameters }}
+            Parameters:
+            {{- range .Graph.Parameters }}
+              - Name: {{ .Name }}
+                Type: {{ .Type }}
+                Value: {{ .Value }}
+            {{- end }}
+            {{- end }}
+            {{- if .Graph.Logger }}
+            Logger:
+              Mode: {{ .Graph.Logger.Mode }}
+            {{- end }}
+            {{- if .Graph.Children }}
+            Children:
+            {{- range .Graph.Children }}
+              - Name: {{ .Name }}
+                Type: {{ .Type }}
+                Implementation: {{ .Implementation }}
+                Children: []
+            {{- end }}
+            {{- else }}
+            Children: []
+            {{- end }}
+      {{- end }}
+  - path: values-ENV.yaml
+    template: true
+    content: |
+      Predictors:
+      {{- range .Predictors }}
+        - Name: {{ .Name }}
+          Replicas: {{ .Replicas }}
+          Traffic: {{ .Traffic }}
+          Graph:
+            {{- if .Graph.ModelUri }}
+            ModelUri: {{ .Graph.ModelUri }}
+            {{- end }}
+            {{- if .Graph.Children }}
+            Children:
+              {{- range .Graph.Children }}
+              - ModelUri: {{ .ModelUri }}
+              {{- end }}
+            {{- end }}
+          ComponentContainers:
+          {{- range .ComponentContainers }}
+            - Name: {{ .Name }}
+              Image: {{ .Image }}
+              {{- if .Resources }}
+              Resources:
+                Requests:
+                  {{- range $k, $v := .Resources.Requests }}
+                  {{ $k }}: {{ $v }}
+                  {{- end }}
+                Limits:
+                  {{- range $k, $v := .Resources.Limits }}
+                  {{ $k }}: {{ $v }}
+                  {{- end }}
+              {{- end }}
+          {{- end }}
+      {{- end }}
+
+  - path: templates/seldon-deployment.yaml
+    template: false
+    content: |
+      apiVersion: machinelearning.seldon.io/v1
+      kind: SeldonDeployment
+      metadata:
+        name: {{ .Values.DeploymentName }}
+        namespace: {{ .Values.Namespace }}
+      spec:
+        name: {{ .Values.DeploymentName }}
+        predictors:
+        {{- range .Values.Predictors }}
+          - name: {{ .Name }}
+            replicas: {{ .Replicas }}
+            traffic: {{ .Traffic }}
+            graph:
+              name: {{ .Graph.Name }}
+              type: {{ .Graph.Type }}
+              {{- if .Graph.Implementation }}
+              implementation: {{ .Graph.Implementation }}
+              {{- end }}
+              {{- if .Graph.ModelUri }}
+              modelUri: {{ .Graph.ModelUri }}
+              {{- end }}
+              {{- if .Graph.Children }}
+              children:
+              {{- range .Graph.Children }}
+                - name: {{ .Name }}
+                  type: {{ .Type }}
+                  {{- if .Implementation }}
+                  implementation: {{ .Implementation }}
+                  {{- end }}
+                  modelUri: {{ .ModelUri }}
+                  children: []
+              {{- end }}
+              {{- else }}
+              children: []
+              {{- end }}
+            componentSpecs:
+              - spec:
+                  containers:
+                  {{- range .ComponentContainers }}
+                    - name: {{ .Name }}
+                      image: {{ .Image }}
+                      {{- if .Resources }}
+                      resources:
+                        requests:
+                          {{- range $k, $v := .Resources.Requests }}
+                          {{ $k }}: {{ $v }}
+                          {{- end }}
+                        limits:
+                          {{- range $k, $v := .Resources.Limits }}
+                          {{ $k }}: {{ $v }}
+                          {{- end }}
+                      {{- end }}
+                  {{- end }}
+        {{- end }}
+
+  - path: .helmignore
+    template: false
+    content: |
+      *.tgz
+      .DS_Store
+      .idea/
+      *.swp
+      __pycache__/
+      .ipynb_checkpoints/
+
+valuesSchema:
+  chart.name:
+    type: string
+    description: The Helm chart name
+    required: true
+  chart.version:
+    type: string
+    description: Helm chart version
+    required: true
+  chart.description:
+    type: string
+    description: Short description of the chart
+    required: true
+  DeploymentName:
+    type: string
+    description: Name of the SeldonDeployment resource
+    required: true
+  Namespace:
+    type: string
+    description: Kubernetes namespace where the deployment will be created
+    required: true
+  Predictors[].Name:
+    type: string
+    description: Name of the predictor
+    required: true
+  Predictors[].Replicas:
+    type: integer
+    description: Number of replicas to deploy
+    required: true
+  Predictors[].Traffic:
+    type: integer
+    description: Traffic percentage assigned to this predictor
+    required: false
+  Predictors[].SvcOrchEnv[]:
+    type: object
+    description: Environment variables for the orchestrator container
+    required: false
+  Predictors[].SvcOrchEnv[].Name:
+    type: string
+    description: Environment variable name
+    required: true
+  Predictors[].SvcOrchEnv[].Value:
+    type: string
+    description: Plain value for the environment variable
+    required: false
+  Predictors[].SvcOrchEnv[].ValueFrom.secretKeyRef.name:
+    type: string
+    description: Secret name for valueFrom reference
+    required: false
+  Predictors[].SvcOrchEnv[].ValueFrom.secretKeyRef.key:
+    type: string
+    description: Secret key for valueFrom reference
+    required: false
+  Predictors[].ComponentContainers[]:
+    type: object
+    description: Additional containers in the predictor pod
+    required: false
+  Predictors[].ComponentContainers[].Name:
+    type: string
+    description: Name of the container
+    required: true
+  Predictors[].ComponentContainers[].Image:
+    type: string
+    description: Docker image used for the container
+    required: false
+  Predictors[].ComponentContainers[].Env[]:
+    type: object
+    description: Environment variables for the container
+    required: false
+  Predictors[].ComponentContainers[].Env[].Name:
+    type: string
+    description: Environment variable name
+    required: true
+  Predictors[].ComponentContainers[].Env[].Value:
+    type: string
+    description: Environment variable value
+    required: true
+  Predictors[].ComponentContainers[].Resources.Requests:
+    type: object
+    description: Resource requests (e.g. cpu, memory)
+    required: false
+  Predictors[].ComponentContainers[].Resources.Limits:
+    type: object
+    description: Resource limits (e.g. cpu, memory)
+    required: false
+  Predictors[].ComponentContainers[].Liveness:
+    type: object
+    description: Liveness probe configuration
+    required: false
+  Predictors[].ComponentContainers[].Liveness.Path:
+    type: string
+    description: HTTP path for liveness probe
+    required: true
+  Predictors[].ComponentContainers[].Liveness.Port:
+    type: string
+    description: Port used for liveness probe
+    required: true
+  Predictors[].ComponentContainers[].Liveness.InitialDelaySeconds:
+    type: integer
+    description: Initial delay in seconds before liveness probe starts
+    required: true
+  Predictors[].ComponentContainers[].Liveness.PeriodSeconds:
+    type: integer
+    description: Period between liveness checks
+    required: true
+  Predictors[].ComponentContainers[].Liveness.FailureThreshold:
+    type: integer
+    description: Failure threshold for liveness probe
+    required: true
+  Predictors[].ComponentContainers[].Liveness.SuccessThreshold:
+    type: integer
+    description: Success threshold for liveness probe
+    required: true
+  Predictors[].ComponentContainers[].Readiness:
+    type: object
+    description: Readiness probe configuration
+    required: false
+  Predictors[].Graph:
+    type: object
+    description: Root node of the model graph
+    required: true
+  Predictors[].Graph.Name:
+    type: string
+    description: Name of the graph node
+    required: true
+  Predictors[].Graph.Type:
+    type: string
+    description: Type of the node (e.g. MODEL, ROUTER, TRANSFORMER)
+    required: true
+  Predictors[].Graph.Implementation:
+    type: string
+    description: Implementation type (e.g. MLFLOW_SERVER)
+    required: false
+  Predictors[].Graph.ModelUri:
+    type: string
+    description: Model storage URI
+    required: false
+  Predictors[].Graph.EndpointType:
+    type: string
+    description: Endpoint type (e.g. REST, GRPC)
+    required: false
+  Predictors[].Graph.EnvSecretRefName:
+    type: string
+    description: Kubernetes secret name used for accessing model storage
+    required: false
+  Predictors[].Graph.Parameters[]:
+    type: object
+    description: Parameters for the graph node
+    required: false
+  Predictors[].Graph.Parameters[].Name:
+    type: string
+    description: Parameter name
+    required: true
+  Predictors[].Graph.Parameters[].Type:
+    type: string
+    description: Parameter type (e.g. STRING, INT)
+    required: true
+  Predictors[].Graph.Parameters[].Value:
+    type: string
+    description: Parameter value
+    required: true
+  Predictors[].Graph.Logger.Mode:
+    type: string
+    description: Logger mode (e.g. all, request, response)
+    required: false
+  Predictors[].Graph.Children:
+    type: array
+    description: Child graph nodes
+    required: false
