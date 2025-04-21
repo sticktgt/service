@@ -35,12 +35,6 @@ type Predictor struct {
 	Graph         GraphNode     `json:"Graph"`
 }
 
-type ComponentSpec struct {
-	ServiceAccountName            string               `json:"ServiceAccountName"`
-	TerminationGracePeriodSeconds int                  `json:"TerminationGracePeriodSeconds"`
-	Containers                    []ComponentContainer `json:"Containers"`
-}
-
 type EnvVar struct {
 	Name      string     `json:"Name"`
 	Value     string     `json:"Value,omitempty"`
@@ -54,6 +48,12 @@ type SecretRef struct {
 	} `json:"SecretKeyRef"`
 }
 
+type ComponentSpec struct {
+	ServiceAccountName            string               `json:"ServiceAccountName"`
+	TerminationGracePeriodSeconds int                  `json:"TerminationGracePeriodSeconds"`
+	Containers                    []ComponentContainer `json:"Containers"`
+}
+
 type ComponentContainer struct {
 	Name      string     `json:"Name"`
 	Image     string     `json:"Image,omitempty"`
@@ -64,8 +64,8 @@ type ComponentContainer struct {
 }
 
 type Resources struct {
-	Requests map[string]string `json:"Requests"`
-	Limits   map[string]string `json:"Limits"`
+	Requests map[string]string `json:"Requests,omitempty"`
+	Limits   map[string]string `json:"Limits,omitempty"`
 }
 
 type Probe struct {
@@ -123,14 +123,18 @@ var log = logrus.New()
 func main() {
 	// Step 1: Read and parse values.json into structured data
 	var values Values
+	log.Printf("Reading values file")
 	valData, err := os.ReadFile("../config/values.json")
 	check(err)
+	log.Printf("Checking values file")
 	check(json.Unmarshal(valData, &values))
 
 	// Step 2: Read and parse seldon.meta.yaml
 	var meta ChartTemplate
+	log.Printf("Reading template file")
 	tmplData, err := os.ReadFile("../config/seldon.meta.yaml")
 	check(err)
+	log.Printf("Checking template file")
 	check(yaml.Unmarshal(tmplData, &meta))
 
 	//log.Printf("Values: %+v", values)
@@ -154,7 +158,7 @@ func main() {
 			tmpl, err := template.New(file.Path).Parse(file.Content)
 			check(err)
 			var buf bytes.Buffer
-			//			log.Printf("executing...")
+			log.Printf("executing...")
 			check(tmpl.Execute(&buf, values))
 			content = buf.String()
 		}

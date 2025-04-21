@@ -3,7 +3,7 @@
   "Chart": {
     "Name": "fs33kafka-chart",
     "Version": "0.1.0",
-    "Description": "Loan approval model"
+    "Description": "Loan approval predictor"
   },
   "DeploymentName": "fs33kafka",
   "Namespace": "app-fdd",
@@ -13,16 +13,8 @@
       "Replicas": 1,
       "Traffic": 100,
       "SvcOrchEnv": [
-        { "Name": "LOGGER_KAFKA_BROKER", "Value": "kafka.example.com:9093" },
-        {
-          "Name": "KAFKA_SSL_CA_CERT",
-          "ValueFrom": {
-            "SecretKeyRef": {
-              "Name": "kafka-creds",
-              "Key": "ca.cert"
-            }
-          }
-        }
+        { "Name": "LOGGER_KAFKA_BROKER", "Value": "kafka-kafka-0.kafka..." },
+        { "Name": "KAFKA_SSL_CA_CERT", "ValueFrom": { "SecretKeyRef": { "Name": "kafka-cluster-creds", "Key": "cluster-ca.cert" } } }
       ],
       "ComponentSpec": {
         "ServiceAccountName": "default-editor",
@@ -30,11 +22,38 @@
         "Containers": [
           {
             "Name": "fs33kafka",
-            "Image": "my-registry/fs33:v1",
+            "Env": [
+              { "Name": "GUNICORN_WORKERS", "Value": "2" },
+              { "Name": "GUNICORN_THREADS", "Value": "2" }
+            ],
             "Resources": {
-              "Requests": { "cpu": "500m", "memory": "256Mi" },
-              "Limits": { "cpu": "1000m", "memory": "512Mi" }
+              "Requests": { "cpu": "2.0", "memory": "4.0Gi" },
+              "Limits": { "cpu": "2.0", "memory": "4.0Gi" }
+            },
+            "Liveness": {
+              "Path": "/health/ping",
+              "Port": "http",
+              "InitialDelaySeconds": 80,
+              "PeriodSeconds": 5,
+              "FailureThreshold": 200,
+              "SuccessThreshold": 1
+            },
+            "Readiness": {
+              "Path": "/health/ping",
+              "Port": "http",
+              "InitialDelaySeconds": 80,
+              "PeriodSeconds": 5,
+              "FailureThreshold": 200,
+              "SuccessThreshold": 1
             }
+          },
+          {
+            "Name": "input-transformer",
+            "Image": "harbor.../feast-rest-enricher:v0.1.0",
+            "Env": [
+              { "Name": "modelURI", "Value": "s3://..." },
+              { "Name": "AWS_ACCESS_KEY_ID", "Value": "..." }
+            ]
           }
         ]
       },
@@ -47,8 +66,12 @@
             "Name": "fs33kafka",
             "Type": "MODEL",
             "Implementation": "MLFLOW_SERVER",
-            "ModelUri": "s3://models/fs33kafka",
-            "Children": []
+            "ModelUri": "s3://...",
+            "EnvSecretRefName": "seldon-secret",
+            "Logger": { "Mode": "response" },
+            "Parameters": [
+              { "Name": "xtype", "Type": "STRING", "Value": "DataFrame" }
+            ]
           }
         ]
       }
