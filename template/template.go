@@ -27,12 +27,18 @@ type Chart struct {
 }
 
 type Predictor struct {
-	Name                string               `json:"Name"`
-	Traffic             int                  `json:"Traffic"`
-	Replicas            int                  `json:"Replicas"`
-	SvcOrchEnv          []EnvVar             `json:"SvcOrchEnv,omitempty"`
-	ComponentContainers []ComponentContainer `json:"ComponentContainers,omitempty"`
-	Graph               GraphNode            `json:"Graph"`
+	Name          string        `json:"Name"`
+	Replicas      int           `json:"Replicas"`
+	Traffic       int           `json:"Traffic"`
+	SvcOrchEnv    []EnvVar      `json:"SvcOrchEnv,omitempty"`
+	ComponentSpec ComponentSpec `json:"ComponentSpec"`
+	Graph         GraphNode     `json:"Graph"`
+}
+
+type ComponentSpec struct {
+	ServiceAccountName            string               `json:"ServiceAccountName"`
+	TerminationGracePeriodSeconds int                  `json:"TerminationGracePeriodSeconds"`
+	Containers                    []ComponentContainer `json:"Containers"`
 }
 
 type EnvVar struct {
@@ -43,9 +49,9 @@ type EnvVar struct {
 
 type SecretRef struct {
 	SecretKeyRef struct {
-		Name string `json:"name"`
-		Key  string `json:"key"`
-	} `json:"secretKeyRef"`
+		Name string `json:"Name"`
+		Key  string `json:"Key"`
+	} `json:"SecretKeyRef"`
 }
 
 type ComponentContainer struct {

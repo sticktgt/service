@@ -1,48 +1,56 @@
 {
-  "chart": {
-    "name": "sdep-chart",
-    "version": "0.1.0",
-    "description": "Simple Seldon model deployment"
+  "Environment": "TEST",
+  "Chart": {
+    "Name": "fs33kafka-chart",
+    "Version": "0.1.0",
+    "Description": "Loan approval model"
   },
-  "Environment": "TEST",  
-  "DeploymentName": "test-deployment",
-  "Namespace": "default",
+  "DeploymentName": "fs33kafka",
+  "Namespace": "app-fdd",
   "Predictors": [
     {
-      "Name": "default",
-      "Traffic": 100,
+      "Name": "loan-approval",
       "Replicas": 1,
-      "SvcOrchEnv": [],
-      "ComponentContainers": [
+      "Traffic": 100,
+      "SvcOrchEnv": [
+        { "Name": "LOGGER_KAFKA_BROKER", "Value": "kafka.example.com:9093" },
         {
-          "Name": "classifier",
-          "Image": "seldonio/sklearn-iris:0.1",
-          "Env": [],
-          "Resources": null,
-          "Liveness": {
-            "Path": "/health/ping",
-            "Port": "http",
-            "InitialDelaySeconds": 5,
-            "PeriodSeconds": 10,
-            "FailureThreshold": 3,
-            "SuccessThreshold": 1
-          },
-          "Readiness": {
-            "Path": "/health/ping",
-            "Port": "http",
-            "InitialDelaySeconds": 5,
-            "PeriodSeconds": 10,
-            "FailureThreshold": 3,
-            "SuccessThreshold": 1
+          "Name": "KAFKA_SSL_CA_CERT",
+          "ValueFrom": {
+            "SecretKeyRef": {
+              "Name": "kafka-creds",
+              "Key": "ca.cert"
+            }
           }
         }
       ],
+      "ComponentSpec": {
+        "ServiceAccountName": "default-editor",
+        "TerminationGracePeriodSeconds": 0,
+        "Containers": [
+          {
+            "Name": "fs33kafka",
+            "Image": "my-registry/fs33:v1",
+            "Resources": {
+              "Requests": { "cpu": "500m", "memory": "256Mi" },
+              "Limits": { "cpu": "1000m", "memory": "512Mi" }
+            }
+          }
+        ]
+      },
       "Graph": {
-        "Name": "classifier",
-        "Type": "MODEL",
-        "Implementation": "SKLEARN_SERVER",
-        "ModelUri": "gs://seldon-models/sklearn/iris",
-        "Children": []
+        "Name": "input-transformer",
+        "Type": "TRANSFORMER",
+        "EndpointType": "REST",
+        "Children": [
+          {
+            "Name": "fs33kafka",
+            "Type": "MODEL",
+            "Implementation": "MLFLOW_SERVER",
+            "ModelUri": "s3://models/fs33kafka",
+            "Children": []
+          }
+        ]
       }
     }
   ]
