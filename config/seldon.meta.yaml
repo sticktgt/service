@@ -11,6 +11,7 @@ files:
   - path: values.yaml
     template: true
     content: |
+      ApiVersion: {{ .ApiVersion }}
       Environment: {{ .Environment }}
       Chart:
         Name: {{ .Chart.Name }}
@@ -18,6 +19,10 @@ files:
         Description: {{ .Chart.Description }}
       DeploymentName: {{ .DeploymentName }}
       Namespace: {{ .Namespace }}
+      Metadata:
+        Labels:
+          app.kubernetes.io/managed-by: Helm
+        Annotations: {}
       Predictors:
       {{- range .Predictors }}
         - Name: {{ .Name }}
@@ -50,7 +55,9 @@ files:
               {{- range .Graph.Children }}
               - Name: {{ .Name }}
                 Type: {{ .Type }}
+                {{- if .Implementation }}
                 Implementation: {{ .Implementation }}
+                {{- end }}
                 {{- if .ModelUri }}
                 ModelUri: {{ .ModelUri }}
                 {{- end }}
@@ -105,7 +112,9 @@ files:
               {{- range .Graph.Children }}
               - Name: {{ .Name }}
                 Type: {{ .Type }}
+                {{- if .Implementation }}
                 Implementation: {{ .Implementation }}
+                {{- end }}
                 {{- if .ModelUri }}
                 ModelUri: {{ .ModelUri }}
                 {{- end }}
@@ -130,11 +139,27 @@ files:
           ComponentSpec:
             ServiceAccountName: {{ .ComponentSpec.ServiceAccountName }}
             TerminationGracePeriodSeconds: {{ .ComponentSpec.TerminationGracePeriodSeconds }}
+            {{- if .ComponentSpec.Volumes }}
+            Volumes:
+              {{- range .ComponentSpec.Volumes }}
+              - Name: {{ .Name }}
+                {{- if .EmptyDir }}
+                EmptyDir: {}
+                {{- end }}
+                {{- if .Secret }}
+                Secret:
+                  SecretName: {{ .Secret.SecretName }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
             Containers:
               {{- range .ComponentSpec.Containers }}
               - Name: {{ .Name }}
                 {{- if .Image }}
                 Image: {{ .Image }}
+                {{- end }}
+                {{- if .ImagePullPolicy }}
+                ImagePullPolicy: {{ .ImagePullPolicy }}
                 {{- end }}
                 {{- if .Env }}
                 Env:
@@ -179,181 +204,219 @@ files:
                   FailureThreshold: {{ .Readiness.FailureThreshold }}
                   SuccessThreshold: {{ .Readiness.SuccessThreshold }}
                 {{- end }}
+                {{- if .VolumeMounts }}
+                VolumeMounts:
+                  {{- range .VolumeMounts }}
+                  - Name: {{ .Name }}
+                    MountPath: {{ .MountPath }}
+                    {{- if .ReadOnly }}
+                    ReadOnly: {{ .ReadOnly }}
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
               {{- end }}
       {{- end }}
 
-  - path: templates/seldon-deployment.yaml                                         
-    template: false                                                                
-    content: |                                                                     
-      apiVersion: machinelearning.seldon.io/v1                                     
-      kind: SeldonDeployment                                                       
-      metadata:                                                                    
-        name: {{ .Values.DeploymentName }}                                         
-        namespace: {{ .Values.Namespace }}                                         
-      spec:                                                                        
-        name: {{ .Values.DeploymentName }}                                         
-        predictors:                                                                
-        {{- range .Values.Predictors }}                                            
-          - name: {{ .Name }}                                                      
-        {{- if .Replicas }}                                                        
-            replicas: {{ .Replicas }}                                              
-        {{- end }}                                                                 
-        {{- if .Traffic }}                                                         
-            traffic: {{ .Traffic }}                                                
-        {{- end }}                                                                 
-        {{- if .SvcOrchEnv }}                                                      
-            svcOrchSpec:                                                           
-              env:                                                                 
-              {{- range .SvcOrchEnv }}                                             
-                - name: {{ .Name }}                                                
-                {{- if .Value }}                                                   
-                  value: {{ .Value }}                                              
-                {{- else if .ValueFrom }}                                          
-                  valueFrom:                                                       
-                    secretKeyRef:                                                  
-                      name: {{ .ValueFrom.SecretKeyRef.Name }}                     
-                      key: {{ .ValueFrom.SecretKeyRef.Key }}                       
-                {{- end }}                                                         
-              {{- end }}                                                           
-        {{- end }}                                                                 
-            graph:                                                                 
-              name: {{ .Graph.Name }}                                              
-              type: {{ .Graph.Type }}                                              
-              {{- if .Graph.Implementation }}                                      
-              implementation: {{ .Graph.Implementation }}                          
-              {{- end }}                                                           
-              {{- if .Graph.ModelUri }}                                            
-              modelUri: {{ .Graph.ModelUri }}                                      
-              {{- end }}                                                           
-              {{- if .Graph.EndpointType }}                                        
-              endpoint:                                                            
-                type: {{ .Graph.EndpointType }}                                    
-              {{- end }}                                                           
-              {{- if .Graph.EnvSecretRefName }}                                    
-              envSecretRefName: {{ .Graph.EnvSecretRefName }}                      
-              {{- end }}                                                           
-              {{- if .Graph.Logger }}                                              
-              logger:                                                              
-                mode: {{ .Graph.Logger.Mode }}                                     
-              {{- end }}                                                           
-              {{- if .Graph.Parameters }}                                          
-              parameters:                                                          
-                {{- range .Graph.Parameters }}                                     
-                - name: {{ .Name }}                                                
-                  type: {{ .Type }}                                                
-                  value: {{ .Value }}                                              
-                {{- end }}                                                         
-              {{- end }}                                                           
-              {{- if .Graph.Children }}                                            
-              children:                                                            
-                {{- range .Graph.Children }}                                       
-                - name: {{ .Name }}                                                
-                  type: {{ .Type }}                                                
-                  {{- if .Implementation }}                                        
-                  implementation: {{ .Implementation }}                            
-                  {{- end }}                                                       
-                  {{- if .ModelUri }}                                              
-                  modelUri: {{ .ModelUri }}                                        
-                  {{- end }}                                                       
-                  {{- if .EnvSecretRefName }}                                      
-                  envSecretRefName: {{ .EnvSecretRefName }}                        
-                  {{- end }}                                                       
-                  {{- if .Logger }}                                                
-                  logger:                                                          
-                    mode: {{ .Logger.Mode }}                                       
-                  {{- end }}                                                       
-                  {{- if .Parameters }}                                            
-                  parameters:                                                      
-                    {{- range .Parameters }}                                       
-                    - name: {{ .Name }}                                            
-                      type: {{ .Type }}                                            
-                      value: {{ .Value }}                                          
-                    {{- end }}                                                     
-                  {{- end }}                                                       
-                  children: []                                                     
-                {{- end }}                                                         
-              {{- else }}                                                          
-              children: []                                                         
-              {{- end }}                                                           
-        {{- with .ComponentSpec }}                                                 
-            componentSpecs:                                                        
-              - spec:                                                              
-                {{- if .ServiceAccountName }}                                      
-                serviceAccountName: {{ .ServiceAccountName }}                      
-                {{- end }}                                                         
-                {{- if .TerminationGracePeriodSeconds }}                           
-                terminationGracePeriodSeconds: {{ .TerminationGracePeriodSeconds }}
-                {{- end }}                                                         
-                containers:                                                        
-                {{- range .Containers }}                                           
-                  - name: {{ .Name }}                                              
-                    {{- if .Image }}                                               
-                    image: {{ .Image }}                                            
-                    {{- end }}                                                     
-                    {{- if .Env }}                                                 
-                    env:                                                           
-                      {{- range .Env }}                                            
-                      - name: {{ .Name }}                                          
-                        {{- if .Value }}                                           
-                        value: {{ .Value }}                                        
-                        {{- else if .ValueFrom }}                                  
-                        valueFrom:                                                 
-                          secretKeyRef:                                            
-                            name: {{ .ValueFrom.SecretKeyRef.Name }}               
-                            key: {{ .ValueFrom.SecretKeyRef.Key }}                 
-                        {{- end }}                                                 
-                      {{- end }}                                                   
-                    {{- end }}                                                     
-                    {{- if .Resources }}                                           
-                    resources:                                                     
-                      {{- if .Resources.Requests }}                                
-                      requests:                                                    
-                        {{- range $k, $v := .Resources.Requests }}                 
-                        {{ $k }}: {{ $v }}                                         
-                        {{- end }}                                                 
-                      {{- end }}                                                   
-                      {{- if .Resources.Limits }}                                  
-                      limits:                                                      
-                        {{- range $k, $v := .Resources.Limits }}                   
-                        {{ $k }}: {{ $v }}                                         
-                        {{- end }}                                                 
-                      {{- end }}                                                   
-                    {{- end }}                                                     
-                    {{- with .Liveness }}                                          
-                    livenessProbe:                                                 
-                      httpGet:                                                     
-                        path: {{ .Path }}                                          
-                        port: {{ .Port }}                                          
-                        scheme: HTTP                                               
-                      initialDelaySeconds: {{ .InitialDelaySeconds }}              
-                      periodSeconds: {{ .PeriodSeconds }}                          
-                      failureThreshold: {{ .FailureThreshold }}                    
-                      successThreshold: {{ .SuccessThreshold }}                    
-                    {{- end }}                                                     
-                    {{- with .Readiness }}                                         
-                    readinessProbe:                                                
-                      httpGet:                                                     
-                        path: {{ .Path }}                                          
-                        port: {{ .Port }}                                          
-                        scheme: HTTP                                               
-                      initialDelaySeconds: {{ .InitialDelaySeconds }}              
-                      periodSeconds: {{ .PeriodSeconds }}                          
-                      failureThreshold: {{ .FailureThreshold }}                    
-                      successThreshold: {{ .SuccessThreshold }}                    
-                    {{- end }}                                                     
-                {{- end }}                                                         
-        {{- end }}                                                                 
-        {{- end }}                                                                 
-                                                                                   
-  - path: .helmignore                                                              
-    template: false                                                                
-    content: |                                                                     
-      *.tgz                                                                        
-      .DS_Store                                                                    
-      .idea/                                                                       
-      *.swp                                                                        
-      __pycache__/                                                                 
-      .ipynb_checkpoints/                                                          
+  - path: templates/seldon-deployment.yaml
+    template: false
+    content: |
+      apiVersion: {{ .Values.ApiVersion }}
+      kind: SeldonDeployment
+      metadata:
+        name: {{ .Values.DeploymentName }}
+        namespace: {{ .Values.Namespace }}
+        {{- if .Values.Metadata.Labels }}
+        labels:
+        {{- range $k, $v := .Values.Metadata.Labels }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.Metadata.Annotations }}
+        annotations:
+        {{- range $k, $v := .Values.Metadata.Annotations }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+      spec:
+        name: {{ .Values.DeploymentName }}
+        predictors:
+        {{- range .Values.Predictors }}
+          - name: {{ .Name }}
+            replicas: {{ .Replicas }}
+            traffic: {{ .Traffic }}
+            {{- if .SvcOrchEnv }}
+            svcOrchSpec:
+              env:
+              {{- range .SvcOrchEnv }}
+                - name: {{ .Name }}
+                  {{- if .Value }}
+                  value: {{ .Value }}
+                  {{- else if .ValueFrom }}
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .ValueFrom.SecretKeyRef.Name }}
+                      key: {{ .ValueFrom.SecretKeyRef.Key }}
+                  {{- end }}
+              {{- end }}
+            {{- end }}
+            graph:
+              name: {{ .Graph.Name }}
+              type: {{ .Graph.Type }}
+              {{- if .Graph.Implementation }}
+              implementation: {{ .Graph.Implementation }}
+              {{- end }}
+              {{- if .Graph.ModelUri }}
+              modelUri: {{ .Graph.ModelUri }}
+              {{- end }}
+              {{- if .Graph.EndpointType }}
+              endpoint:
+                type: {{ .Graph.EndpointType }}
+              {{- end }}
+              {{- if .Graph.EnvSecretRefName }}
+              envSecretRefName: {{ .Graph.EnvSecretRefName }}
+              {{- end }}
+              {{- if .Graph.Logger }}
+              logger:
+                mode: {{ .Graph.Logger.Mode }}
+              {{- end }}
+              {{- if .Graph.Parameters }}
+              parameters:
+              {{- range .Graph.Parameters }}
+                - name: {{ .Name }}
+                  type: {{ .Type }}
+                  value: {{ .Value }}
+              {{- end }}
+              {{- end }}
+              {{- if .Graph.Children }}
+              children:
+              {{- range .Graph.Children }}
+                - name: {{ .Name }}
+                  type: {{ .Type }}
+                  {{- if .Implementation }}
+                  implementation: {{ .Implementation }}
+                  {{- end }}
+                  {{- if .ModelUri }}
+                  modelUri: {{ .ModelUri }}
+                  {{- end }}
+                  {{- if .Logger }}
+                  logger:
+                    mode: {{ .Logger.Mode }}
+                  {{- end }}
+                  {{- if .Parameters }}
+                  parameters:
+                  {{- range .Parameters }}
+                    - name: {{ .Name }}
+                      type: {{ .Type }}
+                      value: {{ .Value }}
+                  {{- end }}
+                  {{- end }}
+                  children: []
+              {{- end }}
+              {{- end }}
+            componentSpecs:
+              - spec:
+                  {{- if .ComponentSpec.ServiceAccountName }}
+                  serviceAccountName: {{ .ComponentSpec.ServiceAccountName }}
+                  {{- end }}
+                  {{- if .ComponentSpec.TerminationGracePeriodSeconds }}
+                  terminationGracePeriodSeconds: {{ .ComponentSpec.TerminationGracePeriodSeconds }}
+                  {{- end }}
+                  containers:
+                  {{- range .ComponentSpec.Containers }}
+                    - name: {{ .Name }}
+                      {{- if .Image }}
+                      image: {{ .Image }}
+                      {{- end }}
+                      {{- if .ImagePullPolicy }}
+                      imagePullPolicy: {{ .ImagePullPolicy }}
+                      {{- end }}
+                      {{- if .Env }}
+                      env:
+                        {{- range .Env }}
+                        - name: {{ .Name }}
+                          {{- if .Value }}
+                          value: {{ .Value }}
+                          {{- else if .ValueFrom }}
+                          valueFrom:
+                            secretKeyRef:
+                              name: {{ .ValueFrom.SecretKeyRef.Name }}
+                              key: {{ .ValueFrom.SecretKeyRef.Key }}
+                          {{- end }}
+                        {{- end }}
+                      {{- end }}
+                      {{- if .VolumeMounts }}
+                      volumeMounts:
+                        {{- range .VolumeMounts }}
+                        - name: {{ .Name }}
+                          mountPath: {{ .MountPath }}
+                          {{- if .ReadOnly }}
+                          readOnly: {{ .ReadOnly }}
+                          {{- end }}
+                        {{- end }}
+                      {{- end }}
+                      {{- if .Resources }}
+                      resources:
+                        {{- if .Resources.Requests }}
+                        requests:
+                          {{- range $k, $v := .Resources.Requests }}
+                          {{ $k }}: {{ $v }}
+                          {{- end }}
+                        {{- end }}
+                        {{- if .Resources.Limits }}
+                        limits:
+                          {{- range $k, $v := .Resources.Limits }}
+                          {{ $k }}: {{ $v }}
+                          {{- end }}
+                        {{- end }}
+                      {{- end }}
+                      {{- if .Liveness }}
+                      livenessProbe:
+                        httpGet:
+                          path: {{ .Liveness.Path }}
+                          port: {{ .Liveness.Port }}
+                          scheme: HTTP
+                        initialDelaySeconds: {{ .Liveness.InitialDelaySeconds }}
+                        periodSeconds: {{ .Liveness.PeriodSeconds }}
+                        failureThreshold: {{ .Liveness.FailureThreshold }}
+                        successThreshold: {{ .Liveness.SuccessThreshold }}
+                      {{- end }}
+                      {{- if .Readiness }}
+                      readinessProbe:
+                        httpGet:
+                          path: {{ .Readiness.Path }}
+                          port: {{ .Readiness.Port }}
+                          scheme: HTTP
+                        initialDelaySeconds: {{ .Readiness.InitialDelaySeconds }}
+                        periodSeconds: {{ .Readiness.PeriodSeconds }}
+                        failureThreshold: {{ .Readiness.FailureThreshold }}
+                        successThreshold: {{ .Readiness.SuccessThreshold }}
+                      {{- end }}
+                  {{- end }}
+                  {{- if .ComponentSpec.Volumes }}
+                  volumes:
+                    {{- range .ComponentSpec.Volumes }}
+                    - name: {{ .Name }}
+                      {{- if .EmptyDir }}
+                      emptyDir: {}
+                      {{- end }}
+                      {{- if .Secret }}
+                      secret:
+                        secretName: {{ .Secret.SecretName }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+        {{- end }}
+
+
+  - path: .helmignore
+    template: false
+    content: |
+      *.tgz
+      .DS_Store
+      .idea/
+      *.swp
+      __pycache__/
+      .ipynb_checkpoints/
 
 valuesSchema:
   chart.name:

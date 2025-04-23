@@ -1,77 +1,86 @@
 {
   "Environment": "TEST",
+  "ApiVersion": "machinelearning.seldon.io/v1",
   "Chart": {
-    "Name": "fs33kafka-chart",
+    "Name": "router-graph",
     "Version": "0.1.0",
-    "Description": "Loan approval predictor"
+    "Description": "A router with multiple child models"
   },
-  "DeploymentName": "fs33kafka",
-  "Namespace": "app-fdd",
+  "DeploymentName": "graph-metadata-router",
+  "Namespace": "default",
+  "Metadata": {
+    "Labels": {
+      "team": "ml"
+    },
+    "Annotations": {
+      "note": "test router graph"
+    }
+  },
   "Predictors": [
     {
-      "Name": "loan-approval",
+      "Name": "example",
       "Replicas": 1,
       "Traffic": 100,
-      "SvcOrchEnv": [
-        { "Name": "LOGGER_KAFKA_BROKER", "Value": "kafka-kafka-0.kafka..." },
-        { "Name": "KAFKA_SSL_CA_CERT", "ValueFrom": { "SecretKeyRef": { "Name": "kafka-cluster-creds", "Key": "cluster-ca.cert" } } }
-      ],
-      "ComponentSpec": {
-        "ServiceAccountName": "default-editor",
-        "TerminationGracePeriodSeconds": 0,
-        "Containers": [
+      "SvcOrchEnv": [],
+      "Graph": {
+        "Name": "node-router",
+        "Type": "ROUTER",
+        "Children": [
           {
-            "Name": "fs33kafka",
-            "Env": [
-              { "Name": "GUNICORN_WORKERS", "Value": "2" },
-              { "Name": "GUNICORN_THREADS", "Value": "2" }
-            ],
-            "Resources": {
-              "Requests": { "cpu": "2.0", "memory": "4.0Gi" },
-              "Limits": { "cpu": "2.0", "memory": "4.0Gi" }
-            },
-            "Liveness": {
-              "Path": "/health/ping",
-              "Port": "http",
-              "InitialDelaySeconds": 80,
-              "PeriodSeconds": 5,
-              "FailureThreshold": 200,
-              "SuccessThreshold": 1
-            },
-            "Readiness": {
-              "Path": "/health/ping",
-              "Port": "http",
-              "InitialDelaySeconds": 80,
-              "PeriodSeconds": 5,
-              "FailureThreshold": 200,
-              "SuccessThreshold": 1
-            }
+            "Name": "node-one",
+            "Type": "MODEL",
+            "Implementation": "SKLEARN_SERVER",
+            "ModelUri": "gs://seldon-models/sklearn/iris-one",
+            "Children": []
           },
           {
-            "Name": "input-transformer",
-            "Image": "harbor.../feast-rest-enricher:v0.1.0",
-            "Env": [
-              { "Name": "modelURI", "Value": "s3://..." },
-              { "Name": "AWS_ACCESS_KEY_ID", "Value": "..." }
-            ]
+            "Name": "node-two",
+            "Type": "MODEL",
+            "Implementation": "SKLEARN_SERVER",
+            "ModelUri": "gs://seldon-models/sklearn/iris-two",
+            "Children": []
           }
         ]
       },
-      "Graph": {
-        "Name": "input-transformer",
-        "Type": "TRANSFORMER",
-        "EndpointType": "REST",
-        "Children": [
+      "ComponentSpec": {
+        "ServiceAccountName": "default",
+        "TerminationGracePeriodSeconds": 20,
+        "Containers": [
           {
-            "Name": "fs33kafka",
-            "Type": "MODEL",
-            "Implementation": "MLFLOW_SERVER",
-            "ModelUri": "s3://...",
-            "EnvSecretRefName": "seldon-secret",
-            "Logger": { "Mode": "response" },
-            "Parameters": [
-              { "Name": "xtype", "Type": "STRING", "Value": "DataFrame" }
-            ]
+            "Name": "router",
+            "Image": "myregistry/router:latest",
+            "ImagePullPolicy": "IfNotPresent",
+            "Env": [
+              {
+                "Name": "MODEL_ENV",
+                "Value": "router"
+              }
+            ],
+            "VolumeMounts": [
+              {
+                "Name": "config-vol",
+                "MountPath": "/etc/config",
+                "ReadOnly": true
+              }
+            ],
+            "Resources": {
+              "Requests": {
+                "cpu": "100m",
+                "memory": "256Mi"
+              },
+              "Limits": {
+                "cpu": "500m",
+                "memory": "512Mi"
+              }
+            }
+          }
+        ],
+        "Volumes": [
+          {
+            "Name": "config-vol",
+            "Secret": {
+              "SecretName": "router-config-secret"
+            }
           }
         ]
       }

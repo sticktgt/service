@@ -14,9 +14,11 @@ import (
 
 type Values struct {
 	Environment    string      `json:"Environment"`
+	ApiVersion     string      `json:"ApiVersion"`
 	Chart          Chart       `json:"Chart"`
 	DeploymentName string      `json:"DeploymentName"`
 	Namespace      string      `json:"Namespace"`
+	Metadata       Metadata    `json:"Metadata"`
 	Predictors     []Predictor `json:"Predictors"`
 }
 
@@ -26,55 +28,33 @@ type Chart struct {
 	Description string `json:"Description"`
 }
 
+type Metadata struct {
+	Labels      map[string]string `json:"Labels,omitempty"`
+	Annotations map[string]string `json:"Annotations,omitempty"`
+}
+
 type Predictor struct {
 	Name          string        `json:"Name"`
 	Replicas      int           `json:"Replicas"`
 	Traffic       int           `json:"Traffic"`
 	SvcOrchEnv    []EnvVar      `json:"SvcOrchEnv,omitempty"`
-	ComponentSpec ComponentSpec `json:"ComponentSpec"`
 	Graph         GraphNode     `json:"Graph"`
+	ComponentSpec ComponentSpec `json:"ComponentSpec"`
 }
 
 type EnvVar struct {
 	Name      string     `json:"Name"`
 	Value     string     `json:"Value,omitempty"`
-	ValueFrom *SecretRef `json:"ValueFrom,omitempty"`
+	ValueFrom *ValueFrom `json:"ValueFrom,omitempty"`
 }
 
-type SecretRef struct {
-	SecretKeyRef struct {
-		Name string `json:"Name"`
-		Key  string `json:"Key"`
-	} `json:"SecretKeyRef"`
+type ValueFrom struct {
+	SecretKeyRef SecretKeyRef `json:"SecretKeyRef"`
 }
 
-type ComponentSpec struct {
-	ServiceAccountName            string               `json:"ServiceAccountName"`
-	TerminationGracePeriodSeconds int                  `json:"TerminationGracePeriodSeconds"`
-	Containers                    []ComponentContainer `json:"Containers"`
-}
-
-type ComponentContainer struct {
-	Name      string     `json:"Name"`
-	Image     string     `json:"Image,omitempty"`
-	Env       []EnvVar   `json:"Env,omitempty"`
-	Resources *Resources `json:"Resources,omitempty"`
-	Liveness  *Probe     `json:"Liveness,omitempty"`
-	Readiness *Probe     `json:"Readiness,omitempty"`
-}
-
-type Resources struct {
-	Requests map[string]string `json:"Requests,omitempty"`
-	Limits   map[string]string `json:"Limits,omitempty"`
-}
-
-type Probe struct {
-	Path                string `json:"Path"`
-	Port                string `json:"Port"`
-	InitialDelaySeconds int    `json:"InitialDelaySeconds"`
-	PeriodSeconds       int    `json:"PeriodSeconds"`
-	FailureThreshold    int    `json:"FailureThreshold"`
-	SuccessThreshold    int    `json:"SuccessThreshold"`
+type SecretKeyRef struct {
+	Name string `json:"Name"`
+	Key  string `json:"Key"`
 }
 
 type GraphNode struct {
@@ -84,9 +64,13 @@ type GraphNode struct {
 	ModelUri         string      `json:"ModelUri,omitempty"`
 	EndpointType     string      `json:"EndpointType,omitempty"`
 	EnvSecretRefName string      `json:"EnvSecretRefName,omitempty"`
-	Parameters       []Parameter `json:"Parameters,omitempty"`
 	Logger           *Logger     `json:"Logger,omitempty"`
+	Parameters       []Parameter `json:"Parameters,omitempty"`
 	Children         []GraphNode `json:"Children,omitempty"`
+}
+
+type Logger struct {
+	Mode string `json:"Mode"`
 }
 
 type Parameter struct {
@@ -95,8 +79,52 @@ type Parameter struct {
 	Value string `json:"Value"`
 }
 
-type Logger struct {
-	Mode string `json:"Mode"`
+type ComponentSpec struct {
+	ServiceAccountName            string      `json:"ServiceAccountName,omitempty"`
+	TerminationGracePeriodSeconds int         `json:"TerminationGracePeriodSeconds,omitempty"`
+	Containers                    []Container `json:"Containers"`
+	Volumes                       []Volume    `json:"Volumes,omitempty"`
+}
+
+type Container struct {
+	Name            string        `json:"Name"`
+	Image           string        `json:"Image,omitempty"`
+	ImagePullPolicy string        `json:"ImagePullPolicy,omitempty"`
+	Env             []EnvVar      `json:"Env,omitempty"`
+	VolumeMounts    []VolumeMount `json:"VolumeMounts,omitempty"`
+	Resources       *Resources    `json:"Resources,omitempty"`
+	Liveness        *Probe        `json:"Liveness,omitempty"`
+	Readiness       *Probe        `json:"Readiness,omitempty"`
+}
+
+type VolumeMount struct {
+	Name      string `json:"Name"`
+	MountPath string `json:"MountPath"`
+	ReadOnly  bool   `json:"ReadOnly,omitempty"`
+}
+
+type Volume struct {
+	Name     string              `json:"Name"`
+	EmptyDir *struct{}           `json:"EmptyDir,omitempty"`
+	Secret   *SecretVolumeSource `json:"Secret,omitempty"`
+}
+
+type SecretVolumeSource struct {
+	SecretName string `json:"SecretName"`
+}
+
+type Resources struct {
+	Requests map[string]string `json:"Requests,omitempty"`
+	Limits   map[string]string `json:"Limits,omitempty"`
+}
+
+type Probe struct {
+	Path                string `json:"Path"`
+	Port                int    `json:"Port"`
+	InitialDelaySeconds int    `json:"InitialDelaySeconds"`
+	PeriodSeconds       int    `json:"PeriodSeconds"`
+	FailureThreshold    int    `json:"FailureThreshold"`
+	SuccessThreshold    int    `json:"SuccessThreshold"`
 }
 
 // ChartTemplate maps the structure of seldon.meta.yaml
