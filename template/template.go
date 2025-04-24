@@ -80,10 +80,11 @@ type Parameter struct {
 }
 
 type ComponentSpec struct {
-	ServiceAccountName            string      `json:"ServiceAccountName,omitempty"`
-	TerminationGracePeriodSeconds int         `json:"TerminationGracePeriodSeconds,omitempty"`
-	Containers                    []Container `json:"Containers"`
-	Volumes                       []Volume    `json:"Volumes,omitempty"`
+	ServiceAccountName            string          `json:"ServiceAccountName,omitempty"`
+	TerminationGracePeriodSeconds int             `json:"TerminationGracePeriodSeconds,omitempty"`
+	Containers                    []Container     `json:"Containers"`
+	Volumes                       []Volume        `json:"Volumes,omitempty"`
+	InitContainers                []InitContainer `json:"InitContainers,omitempty"`
 }
 
 type Container struct {
@@ -125,6 +126,23 @@ type Probe struct {
 	PeriodSeconds       int    `json:"PeriodSeconds"`
 	FailureThreshold    int    `json:"FailureThreshold"`
 	SuccessThreshold    int    `json:"SuccessThreshold"`
+}
+
+type InitContainer struct {
+	Name            string        `json:"Name"`
+	Image           string        `json:"Image"`
+	ImagePullPolicy string        `json:"ImagePullPolicy"`
+	Args            []string      `json:"Args"`
+	VolumeMounts    []VolumeMount `json:"VolumeMounts"`
+	EnvFrom         []EnvFromItem `json:"EnvFrom,omitempty"`
+}
+
+type EnvFromItem struct {
+	SecretRef *SecretRef `json:"SecretRef,omitempty"`
+}
+
+type SecretRef struct {
+	Name string `json:"Name"`
 }
 
 // ChartTemplate maps the structure of seldon.meta.yaml

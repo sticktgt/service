@@ -75,6 +75,30 @@
             }
           }
         ],
+        "InitContainers": [
+          {
+            "Name": "initRouter",
+            "Image": "myregistry/router:latest",
+            "ImagePullPolicy": "IfNotPresent",
+            "Args": [
+              "initRouter"
+            ],
+            "VolumeMounts": [
+              {
+                "Name": "config-vol",
+                "MountPath": "/etc/config",
+                "ReadOnly": true
+              }
+            ],
+            "EnvFrom": [
+              {
+                "SecretRef": {
+                  "Name": "r-r-r"
+                }
+              }
+            ]
+          }
+        ],
         "Volumes": [
           {
             "Name": "config-vol",

@@ -104,8 +104,28 @@ files:
               {{- end }}
           {{- end }}
           Graph:
-            {{- if .Graph.ModelUri }}
-            ModelUri: {{ .Graph.ModelUri }}
+            Name: {{ .Graph.Name }}
+            Type: {{ .Graph.Type }}
+            {{- if .Graph.Implementation }}
+            Implementation: {{ .Graph.Implementation }}
+            {{- end }}
+            {{- if .Graph.EndpointType }}
+            EndpointType: {{ .Graph.EndpointType }}
+            {{- end }}
+            {{- if .Graph.EnvSecretRefName }}
+            EnvSecretRefName: {{ .Graph.EnvSecretRefName }}
+            {{- end }}
+            {{- if .Graph.Logger }}
+            Logger:
+              Mode: {{ .Graph.Logger.Mode }}
+            {{- end }}
+            {{- if .Graph.Parameters }}
+            Parameters:
+              {{- range .Graph.Parameters }}
+              - Name: {{ .Name }}
+                Type: {{ .Type }}
+                Value: {{ .Value }}
+              {{- end }}
             {{- end }}
             {{- if .Graph.Children }}
             Children:
@@ -215,6 +235,32 @@ files:
                   {{- end }}
                 {{- end }}
               {{- end }}
+            {{- if .ComponentSpec.InitContainers }}  
+            InitContainers:
+              {{- range .ComponentSpec.InitContainers }}
+              - Name: {{ .Name }}
+                Image: {{ .Image }}
+                ImagePullPolicy: {{ .ImagePullPolicy }}
+                Args:
+                  {{- range .Args }}
+                  - {{ . }}
+                  {{- end }}
+                VolumeMounts:
+                  {{- range .VolumeMounts }}
+                  - Name: {{ .Name }}
+                    MountPath: {{ .MountPath }}
+                  {{- end }}
+                {{- if .EnvFrom }}
+                EnvFrom:
+                  {{- range .EnvFrom }}
+                    {{- if .SecretRef }}
+                    - SecretRef:
+                        Name: {{ .SecretRef.Name }}
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+            {{- end }}  
       {{- end }}
 
   - path: templates/seldon-deployment.yaml
@@ -392,6 +438,32 @@ files:
                         successThreshold: {{ .Readiness.SuccessThreshold }}
                       {{- end }}
                   {{- end }}
+                  {{- if .ComponentSpec.InitContainers }}
+                  initContainers:
+                    {{- range .ComponentSpec.InitContainers }}
+                    - name: {{ .Name }}
+                      image: {{ .Image }}
+                      imagePullPolicy: {{ .ImagePullPolicy }}
+                      args:
+                        {{- range .Args }}
+                        - {{ . }}
+                        {{- end }}
+                      volumeMounts:
+                        {{- range .VolumeMounts }}
+                        - name: {{ .Name }}
+                          mountPath: {{ .MountPath }}
+                        {{- end }}
+                      {{- if .EnvFrom }}
+                      envFrom:
+                        {{- range .EnvFrom }}
+                          {{- if .SecretRef }}
+                        - secretRef:
+                            name: {{ .SecretRef.Name }}
+                          {{- end }}
+                        {{- end }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
                   {{- if .ComponentSpec.Volumes }}
                   volumes:
                     {{- range .ComponentSpec.Volumes }}
@@ -419,153 +491,109 @@ files:
       .ipynb_checkpoints/
 
 valuesSchema:
-  chart.name:
+  Environment:
     type: string
-    description: The Helm chart name
+    description: Target environment (e.g., TEST, PROD)
     required: true
-  chart.version:
+  ApiVersion:
+    type: string
+    description: SeldonDeployment API version
+    required: true
+  Chart.Name:
+    type: string
+    description: Helm chart name
+    required: true
+  Chart.Version:
     type: string
     description: Helm chart version
     required: true
-  chart.description:
+  Chart.Description:
     type: string
-    description: Short description of the chart
+    description: Helm chart description
     required: true
   DeploymentName:
     type: string
-    description: Name of the SeldonDeployment resource
+    description: Name of the SeldonDeployment
     required: true
   Namespace:
     type: string
-    description: Kubernetes namespace where the deployment will be created
+    description: Kubernetes namespace for deployment
     required: true
+  Metadata.Labels:
+    type: object
+    description: Labels applied to the SeldonDeployment
+    required: false
+  Metadata.Annotations:
+    type: object
+    description: Annotations applied to the SeldonDeployment
+    required: false
   Predictors[].Name:
     type: string
     description: Name of the predictor
     required: true
   Predictors[].Replicas:
     type: integer
-    description: Number of replicas to deploy
+    description: Number of replicas
     required: true
   Predictors[].Traffic:
     type: integer
-    description: Traffic percentage assigned to this predictor
-    required: false
-  Predictors[].SvcOrchEnv[]:
-    type: object
-    description: Environment variables for the orchestrator container
+    description: Percentage of traffic to this predictor
+    required: true
+  Predictors[].SvcOrchEnv:
+    type: array
+    description: Orchestrator environment variables
     required: false
   Predictors[].SvcOrchEnv[].Name:
     type: string
-    description: Environment variable name
+    description: Orchestrator env var name
     required: true
   Predictors[].SvcOrchEnv[].Value:
     type: string
-    description: Plain value for the environment variable
+    description: Env var value
     required: false
-  Predictors[].SvcOrchEnv[].ValueFrom.secretKeyRef.name:
-    type: string
-    description: Secret name for valueFrom reference
-    required: false
-  Predictors[].SvcOrchEnv[].ValueFrom.secretKeyRef.key:
-    type: string
-    description: Secret key for valueFrom reference
-    required: false
-  Predictors[].ComponentContainers[]:
+  Predictors[].SvcOrchEnv[].ValueFrom:
     type: object
-    description: Additional containers in the predictor pod
+    description: Use value from a Kubernetes secret
     required: false
-  Predictors[].ComponentContainers[].Name:
-    type: string
-    description: Name of the container
-    required: true
-  Predictors[].ComponentContainers[].Image:
-    type: string
-    description: Docker image used for the container
-    required: false
-  Predictors[].ComponentContainers[].Env[]:
+  Predictors[].SvcOrchEnv[].ValueFrom.SecretKeyRef:
     type: object
-    description: Environment variables for the container
+    description: Secret key reference for env variable
     required: false
-  Predictors[].ComponentContainers[].Env[].Name:
+  Predictors[].SvcOrchEnv[].ValueFrom.SecretKeyRef.Name:
     type: string
-    description: Environment variable name
-    required: true
-  Predictors[].ComponentContainers[].Env[].Value:
+    description: Name of the Kubernetes secret
+    required: false
+  Predictors[].SvcOrchEnv[].ValueFrom.SecretKeyRef.Key:
     type: string
-    description: Environment variable value
-    required: true
-  Predictors[].ComponentContainers[].Resources.Requests:
-    type: object
-    description: Resource requests (e.g. cpu, memory)
+    description: Key of the Kubernetes secret
     required: false
-  Predictors[].ComponentContainers[].Resources.Limits:
-    type: object
-    description: Resource limits (e.g. cpu, memory)
-    required: false
-  Predictors[].ComponentContainers[].Liveness:
-    type: object
-    description: Liveness probe configuration
-    required: false
-  Predictors[].ComponentContainers[].Liveness.Path:
-    type: string
-    description: HTTP path for liveness probe
-    required: true
-  Predictors[].ComponentContainers[].Liveness.Port:
-    type: string
-    description: Port used for liveness probe
-    required: true
-  Predictors[].ComponentContainers[].Liveness.InitialDelaySeconds:
-    type: integer
-    description: Initial delay in seconds before liveness probe starts
-    required: true
-  Predictors[].ComponentContainers[].Liveness.PeriodSeconds:
-    type: integer
-    description: Period between liveness checks
-    required: true
-  Predictors[].ComponentContainers[].Liveness.FailureThreshold:
-    type: integer
-    description: Failure threshold for liveness probe
-    required: true
-  Predictors[].ComponentContainers[].Liveness.SuccessThreshold:
-    type: integer
-    description: Success threshold for liveness probe
-    required: true
-  Predictors[].ComponentContainers[].Readiness:
-    type: object
-    description: Readiness probe configuration
-    required: false
-  Predictors[].Graph:
-    type: object
-    description: Root node of the model graph
-    required: true
   Predictors[].Graph.Name:
     type: string
-    description: Name of the graph node
+    description: Name of the graph root node
     required: true
   Predictors[].Graph.Type:
     type: string
-    description: Type of the node (e.g. MODEL, ROUTER, TRANSFORMER)
+    description: Type of graph node (MODEL, ROUTER, TRANSFORMER)
     required: true
   Predictors[].Graph.Implementation:
     type: string
-    description: Implementation type (e.g. MLFLOW_SERVER)
+    description: Model server implementation
     required: false
   Predictors[].Graph.ModelUri:
     type: string
-    description: Model storage URI
+    description: URI to the model
     required: false
   Predictors[].Graph.EndpointType:
     type: string
-    description: Endpoint type (e.g. REST, GRPC)
+    description: Endpoint type (REST/GRPC)
     required: false
   Predictors[].Graph.EnvSecretRefName:
     type: string
-    description: Kubernetes secret name used for accessing model storage
+    description: Reference to secret for graph node
     required: false
-  Predictors[].Graph.Parameters[]:
-    type: object
-    description: Parameters for the graph node
+  Predictors[].Graph.Logger.Mode:
+    type: string
+    description: Logging mode for the graph node
     required: false
   Predictors[].Graph.Parameters[].Name:
     type: string
@@ -573,17 +601,97 @@ valuesSchema:
     required: true
   Predictors[].Graph.Parameters[].Type:
     type: string
-    description: Parameter type (e.g. STRING, INT)
+    description: Parameter type (STRING, INT)
     required: true
   Predictors[].Graph.Parameters[].Value:
     type: string
     description: Parameter value
     required: true
-  Predictors[].Graph.Logger.Mode:
-    type: string
-    description: Logger mode (e.g. all, request, response)
-    required: false
   Predictors[].Graph.Children:
     type: array
-    description: Child graph nodes
+    description: Children of the root graph node
+    required: false
+  Predictors[].ComponentSpec.ServiceAccountName:
+    type: string
+    description: Service account for the predictor
+    required: false
+  Predictors[].ComponentSpec.TerminationGracePeriodSeconds:
+    type: integer
+    description: Grace period before termination
+    required: false
+  Predictors[].ComponentSpec.Containers[].Name:
+    type: string
+    description: Container name
+    required: true
+  Predictors[].ComponentSpec.Containers[].Image:
+    type: string
+    description: Docker image for container
+    required: false
+  Predictors[].ComponentSpec.Containers[].ImagePullPolicy:
+    type: string
+    description: Image pull policy
+    required: false
+  Predictors[].ComponentSpec.Containers[].Env:
+    type: array
+    description: Container environment variables
+    required: false
+  Predictors[].ComponentSpec.Containers[].Env[].Name:
+    type: string
+    description: Environment variable name
+    required: true
+  Predictors[].ComponentSpec.Containers[].Env[].Value:
+    type: string
+    description: Environment variable value
+    required: false
+  Predictors[].ComponentSpec.Containers[].Env[].ValueFrom:
+    type: object
+    description: Use value from a Kubernetes secret
+    required: false
+  Predictors[].ComponentSpec.Containers[].Env[].ValueFrom.SecretKeyRef:
+    type: object
+    description: Secret key reference for container env variable
+    required: false
+  Predictors[].ComponentSpec.Containers[].Env[].ValueFrom.SecretKeyRef.Name:
+    type: string
+    description: Name of the Kubernetes secret
+    required: false
+  Predictors[].ComponentSpec.Containers[].Env[].ValueFrom.SecretKeyRef.Key:
+    type: string
+    description: Key of the Kubernetes secret
+    required: false
+  Predictors[].ComponentSpec.Containers[].VolumeMounts[].Name:
+    type: string
+    description: Volume mount name
+    required: false
+  Predictors[].ComponentSpec.Containers[].VolumeMounts[].MountPath:
+    type: string
+    description: Mount path inside container
+    required: false
+  Predictors[].ComponentSpec.Containers[].VolumeMounts[].ReadOnly:
+    type: boolean
+    description: If the mount is read-only
+    required: false
+  Predictors[].ComponentSpec.Containers[].Resources.Requests:
+    type: object
+    description: Resource requests
+    required: false
+  Predictors[].ComponentSpec.Containers[].Resources.Limits:
+    type: object
+    description: Resource limits
+    required: false
+  Predictors[].ComponentSpec.Containers[].Liveness:
+    type: object
+    description: Liveness probe
+    required: false
+  Predictors[].ComponentSpec.Containers[].Readiness:
+    type: object
+    description: Readiness probe
+    required: false
+  Predictors[].ComponentSpec.Volumes[].Name:
+    type: string
+    description: Volume name
+    required: false
+  Predictors[].ComponentSpec.Volumes[].Secret.SecretName:
+    type: string
+    description: Name of the secret volume
     required: false
