@@ -493,205 +493,221 @@ files:
 valuesSchema:
   Environment:
     type: string
-    description: Target environment (e.g., TEST, PROD)
+    description: Target environment such as TEST, STAGING, or PROD
     required: true
   ApiVersion:
     type: string
-    description: SeldonDeployment API version
+    description: Kubernetes API version for SeldonDeployment resource
     required: true
   Chart.Name:
     type: string
-    description: Helm chart name
+    description: Name of the Helm chart
     required: true
   Chart.Version:
     type: string
-    description: Helm chart version
+    description: Version of the Helm chart
     required: true
   Chart.Description:
     type: string
-    description: Helm chart description
+    description: Short description of the chart's purpose
     required: true
   DeploymentName:
     type: string
-    description: Name of the SeldonDeployment
+    description: Name of the SeldonDeployment resource
     required: true
   Namespace:
     type: string
-    description: Kubernetes namespace for deployment
+    description: Kubernetes namespace to deploy the resources in
     required: true
   Metadata.Labels:
     type: object
-    description: Labels applied to the SeldonDeployment
+    description: Key-value pairs used to categorize and select Kubernetes objects
     required: false
   Metadata.Annotations:
     type: object
-    description: Annotations applied to the SeldonDeployment
+    description: Additional metadata for tooling, policies, and configuration
     required: false
   Predictors[].Name:
     type: string
-    description: Name of the predictor
+    description: Unique name of the predictor
     required: true
   Predictors[].Replicas:
     type: integer
-    description: Number of replicas
+    description: Number of model replicas to deploy
     required: true
   Predictors[].Traffic:
     type: integer
-    description: Percentage of traffic to this predictor
-    required: true
+    description: Percentage of traffic assigned to this predictor
+    required: false
   Predictors[].SvcOrchEnv:
     type: array
-    description: Orchestrator environment variables
+    description: Environment variables for the orchestrator container
     required: false
   Predictors[].SvcOrchEnv[].Name:
     type: string
-    description: Orchestrator env var name
+    description: Name of environment variable for orchestrator
     required: true
   Predictors[].SvcOrchEnv[].Value:
     type: string
-    description: Env var value
-    required: false
-  Predictors[].SvcOrchEnv[].ValueFrom:
-    type: object
-    description: Use value from a Kubernetes secret
-    required: false
-  Predictors[].SvcOrchEnv[].ValueFrom.SecretKeyRef:
-    type: object
-    description: Secret key reference for env variable
+    description: Value of environment variable for orchestrator
     required: false
   Predictors[].SvcOrchEnv[].ValueFrom.SecretKeyRef.Name:
     type: string
-    description: Name of the Kubernetes secret
+    description: Name of the Kubernetes secret to use in env variable
     required: false
   Predictors[].SvcOrchEnv[].ValueFrom.SecretKeyRef.Key:
     type: string
-    description: Key of the Kubernetes secret
+    description: Key in the Kubernetes secret to use in env variable
     required: false
   Predictors[].Graph.Name:
     type: string
-    description: Name of the graph root node
+    description: Name of the root node in the prediction graph
     required: true
   Predictors[].Graph.Type:
     type: string
-    description: Type of graph node (MODEL, ROUTER, TRANSFORMER)
-    required: true
+    description: Type of the graph node (MODEL, ROUTER, TRANSFORMER)
+    required: false
   Predictors[].Graph.Implementation:
     type: string
-    description: Model server implementation
+    description: Implementation of the model server (e.g. SKLEARN_SERVER)
     required: false
   Predictors[].Graph.ModelUri:
     type: string
-    description: URI to the model
+    description: URI to the stored model (S3, GCS, local, etc.)
     required: false
   Predictors[].Graph.EndpointType:
     type: string
-    description: Endpoint type (REST/GRPC)
+    description: Type of endpoint exposed by the graph (REST or GRPC)
     required: false
   Predictors[].Graph.EnvSecretRefName:
     type: string
-    description: Reference to secret for graph node
+    description: Name of secret to pull environment credentials from
     required: false
   Predictors[].Graph.Logger.Mode:
     type: string
-    description: Logging mode for the graph node
+    description: Logging mode (all, request, response)
     required: false
   Predictors[].Graph.Parameters[].Name:
     type: string
-    description: Parameter name
+    description: Name of a parameter used in the node
     required: true
   Predictors[].Graph.Parameters[].Type:
     type: string
-    description: Parameter type (STRING, INT)
+    description: Data type of the parameter (STRING, INT, FLOAT)
     required: true
   Predictors[].Graph.Parameters[].Value:
     type: string
-    description: Parameter value
+    description: Value of the parameter
     required: true
   Predictors[].Graph.Children:
     type: array
-    description: Children of the root graph node
+    description: Child nodes in the prediction graph
     required: false
   Predictors[].ComponentSpec.ServiceAccountName:
     type: string
-    description: Service account for the predictor
+    description: Service account used by pods for access control
     required: false
   Predictors[].ComponentSpec.TerminationGracePeriodSeconds:
     type: integer
-    description: Grace period before termination
+    description: Time (in seconds) for graceful shutdown
     required: false
   Predictors[].ComponentSpec.Containers[].Name:
     type: string
-    description: Container name
+    description: Name of the container in the pod
     required: true
   Predictors[].ComponentSpec.Containers[].Image:
     type: string
-    description: Docker image for container
-    required: false
+    description: Docker image to use in the container
+    required: true
   Predictors[].ComponentSpec.Containers[].ImagePullPolicy:
     type: string
-    description: Image pull policy
-    required: false
-  Predictors[].ComponentSpec.Containers[].Env:
-    type: array
-    description: Container environment variables
+    description: Image pull policy (Always, IfNotPresent, Never)
     required: false
   Predictors[].ComponentSpec.Containers[].Env[].Name:
     type: string
-    description: Environment variable name
+    description: Name of environment variable
     required: true
   Predictors[].ComponentSpec.Containers[].Env[].Value:
     type: string
-    description: Environment variable value
-    required: false
-  Predictors[].ComponentSpec.Containers[].Env[].ValueFrom:
-    type: object
-    description: Use value from a Kubernetes secret
-    required: false
-  Predictors[].ComponentSpec.Containers[].Env[].ValueFrom.SecretKeyRef:
-    type: object
-    description: Secret key reference for container env variable
+    description: Value of environment variable
     required: false
   Predictors[].ComponentSpec.Containers[].Env[].ValueFrom.SecretKeyRef.Name:
     type: string
-    description: Name of the Kubernetes secret
+    description: Name of the Kubernetes secret to reference
     required: false
   Predictors[].ComponentSpec.Containers[].Env[].ValueFrom.SecretKeyRef.Key:
     type: string
-    description: Key of the Kubernetes secret
+    description: Key inside the referenced secret
     required: false
   Predictors[].ComponentSpec.Containers[].VolumeMounts[].Name:
     type: string
-    description: Volume mount name
-    required: false
+    description: Name of the volume to mount
+    required: true
   Predictors[].ComponentSpec.Containers[].VolumeMounts[].MountPath:
     type: string
-    description: Mount path inside container
-    required: false
+    description: Path in container where volume will be mounted
+    required: true
   Predictors[].ComponentSpec.Containers[].VolumeMounts[].ReadOnly:
     type: boolean
-    description: If the mount is read-only
+    description: Whether the volume mount should be read-only
     required: false
   Predictors[].ComponentSpec.Containers[].Resources.Requests:
     type: object
-    description: Resource requests
+    description: Minimum amount of compute resources required
     required: false
   Predictors[].ComponentSpec.Containers[].Resources.Limits:
     type: object
-    description: Resource limits
+    description: Maximum amount of compute resources allowed
     required: false
   Predictors[].ComponentSpec.Containers[].Liveness:
     type: object
-    description: Liveness probe
+    description: Liveness probe configuration for container
     required: false
   Predictors[].ComponentSpec.Containers[].Readiness:
     type: object
-    description: Readiness probe
+    description: Readiness probe configuration for container
     required: false
   Predictors[].ComponentSpec.Volumes[].Name:
     type: string
-    description: Volume name
-    required: false
+    description: Name of the volume
+    required: true
   Predictors[].ComponentSpec.Volumes[].Secret.SecretName:
     type: string
-    description: Name of the secret volume
+    description: Kubernetes secret name to mount as volume
+    required: false
+  Predictors[].ComponentSpec.Volumes[].EmptyDir:
+    type: object
+    description: EmptyDir volume source for ephemeral storage
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Name:
+    type: string
+    description: Name of the init container
+    required: true
+  Predictors[].ComponentSpec.InitContainers[].Image:
+    type: string
+    description: Image used for the init container
+    required: true
+  Predictors[].ComponentSpec.InitContainers[].ImagePullPolicy:
+    type: string
+    description: Policy for pulling init container image
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Args:
+    type: array
+    description: Arguments passed to init container on start
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].VolumeMounts[].Name:
+    type: string
+    description: Volume name to mount into init container
+    required: true
+  Predictors[].ComponentSpec.InitContainers[].VolumeMounts[].MountPath:
+    type: string
+    description: Path inside init container to mount the volume
+    required: true
+  Predictors[].ComponentSpec.InitContainers[].VolumeMounts[].ReadOnly:
+    type: boolean
+    description: Whether the mount is read-only
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].EnvFrom[].SecretRef.Name:
+    type: string
+    description: Secret name to import env vars into init container
     required: false
