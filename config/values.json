@@ -1,179 +1,144 @@
 {
-  "ApiVersion": "machinelearning.seldon.io/v1",
-  "Environment": "TEST",
-  "Protocol": "seldon",
-  "Transport": "rest",
+  "ApiVersion": "machinelearning.seldon.io/v1alpha2",
   "Chart": {
     "Name": "example-model",
     "Version": "0.1.0",
     "Description": "An example Seldon model with advanced features"
   },
-  "DeploymentName": "example-deployment",
-  "Namespace": "default",
+  "DeploymentName": "fs33kafka",
+  "Namespace": "app-fdd",
   "Metadata": {
     "Labels": {
-      "app.kubernetes.io/managed-by": "Helm"
+      "components": "seldon-core",
+      "entity": "online-model"
     },
     "Annotations": {}
   },
   "Predictors": [
     {
-      "Name": "example",
+      "Name": "loan-approval",
       "Replicas": 1,
-      "Traffic": 100,
-      "Annotations": {
-        "seldon.io/no-engine": "true"
-      },
-      "SvcOrchSpec": {
-        "Resources": {
-          "requests": {
-            "cpu": "0.1",
-            "memory": "256Mi"
-          },
-          "limits": {
-            "cpu": "0.5",
-            "memory": "512Mi"
-          }
-        },
-        "Env": [
-          {
-            "Name": "LOG_LEVEL",
-            "Value": "DEBUG"
-          },
-          {
-            "Name": "JAEGER_AGENT_HOST",
-            "Value": "jaeger-agent"
-          }
-        ]
-      },
-      "Graph": {
-        "Name": "router",
-        "Type": "ROUTER",
-        "Implementation": "",
-        "ModelUri": "",
-        "EnvSecretRefName": "my-secret",
-        "Endpoint": {
-          "Type": "REST"
-        },
-        "Logger": {
-          "Mode": "all",
-          "URL": "http://logger.seldon"
-        },
-        "Parameters": [
-          {
-            "Name": "param1",
-            "Type": "STRING",
-            "Value": "value1"
-          }
-        ],
-        "Children": [
-          {
-            "Name": "model-a",
-            "Type": "MODEL",
-            "Implementation": "SKLEARN_SERVER",
-            "ModelUri": "gs://seldon-models/sklearn/iris",
-            "Parameters": [],
-            "Children": []
-          },
-          {
-            "Name": "model-b",
-            "Type": "MODEL",
-            "Implementation": "SKLEARN_SERVER",
-            "ModelUri": "gs://seldon-models/sklearn/wine",
-            "Parameters": [],
-            "Children": []
-          }
-        ]
-      },
       "ComponentSpec": {
-        "ServiceAccountName": "default",
-        "TerminationGracePeriodSeconds": 20,
+        "ServiceAccountName": "default-editor",
+        "TerminationGracePeriodSeconds": 0,
         "Containers": [
           {
-            "Name": "example-container",
-            "Image": "seldonio/mock_classifier:1.18.0",
-            "ImagePullPolicy": "IfNotPresent",
+            "Name": "fs33kafka",
             "Env": [
-              {
-                "Name": "MODEL_PARAM",
-                "Value": "xyz"
-              },
-              {
-                "Name": "SECRET_ENV",
-                "ValueFrom": {
-                  "SecretKeyRef": {
-                    "Name": "my-secret",
-                    "Key": "key1"
-                  }
-                }
-              }
+              { "Name": "GUNICORN_WORKERS", "Value": "2" },
+              { "Name": "GUNICORN_THREADS", "Value": "2" }
             ],
-            "VolumeMounts": [
-              {
-                "Name": "data-volume",
-                "MountPath": "/mnt/data",
-                "ReadOnly": true
-              }
-            ],
-            "Resources": {
-              "Requests": {
-                "cpu": "0.1",
-                "memory": "128Mi"
-              },
-              "Limits": {
-                "cpu": "0.5",
-                "memory": "256Mi"
-              }
-            },
             "Liveness": {
-              "Path": "/health/live",
-              "Port": 8080,
-              "InitialDelaySeconds": 10,
+              "Path": "/health/ping",
+              "Port": "http",
+              "Scheme": "HTTP",
+              "InitialDelaySeconds": 80,
               "PeriodSeconds": 5,
-              "FailureThreshold": 3,
+              "FailureThreshold": 200,
               "SuccessThreshold": 1
             },
             "Readiness": {
-              "Path": "/health/ready",
-              "Port": 8080,
-              "InitialDelaySeconds": 10,
+              "Path": "/health/ping",
+              "Port": "http",
+              "Scheme": "HTTP",
+              "InitialDelaySeconds": 80,
               "PeriodSeconds": 5,
-              "FailureThreshold": 3,
+              "FailureThreshold": 200,
               "SuccessThreshold": 1
+            },
+            "Resources": {
+              "Limits": {
+                "cpu": "2.0",
+                "memory": "4.0Gi"
+              },
+              "Requests": {
+                "cpu": "2.0",
+                "memory": "4.0Gi"
+              }
             }
-          }
-        ],
-        "InitContainers": [
-          {
-            "Name": "init-example",
-            "Image": "busybox",
-            "ImagePullPolicy": "IfNotPresent",
-            "Args": ["echo", "init"],
-            "VolumeMounts": [
-              {
-                "Name": "data-volume",
-                "MountPath": "/mnt/data"
-              }
-            ],
-            "EnvFrom": [
-              {
-                "SecretRef": {
-                  "Name": "init-secret"
-                }
-              }
-            ]
-          }
-        ],
-        "Volumes": [
-          {
-            "Name": "data-volume",
-            "EmptyDir": {}
           },
           {
-            "Name": "creds-volume",
-            "Secret": {
-              "SecretName": "my-secret"
+            "Name": "input-transformer",
+            "Image": "harbor-dognauts.neoflex.ru/dognauts/feast-rest-enricher:v0.1.0",
+            "Env": [
+              { "Name": "GUNICORN_WORKERS", "Value": "2" },
+              { "Name": "GUNICORN_THREADS", "Value": "2" },
+              { "Name": "modelURI", "Value": "s3://app-fdd/1/2f50d812d476495d90d4c566a2f99d4d/artifacts/model" },
+              { "Name": "MLFLOW_S3_ENDPOINT_URL", "Value": "https://s3-mlops.neoflex.ru" },
+              { "Name": "AWS_ACCESS_KEY_ID", "Value": "8A8TWIG7I0PUKUD5HU7J" },
+              { "Name": "AWS_SECRET_ACCESS_KEY", "Value": "Ns4Oi92O5DAGZ015rp2zWe4BQw8rt1pFBDkJGrMJ" },
+              { "Name": "FEAST_FEATURE_SERVER_URL", "Value": "http://feast-feature-server.app-fdd:80/" }
+            ]
+          }
+        ]
+      },
+      "SvcOrchSpec": {
+        "Env": [
+          { "Name": "LOGGER_KAFKA_BROKER", "Value": "kafka-kafka-0.kafka-kafka-brokers.dognauts-kafka.svc:9093" },
+          { "Name": "LOGGER_KAFKA_TOPIC", "Value": "model-drift-demo" },
+          { "Name": "KAFKA_SECURITY_PROTOCOL", "Value": "sasl_ssl" },
+          {
+            "Name": "KAFKA_SSL_CA_CERT",
+            "ValueFrom": {
+              "SecretKeyRef": { "Name": "kafka-cluster-creds", "Key": "cluster-ca.cert" }
             }
+          },
+          {
+            "Name": "KAFKA_SSL_CLIENT_CERT",
+            "ValueFrom": {
+              "SecretKeyRef": { "Name": "kafka-cluster-creds", "Key": "clients-ca.cert" }
+            }
+          },
+          {
+            "Name": "KAFKA_SSL_CLIENT_KEY",
+            "ValueFrom": {
+              "SecretKeyRef": { "Name": "kafka-cluster-creds", "Key": "clients-ca.key" }
+            }
+          },
+          {
+            "Name": "KAFKA_SSL_CLIENT_KEY_PASS",
+            "ValueFrom": {
+              "SecretKeyRef": { "Name": "kafka-cluster-creds", "Key": "clients-ca.pass" }
+            }
+          },
+          {
+            "Name": "KAFKA_SASL_PASSWORD",
+            "ValueFrom": {
+              "SecretKeyRef": { "Name": "kafka-cluster-creds", "Key": "sasl.pass" }
+            }
+          },
+          {
+            "Name": "KAFKA_SASL_USERNAME",
+            "ValueFrom": {
+              "SecretKeyRef": { "Name": "kafka-cluster-creds", "Key": "sasl-user" }
+            }
+          },
+          { "Name": "KAFKA_SASL_MECHANISM", "Value": "SCRAM-SHA-512" }
+        ]
+      },
+      "Graph": {
+        "Name": "input-transformer",
+        "Type": "TRANSFORMER",
+        "Endpoint": {
+          "Type": "REST"
+        },
+        "Children": [
+          {
+            "Name": "fs33kafka",
+            "Implementation": "MLFLOW_SERVER",
+            "ModelUri": "s3://app-fdd/1/2f50d812d476495d90d4c566a2f99d4d/artifacts/model",
+            "EnvSecretRefName": "seldon-secret",
+            "Logger": {
+              "Mode": "response"
+            },
+            "Parameters": [
+              {
+                "Name": "xtype",
+                "Type": "STRING",
+                "Value": "DataFrame"
+              }
+            ],
+            "Children": []
           }
         ]
       }

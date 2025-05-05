@@ -239,10 +239,16 @@ files:
           SvcOrchSpec:
             {{- if .SvcOrchSpec.Resources }}
             Resources:
-              {{- range $k, $v := .SvcOrchSpec.Resources }}
-              {{ $k }}:
-                {{- range $rk, $rv := $v }}
-                {{ $rk }}: {{ $rv }}
+              {{- if .SvcOrchSpec.Resources.Requests }}
+              Requests:
+                {{- range $k, $v := .SvcOrchSpec.Resources.Requests }}
+                {{ $k }}: {{ $v }}
+                {{- end }}
+              {{- end }}
+              {{- if .SvcOrchSpec.Resources.Limits }}
+              Limits:
+                {{- range $k, $v := .SvcOrchSpec.Resources.Limits }}
+                {{ $k }}: {{ $v }}
                 {{- end }}
               {{- end }}
             {{- end }}
@@ -578,10 +584,16 @@ files:
             svcOrchSpec:
               {{- if .SvcOrchSpec.Resources }}
               resources:
-                {{- range $k, $v := .SvcOrchSpec.Resources }}
-                {{ $k }}:
-                  {{- range $rk, $rv := $v }}
-                  {{ $rk }}: {{ $rv }}
+                {{- if .SvcOrchSpec.Resources.Requests }}
+                requests:
+                  {{- range $k, $v := .SvcOrchSpec.Resources.Requests }}
+                  {{ $k }}: {{ $v }}
+                  {{- end }}
+                {{- end }}
+                {{- if .SvcOrchSpec.Resources.Limits }}
+                limits:
+                  {{- range $k, $v := .SvcOrchSpec.Resources.Limits }}
+                  {{ $k }}: {{ $v }}
                   {{- end }}
                 {{- end }}
               {{- end }}
@@ -903,15 +915,14 @@ files:
       __pycache__/
       .ipynb_checkpoints/
 
-
 valuesSchema:
   Environment:
     type: string
-    description: Target environment such as TEST, STAGING, or PROD
+    description: Target environment (e.g., TEST, STAGING, PROD)
     required: true
   ApiVersion:
     type: string
-    description: Kubernetes API version for SeldonDeployment resource
+    description: Kubernetes API version for the SeldonDeployment resource (e.g., machinelearning.seldon.io/v1)
     required: true
   Chart.Name:
     type: string
@@ -939,8 +950,28 @@ valuesSchema:
     required: false
   Metadata.Annotations:
     type: object
-    description: Additional metadata for tooling, policies, and configuration
+    description: Annotations applied to the SeldonDeployment additional metadata for tooling, policies, and configuration
     required: false
+  Protocol:
+    type: string
+    description: Inference protocol to use (e.g., seldon, tensorflow, v2)
+    required: false
+  Transport:
+    type: string
+    description: Transport mechanism to use (e.g., rest, grpc)
+    required: false
+  Annotations:
+    type: object
+    description: Annotations added to the SeldonDeployment spec
+    required: false
+  SpecAnnotations:
+    type: object
+    description: Additional annotations applied under SeldonDeployment.spec
+    required: false
+  Predictors:
+    type: array
+    description: List of predictors defining traffic-split and graph configurations
+    required: true
   Predictors[].Name:
     type: string
     description: Unique name of the predictor
@@ -948,30 +979,38 @@ valuesSchema:
   Predictors[].Replicas:
     type: integer
     description: Number of model replicas to deploy
-    required: true
+    required: false
   Predictors[].Traffic:
     type: integer
     description: Percentage of traffic assigned to this predictor
     required: false
-  Predictors[].SvcOrchEnv:
-    type: array
-    description: Environment variables for the orchestrator container
+  Predictors[].Annotations:
+    type: object
+    description: Annotations applied to this predictor instance
     required: false
-  Predictors[].SvcOrchEnv[].Name:
+  Predictors[].SvcOrchSpec.Resources:
+    type: object
+    description: Resource requests and limits for the service orchestrator (keys limits, requests)
+    required: false
+  Predictors[].SvcOrchSpec.Resources.requests:
+    type: object
+    description: Requested CPU and memory resources
+    required: false
+  Predictors[].SvcOrchSpec.Resources.limits:
+    type: object
+    description: Maximum allowed CPU and memory resources
+    required: false
+  Predictors[].SvcOrchSpec.Env:
+    type: array
+    description: Environment variables for the service orchestrator
+    required: false
+  Predictors[].SvcOrchSpec.Env[].Name:
     type: string
     description: Name of environment variable for orchestrator
     required: true
-  Predictors[].SvcOrchEnv[].Value:
+  Predictors[].SvcOrchSpec.Env[].Value:
     type: string
     description: Value of environment variable for orchestrator
-    required: false
-  Predictors[].SvcOrchEnv[].ValueFrom.SecretKeyRef.Name:
-    type: string
-    description: Name of the Kubernetes secret to use in env variable
-    required: false
-  Predictors[].SvcOrchEnv[].ValueFrom.SecretKeyRef.Key:
-    type: string
-    description: Key in the Kubernetes secret to use in env variable
     required: false
   Predictors[].Graph.Name:
     type: string
@@ -979,17 +1018,17 @@ valuesSchema:
     required: true
   Predictors[].Graph.Type:
     type: string
-    description: Type of the graph node (MODEL, ROUTER, TRANSFORMER)
-    required: false
+    description: Type of the node (MODEL, ROUTER, TRANSFORMER, etc.)
+    required: true
   Predictors[].Graph.Implementation:
     type: string
-    description: Implementation of the model server (e.g. SKLEARN_SERVER)
+    description: Predefined implementation for the model server (e.g., SKLEARN_SERVER, MLFLOW)
     required: false
   Predictors[].Graph.ModelUri:
     type: string
     description: URI to the stored model (S3, GCS, local, etc.)
     required: false
-  Predictors[].Graph.EndpointType:
+  Predictors[].Graph.Endpoint.Type:
     type: string
     description: Type of endpoint exposed by the graph (REST or GRPC)
     required: false
@@ -999,11 +1038,19 @@ valuesSchema:
     required: false
   Predictors[].Graph.Logger.Mode:
     type: string
-    description: Logging mode (all, request, response)
+    description: Logging mode (all, request, response, none)
+    required: false
+  Predictors[].Graph.Logger.URL:
+    type: string
+    description: Optional URL to send logs to
+    required: false
+  Predictors[].Graph.Parameters:
+    type: array
+    description: List of parameters for this graph node
     required: false
   Predictors[].Graph.Parameters[].Name:
     type: string
-    description: Name of a parameter used in the node
+    description: Name of the parameter
     required: true
   Predictors[].Graph.Parameters[].Type:
     type: string
@@ -1019,11 +1066,15 @@ valuesSchema:
     required: false
   Predictors[].ComponentSpec.ServiceAccountName:
     type: string
-    description: Service account used by pods for access control
+    description: Kubernetes service account used by pods for access control
     required: false
   Predictors[].ComponentSpec.TerminationGracePeriodSeconds:
     type: integer
     description: Time (in seconds) for graceful shutdown
+    required: false
+  Predictors[].ComponentSpec.Containers:
+    type: array
+    description: Additional containers in the predictor pod
     required: false
   Predictors[].ComponentSpec.Containers[].Name:
     type: string
@@ -1035,15 +1086,19 @@ valuesSchema:
     required: true
   Predictors[].ComponentSpec.Containers[].ImagePullPolicy:
     type: string
-    description: Image pull policy (Always, IfNotPresent, Never)
+    description: Kubernetes image pull policy (Always, IfNotPresent, Never)
+    required: false
+  Predictors[].ComponentSpec.Containers[].Env:
+    type: array
+    description: Environment variables for the container
     required: false
   Predictors[].ComponentSpec.Containers[].Env[].Name:
     type: string
-    description: Name of environment variable
+    description: Name of the environment variable
     required: true
   Predictors[].ComponentSpec.Containers[].Env[].Value:
     type: string
-    description: Value of environment variable
+    description: Value of the environment variable
     required: false
   Predictors[].ComponentSpec.Containers[].Env[].ValueFrom.SecretKeyRef.Name:
     type: string
@@ -1052,6 +1107,10 @@ valuesSchema:
   Predictors[].ComponentSpec.Containers[].Env[].ValueFrom.SecretKeyRef.Key:
     type: string
     description: Key inside the referenced secret
+    required: false
+  Predictors[].ComponentSpec.Containers[].VolumeMounts:
+    type: array
+    description: Volume mounts for container
     required: false
   Predictors[].ComponentSpec.Containers[].VolumeMounts[].Name:
     type: string
@@ -1081,6 +1140,10 @@ valuesSchema:
     type: object
     description: Readiness probe configuration for container
     required: false
+  Predictors[].ComponentSpec.Volumes:
+    type: array
+    description: Volumes used by the predictor
+    required: false
   Predictors[].ComponentSpec.Volumes[].Name:
     type: string
     description: Name of the volume
@@ -1093,13 +1156,17 @@ valuesSchema:
     type: object
     description: EmptyDir volume source for ephemeral storage
     required: false
+  Predictors[].ComponentSpec.InitContainers:
+    type: array
+    description: Init containers to run before main containers
+    required: false
   Predictors[].ComponentSpec.InitContainers[].Name:
     type: string
     description: Name of the init container
     required: true
   Predictors[].ComponentSpec.InitContainers[].Image:
     type: string
-    description: Image used for the init container
+    description: Image of the init container
     required: true
   Predictors[].ComponentSpec.InitContainers[].ImagePullPolicy:
     type: string
@@ -1108,6 +1175,10 @@ valuesSchema:
   Predictors[].ComponentSpec.InitContainers[].Args:
     type: array
     description: Arguments passed to init container on start
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].VolumeMounts:
+    type: array
+    description: Volume mounts for the init container
     required: false
   Predictors[].ComponentSpec.InitContainers[].VolumeMounts[].Name:
     type: string
@@ -1121,7 +1192,43 @@ valuesSchema:
     type: boolean
     description: Whether the mount is read-only
     required: false
+  Predictors[].ComponentSpec.InitContainers[].EnvFrom:
+    type: array
+    description: Import environment variables from Kubernetes secrets or configmaps
+    required: false
   Predictors[].ComponentSpec.InitContainers[].EnvFrom[].SecretRef.Name:
     type: string
     description: Secret name to import env vars into init container
+    required: false
+  Predictors[].ComponentSpec.HPASpec:
+    type: object
+    description: Horizontal Pod Autoscaler configuration for the predictor
+    required: false
+  Predictors[].ComponentSpec.HPASpec.MinReplicas:
+    type: integer
+    description: Minimum number of replicas allowed
+    required: true
+  Predictors[].ComponentSpec.HPASpec.MaxReplicas:
+    type: integer
+    description: Maximum number of replicas allowed
+    required: true
+  Predictors[].ComponentSpec.HPASpec.MetricsV2:
+    type: array
+    description: List of custom metrics for autoscaling
+    required: false
+  Predictors[].ComponentSpec.HPASpec.MetricsV2[].Type:
+    type: string
+    description: Type of metric (e.g., Resource)
+    required: true
+  Predictors[].ComponentSpec.HPASpec.MetricsV2[].Resource.Name:
+    type: string
+    description: Resource name for autoscaling (e.g., cpu)
+    required: true
+  Predictors[].ComponentSpec.HPASpec.MetricsV2[].Resource.Target.Type:
+    type: string
+    description: Type of target (e.g., Utilization)
+    required: true
+  Predictors[].ComponentSpec.HPASpec.MetricsV2[].Resource.Target.AverageUtilization:
+    type: integer
+    description: Target average utilization percentage
     required: false

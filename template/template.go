@@ -64,17 +64,16 @@ type GraphNode struct {
 	Type             string      `json:"Type"`
 	Implementation   string      `json:"Implementation,omitempty"`
 	ModelUri         string      `json:"ModelUri,omitempty"`
-	EndpointType     string      `json:"EndpointType,omitempty"`
 	EnvSecretRefName string      `json:"EnvSecretRefName,omitempty"`
 	Logger           *Logger     `json:"Logger,omitempty"`
-	Endpoint         *Endpoint   `json:"endpoint,omitempty"`
+	Endpoint         *Endpoint   `json:"Endpoint,omitempty"`
 	Parameters       []Parameter `json:"Parameters,omitempty"`
 	Children         []GraphNode `json:"Children,omitempty"`
 }
 
 type Logger struct {
-	Mode string `json:"mode,omitempty"`
-	URL  string `json:"url,omitempty"`
+	Mode string `json:"Mode,omitempty"`
+	URL  string `json:"URL,omitempty"`
 }
 
 type Parameter struct {
@@ -126,11 +125,12 @@ type Resources struct {
 
 type Probe struct {
 	Path                string `json:"Path"`
-	Port                int    `json:"Port"`
+	Port                string `json:"Port"`
 	InitialDelaySeconds int    `json:"InitialDelaySeconds"`
 	PeriodSeconds       int    `json:"PeriodSeconds"`
 	FailureThreshold    int    `json:"FailureThreshold"`
 	SuccessThreshold    int    `json:"SuccessThreshold"`
+	Scheme              string `json:"Scheme,omitempty"`
 }
 
 type InitContainer struct {
@@ -151,7 +151,7 @@ type SecretRef struct {
 }
 
 type Endpoint struct {
-	Type string `json:"type,omitempty"`
+	Type string `json:"Type,omitempty"`
 }
 
 type HPATarget struct {
@@ -175,11 +175,9 @@ type HPASpec struct {
 	MetricsV2   []HPAMetric `json:"metricsv2,omitempty"`
 }
 
-//type Annotations map[string]string
-
 type SvcOrchSpec struct {
-	Resources map[string]map[string]string `json:"resources,omitempty"`
-	Env       []EnvVar                     `json:"env,omitempty"`
+	Resources *Resources `json:"resources,omitempty"`
+	Env       []EnvVar   `json:"env,omitempty"`
 }
 
 type ChartTemplate struct {
