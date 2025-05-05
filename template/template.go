@@ -8,18 +8,20 @@ import (
 	"text/template"
 
 	"github.com/sirupsen/logrus"
-
 	"gopkg.in/yaml.v3"
 )
 
 type Values struct {
-	Environment    string      `json:"Environment"`
-	ApiVersion     string      `json:"ApiVersion"`
-	Chart          Chart       `json:"Chart"`
-	DeploymentName string      `json:"DeploymentName"`
-	Namespace      string      `json:"Namespace"`
-	Metadata       Metadata    `json:"Metadata"`
-	Predictors     []Predictor `json:"Predictors"`
+	Environment    string            `json:"Environment"`
+	ApiVersion     string            `json:"ApiVersion"`
+	Chart          Chart             `json:"Chart"`
+	DeploymentName string            `json:"DeploymentName"`
+	Namespace      string            `json:"Namespace"`
+	Metadata       Metadata          `json:"Metadata"`
+	Predictors     []Predictor       `json:"Predictors"`
+	Annotations    map[string]string `json:"annotations,omitempty"`
+	Protocol       string            `json:"protocol,omitempty"`
+	Transport      string            `json:"transport,omitempty"`
 }
 
 type Chart struct {
@@ -37,7 +39,7 @@ type Predictor struct {
 	Name          string        `json:"Name"`
 	Replicas      int           `json:"Replicas"`
 	Traffic       int           `json:"Traffic"`
-	SvcOrchEnv    []EnvVar      `json:"SvcOrchEnv,omitempty"`
+	SvcOrchSpec   *SvcOrchSpec  `json:"svcOrchSpec,omitempty"`
 	Graph         GraphNode     `json:"Graph"`
 	ComponentSpec ComponentSpec `json:"ComponentSpec"`
 }
@@ -65,12 +67,14 @@ type GraphNode struct {
 	EndpointType     string      `json:"EndpointType,omitempty"`
 	EnvSecretRefName string      `json:"EnvSecretRefName,omitempty"`
 	Logger           *Logger     `json:"Logger,omitempty"`
+	Endpoint         *Endpoint   `json:"endpoint,omitempty"`
 	Parameters       []Parameter `json:"Parameters,omitempty"`
 	Children         []GraphNode `json:"Children,omitempty"`
 }
 
 type Logger struct {
-	Mode string `json:"Mode"`
+	Mode string `json:"mode,omitempty"`
+	URL  string `json:"url,omitempty"`
 }
 
 type Parameter struct {
@@ -85,6 +89,7 @@ type ComponentSpec struct {
 	Containers                    []Container     `json:"Containers"`
 	Volumes                       []Volume        `json:"Volumes,omitempty"`
 	InitContainers                []InitContainer `json:"InitContainers,omitempty"`
+	HPASpec                       *HPASpec        `json:"hpaSpec,omitempty"`
 }
 
 type Container struct {
@@ -145,14 +150,39 @@ type SecretRef struct {
 	Name string `json:"Name"`
 }
 
-// ChartTemplate maps the structure of seldon.meta.yaml
-type ChartTemplate struct {
-	ValuesSchema map[string]struct {
-		Type        string `yaml:"type"`
-		Description string `yaml:"description"`
-		Required    bool   `yaml:"required"`
-	} `yaml:"valuesSchema"`
+type Endpoint struct {
+	Type string `json:"type,omitempty"`
+}
 
+type HPATarget struct {
+	Type               string `json:"type"`               // e.g., "Utilization"
+	AverageUtilization int    `json:"averageUtilization"` // e.g., 70
+}
+
+type HPAResourceMetric struct {
+	Name   string    `json:"name"`   // e.g., "cpu"
+	Target HPATarget `json:"target"` // Target threshold
+}
+
+type HPAMetric struct {
+	Type     string            `json:"type"`     // e.g., "Resource"
+	Resource HPAResourceMetric `json:"resource"` // Resource-based metric
+}
+
+type HPASpec struct {
+	MinReplicas int         `json:"minReplicas"`
+	MaxReplicas int         `json:"maxReplicas"`
+	MetricsV2   []HPAMetric `json:"metricsv2,omitempty"`
+}
+
+//type Annotations map[string]string
+
+type SvcOrchSpec struct {
+	Resources map[string]map[string]string `json:"resources,omitempty"`
+	Env       []EnvVar                     `json:"env,omitempty"`
+}
+
+type ChartTemplate struct {
 	Files []struct {
 		Path     string `yaml:"path"`
 		Template bool   `yaml:"template"`
@@ -162,53 +192,41 @@ type ChartTemplate struct {
 
 var log = logrus.New()
 
-// Values is your full input data structure, matching values.json
-// -- Include your full Values struct here as defined previously
-// For brevity, we'll assume it's defined in another file or inline above main()
-
 func main() {
-	// Step 1: Read and parse values.json into structured data
 	var values Values
 	log.Printf("Reading values file")
 	valData, err := os.ReadFile("../config/values.json")
 	check(err)
-	log.Printf("Checking values file")
 	check(json.Unmarshal(valData, &values))
 
-	// Step 2: Read and parse seldon.meta.yaml
+	//valuesStr, err := json.Marshal(values)
+	//check(err)
+	//log.Printf("Generated: %s", valuesStr)
+
 	var meta ChartTemplate
 	log.Printf("Reading template file")
 	tmplData, err := os.ReadFile("../config/seldon.meta.yaml")
 	check(err)
-	log.Printf("Checking template file")
 	check(yaml.Unmarshal(tmplData, &meta))
 
-	//log.Printf("Values: %+v", values)
-	// Step 3: Render each file from template
 	for _, file := range meta.Files {
-
 		newfilepath := file.Path
-		if file.Path == "values-ENV.yaml" {
-			if values.Environment != "" {
-				newfilepath = "values-" + values.Environment + ".yaml"
-			}
+		if file.Path == "values-ENV.yaml" && values.Environment != "" {
+			newfilepath = "values-" + values.Environment + ".yaml"
 		}
 
 		outputPath := filepath.Join("output", newfilepath)
 		outputDir := filepath.Dir(outputPath)
 		check(os.MkdirAll(outputDir, 0755))
-		//		log.Printf("outputPath: %s", outputPath)
 
 		content := file.Content
 		if file.Template {
 			tmpl, err := template.New(file.Path).Parse(file.Content)
 			check(err)
 			var buf bytes.Buffer
-			log.Printf("executing...")
 			check(tmpl.Execute(&buf, values))
 			content = buf.String()
 		}
-
 		check(os.WriteFile(outputPath, []byte(content), 0644))
 		log.Printf("Generated: %s", outputPath)
 	}

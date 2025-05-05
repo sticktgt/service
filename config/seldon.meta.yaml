@@ -12,7 +12,21 @@ files:
     template: true
     content: |
       ApiVersion: {{ .ApiVersion }}
+      {{- if .Environment }}
       Environment: {{ .Environment }}
+      {{- end }}
+      {{- if .Protocol }}
+      Protocol: {{ .Protocol }}
+      {{- end }}
+      {{- if .Transport }}
+      Transport: {{ .Transport }}
+      {{- end }}
+      {{- if .Annotations }}
+      SpecAnnotations:
+        {{- range $k, $v := .Annotations }}
+        {{ $k }}: {{ $v }}
+        {{- end }}
+      {{- end }}
       Chart:
         Name: {{ .Chart.Name }}
         Version: {{ .Chart.Version }}
@@ -21,8 +35,13 @@ files:
       Namespace: {{ .Namespace }}
       Metadata:
         Labels:
-          app.kubernetes.io/managed-by: Helm
-        Annotations: {}
+          {{- range $k, $v := .Metadata.Labels }}
+          {{ $k }}: {{ $v }}
+          {{- end }}
+        Annotations:
+          {{- range $k, $v := .Metadata.Annotations }}
+          {{ $k }}: {{ $v }}
+          {{- end }}
       Predictors:
       {{- range .Predictors }}
         - Name: {{ .Name }}
@@ -32,15 +51,22 @@ files:
             {{- if .Graph.Implementation }}
             Implementation: {{ .Graph.Implementation }}
             {{- end }}
-            {{- if .Graph.EndpointType }}
-            EndpointType: {{ .Graph.EndpointType }}
+            {{- if .Graph.ModelUri }}
+            ModelUri: {{ .Graph.ModelUri }}
             {{- end }}
             {{- if .Graph.EnvSecretRefName }}
             EnvSecretRefName: {{ .Graph.EnvSecretRefName }}
             {{- end }}
+            {{- if .Graph.Endpoint }}
+            Endpoint:
+              Type: {{ .Graph.Endpoint.Type }}
+            {{- end }}
             {{- if .Graph.Logger }}
             Logger:
               Mode: {{ .Graph.Logger.Mode }}
+              {{- if .Graph.Logger.URL }}
+              URL: {{ .Graph.Logger.URL }}
+              {{- end }}
             {{- end }}
             {{- if .Graph.Parameters }}
             Parameters:
@@ -64,9 +90,16 @@ files:
                 {{- if .EnvSecretRefName }}
                 EnvSecretRefName: {{ .EnvSecretRefName }}
                 {{- end }}
+                {{- if .Endpoint }}
+                Endpoint:
+                  Type: {{ .Endpoint.Type }}
+                {{- end }}
                 {{- if .Logger }}
                 Logger:
                   Mode: {{ .Logger.Mode }}
+                  {{- if .Logger.URL }}
+                  URL: {{ .Logger.URL }}
+                  {{- end }}
                 {{- end }}
                 {{- if .Parameters }}
                 Parameters:
@@ -76,12 +109,124 @@ files:
                     Value: {{ .Value }}
                   {{- end }}
                 {{- end }}
+                {{- if .Children }}
+                Children:
+                  {{- range .Children }}
+                  - Name: {{ .Name }}
+                    Type: {{ .Type }}
+                    {{- if .Implementation }}
+                    Implementation: {{ .Implementation }}
+                    {{- end }}
+                    {{- if .ModelUri }}
+                    ModelUri: {{ .ModelUri }}
+                    {{- end }}
+                    {{- if .EnvSecretRefName }}
+                    EnvSecretRefName: {{ .EnvSecretRefName }}
+                    {{- end }}
+                    {{- if .Endpoint }}
+                    Endpoint:
+                      Type: {{ .Endpoint.Type }}
+                    {{- end }}
+                    {{- if .Logger }}
+                    Logger:
+                      Mode: {{ .Logger.Mode }}
+                      {{- if .Logger.URL }}
+                      URL: {{ .Logger.URL }}
+                      {{- end }}
+                    {{- end }}
+                    {{- if .Parameters }}
+                    Parameters:
+                      {{- range .Parameters }}
+                      - Name: {{ .Name }}
+                        Type: {{ .Type }}
+                        Value: {{ .Value }}
+                      {{- end }}
+                    {{- end }}
+                    {{- if .Children }}
+                    Children:
+                      {{- range .Children }}
+                      - Name: {{ .Name }}
+                        Type: {{ .Type }}
+                        {{- if .Implementation }}
+                        Implementation: {{ .Implementation }}
+                        {{- end }}
+                        {{- if .ModelUri }}
+                        ModelUri: {{ .ModelUri }}
+                        {{- end }}
+                        {{- if .EnvSecretRefName }}
+                        EnvSecretRefName: {{ .EnvSecretRefName }}
+                        {{- end }}
+                        {{- if .Endpoint }}
+                        Endpoint:
+                          Type: {{ .Endpoint.Type }}
+                        {{- end }}
+                        {{- if .Logger }}
+                        Logger:
+                          Mode: {{ .Logger.Mode }}
+                          {{- if .Logger.URL }}
+                          URL: {{ .Logger.URL }}
+                          {{- end }}
+                        {{- end }}
+                        {{- if .Parameters }}
+                        Parameters:
+                          {{- range .Parameters }}
+                          - Name: {{ .Name }}
+                            Type: {{ .Type }}
+                            Value: {{ .Value }}
+                          {{- end }}
+                        {{- end }}
+                        {{- if .Children }}
+                        Children:
+                          {{- range .Children }}
+                          - Name: {{ .Name }}
+                            Type: {{ .Type }}
+                            {{- if .Implementation }}
+                            Implementation: {{ .Implementation }}
+                            {{- end }}
+                            {{- if .ModelUri }}
+                            ModelUri: {{ .ModelUri }}
+                            {{- end }}
+                            {{- if .EnvSecretRefName }}
+                            EnvSecretRefName: {{ .EnvSecretRefName }}
+                            {{- end }}
+                            {{- if .Endpoint }}
+                            Endpoint:
+                              Type: {{ .Endpoint.Type }}
+                            {{- end }}
+                            {{- if .Logger }}
+                            Logger:
+                              Mode: {{ .Logger.Mode }}
+                              {{- if .Logger.URL }}
+                              URL: {{ .Logger.URL }}
+                              {{- end }}
+                            {{- end }}
+                            {{- if .Parameters }}
+                            Parameters:
+                              {{- range .Parameters }}
+                              - Name: {{ .Name }}
+                                Type: {{ .Type }}
+                                Value: {{ .Value }}
+                              {{- end }}
+                            {{- end }}
+                            Children: []
+                          {{- end }}
+                        {{- else }}
+                        Children: []
+                        {{- end }}
+                      {{- end }}
+                    {{- else }}
+                    Children: []
+                    {{- end }}
+                  {{- end }}
+                {{- else }}
                 Children: []
+                {{- end }}
               {{- end }}
             {{- else }}
             Children: []
             {{- end }}
       {{- end }}
+
 
   - path: values-ENV.yaml
     template: true
@@ -91,99 +236,82 @@ files:
         - Name: {{ .Name }}
           Replicas: {{ .Replicas }}
           Traffic: {{ .Traffic }}
-          SvcOrchEnv:
-          {{- range .SvcOrchEnv }}
-            - Name: {{ .Name }}
-              {{- if .Value }}
-              Value: {{ .Value }}
-              {{- else if .ValueFrom }}
-              ValueFrom:
-                SecretKeyRef:
-                  Name: {{ .ValueFrom.SecretKeyRef.Name }}
-                  Key: {{ .ValueFrom.SecretKeyRef.Key }}
+          SvcOrchSpec:
+            {{- if .SvcOrchSpec.Resources }}
+            Resources:
+              {{- range $k, $v := .SvcOrchSpec.Resources }}
+              {{ $k }}:
+                {{- range $rk, $rv := $v }}
+                {{ $rk }}: {{ $rv }}
+                {{- end }}
               {{- end }}
-          {{- end }}
-          Graph:
-            Name: {{ .Graph.Name }}
-            Type: {{ .Graph.Type }}
-            {{- if .Graph.Implementation }}
-            Implementation: {{ .Graph.Implementation }}
             {{- end }}
-            {{- if .Graph.EndpointType }}
-            EndpointType: {{ .Graph.EndpointType }}
-            {{- end }}
-            {{- if .Graph.EnvSecretRefName }}
-            EnvSecretRefName: {{ .Graph.EnvSecretRefName }}
-            {{- end }}
-            {{- if .Graph.Logger }}
-            Logger:
-              Mode: {{ .Graph.Logger.Mode }}
-            {{- end }}
-            {{- if .Graph.Parameters }}
-            Parameters:
-              {{- range .Graph.Parameters }}
+            {{- if .SvcOrchSpec.Env }}
+            Env:
+              {{- range .SvcOrchSpec.Env }}
               - Name: {{ .Name }}
-                Type: {{ .Type }}
                 Value: {{ .Value }}
-              {{- end }}
-            {{- end }}
-            {{- if .Graph.Children }}
-            Children:
-              {{- range .Graph.Children }}
-              - Name: {{ .Name }}
-                Type: {{ .Type }}
-                {{- if .Implementation }}
-                Implementation: {{ .Implementation }}
-                {{- end }}
-                {{- if .ModelUri }}
-                ModelUri: {{ .ModelUri }}
-                {{- end }}
-                {{- if .EnvSecretRefName }}
-                EnvSecretRefName: {{ .EnvSecretRefName }}
-                {{- end }}
-                {{- if .Logger }}
-                Logger:
-                  Mode: {{ .Logger.Mode }}
-                {{- end }}
-                {{- if .Parameters }}
-                Parameters:
-                  {{- range .Parameters }}
-                  - Name: {{ .Name }}
-                    Type: {{ .Type }}
-                    Value: {{ .Value }}
-                  {{- end }}
-                {{- end }}
-                Children: []
               {{- end }}
             {{- end }}
           ComponentSpec:
             ServiceAccountName: {{ .ComponentSpec.ServiceAccountName }}
             TerminationGracePeriodSeconds: {{ .ComponentSpec.TerminationGracePeriodSeconds }}
-            {{- if .ComponentSpec.Volumes }}
+            {{- if .ComponentSpec.HPASpec }}
+            - HpaSpec:
+                MinReplicas: {{ .ComponentSpec.HPASpec.MinReplicas }}
+                MaxReplicas: {{ .ComponentSpec.HPASpec.MaxReplicas }}
+                Metricsv2:
+                  {{- range .ComponentSpec.HPASpec.MetricsV2 }}
+                  - Type: {{ .Type }}
+                    Resource:
+                      Name: {{ .Resource.Name }}
+                      Target:
+                        Type: {{ .Resource.Target.Type }}
+                        AverageUtilization: {{ .Resource.Target.AverageUtilization }}
+                  {{- end }}
+            {{- end }}
             Volumes:
-              {{- range .ComponentSpec.Volumes }}
+            {{- range .ComponentSpec.Volumes }}
               - Name: {{ .Name }}
                 {{- if .EmptyDir }}
                 EmptyDir: {}
-                {{- end }}
-                {{- if .Secret }}
+                {{- else if .Secret }}
                 Secret:
                   SecretName: {{ .Secret.SecretName }}
                 {{- end }}
-              {{- end }}
+            {{- end }}
+            InitContainers:
+            {{- range .ComponentSpec.InitContainers }}
+              - Name: {{ .Name }}
+                Image: {{ .Image }}
+                ImagePullPolicy: {{ .ImagePullPolicy }}
+                Args:
+                {{- range .Args }}
+                  - {{ . }}
+                {{- end }}
+                VolumeMounts:
+                {{- range .VolumeMounts }}
+                  - Name: {{ .Name }}
+                    MountPath: {{ .MountPath }}
+                    {{- if .ReadOnly }}
+                    ReadOnly: {{ .ReadOnly }}
+                    {{- end }}
+                {{- end }}
+                EnvFrom:
+                {{- range .EnvFrom }}
+                  {{- if .SecretRef }}
+                  - SecretRef:
+                      Name: {{ .SecretRef.Name }}
+                  {{- end }}
+                {{- end }}
             {{- end }}
             Containers:
-              {{- range .ComponentSpec.Containers }}
+            {{- range .ComponentSpec.Containers }}
               - Name: {{ .Name }}
-                {{- if .Image }}
                 Image: {{ .Image }}
-                {{- end }}
-                {{- if .ImagePullPolicy }}
                 ImagePullPolicy: {{ .ImagePullPolicy }}
-                {{- end }}
-                {{- if .Env }}
                 Env:
-                  {{- range .Env }}
+                {{- range .Env }}
                   - Name: {{ .Name }}
                     {{- if .Value }}
                     Value: {{ .Value }}
@@ -193,7 +321,14 @@ files:
                         Name: {{ .ValueFrom.SecretKeyRef.Name }}
                         Key: {{ .ValueFrom.SecretKeyRef.Key }}
                     {{- end }}
-                  {{- end }}
+                {{- end }}
+                VolumeMounts:
+                {{- range .VolumeMounts }}
+                  - Name: {{ .Name }}
+                    MountPath: {{ .MountPath }}
+                    {{- if .ReadOnly }}
+                    ReadOnly: {{ .ReadOnly }}
+                    {{- end }}
                 {{- end }}
                 {{- if .Resources }}
                 Resources:
@@ -224,43 +359,187 @@ files:
                   FailureThreshold: {{ .Readiness.FailureThreshold }}
                   SuccessThreshold: {{ .Readiness.SuccessThreshold }}
                 {{- end }}
-                {{- if .VolumeMounts }}
-                VolumeMounts:
-                  {{- range .VolumeMounts }}
-                  - Name: {{ .Name }}
-                    MountPath: {{ .MountPath }}
-                    {{- if .ReadOnly }}
-                    ReadOnly: {{ .ReadOnly }}
-                    {{- end }}
-                  {{- end }}
-                {{- end }}
+            {{- end }}
+          Graph:
+            Name: {{ .Graph.Name }}
+            Type: {{ .Graph.Type }}
+            {{- if .Graph.Implementation }}
+            Implementation: {{ .Graph.Implementation }}
+            {{- end }}
+            {{- if .Graph.ModelUri }}
+            ModelUri: {{ .Graph.ModelUri }}
+            {{- end }}
+            {{- if .Graph.EnvSecretRefName }}
+            EnvSecretRefName: {{ .Graph.EnvSecretRefName }}
+            {{- end }}
+            {{- if .Graph.Endpoint }}
+            Endpoint:
+              Type: {{ .Graph.Endpoint.Type }}
+            {{- end }}
+            {{- if .Graph.Logger }}
+            Logger:
+              Mode: {{ .Graph.Logger.Mode }}
+              {{- if .Graph.Logger.URL }}
+              URL: {{ .Graph.Logger.URL }}
               {{- end }}
-            {{- if .ComponentSpec.InitContainers }}  
-            InitContainers:
-              {{- range .ComponentSpec.InitContainers }}
+            {{- end }}
+            {{- if .Graph.Parameters }}
+            Parameters:
+              {{- range .Graph.Parameters }}
               - Name: {{ .Name }}
-                Image: {{ .Image }}
-                ImagePullPolicy: {{ .ImagePullPolicy }}
-                Args:
-                  {{- range .Args }}
-                  - {{ . }}
-                  {{- end }}
-                VolumeMounts:
-                  {{- range .VolumeMounts }}
-                  - Name: {{ .Name }}
-                    MountPath: {{ .MountPath }}
-                  {{- end }}
-                {{- if .EnvFrom }}
-                EnvFrom:
-                  {{- range .EnvFrom }}
-                    {{- if .SecretRef }}
-                    - SecretRef:
-                        Name: {{ .SecretRef.Name }}
-                    {{- end }}
+                Type: {{ .Type }}
+                Value: {{ .Value }}
+              {{- end }}
+            {{- end }}
+            {{- if .Graph.Children }}
+            Children:
+              {{- range .Graph.Children }}
+              - Name: {{ .Name }}
+                Type: {{ .Type }}
+                {{- if .Implementation }}
+                Implementation: {{ .Implementation }}
+                {{- end }}
+                {{- if .ModelUri }}
+                ModelUri: {{ .ModelUri }}
+                {{- end }}
+                {{- if .EnvSecretRefName }}
+                EnvSecretRefName: {{ .EnvSecretRefName }}
+                {{- end }}
+                {{- if .Endpoint }}
+                Endpoint:
+                  Type: {{ .Endpoint.Type }}
+                {{- end }}
+                {{- if .Logger }}
+                Logger:
+                  Mode: {{ .Logger.Mode }}
+                  {{- if .Logger.URL }}
+                  URL: {{ .Logger.URL }}
                   {{- end }}
                 {{- end }}
+                {{- if .Parameters }}
+                Parameters:
+                  {{- range .Parameters }}
+                  - Name: {{ .Name }}
+                    Type: {{ .Type }}
+                    Value: {{ .Value }}
+                  {{- end }}
+                {{- end }}
+                {{- if .Children }}
+                Children:
+                  {{- range .Children }}
+                  - Name: {{ .Name }}
+                    Type: {{ .Type }}
+                    {{- if .Implementation }}
+                    Implementation: {{ .Implementation }}
+                    {{- end }}
+                    {{- if .ModelUri }}
+                    ModelUri: {{ .ModelUri }}
+                    {{- end }}
+                    {{- if .EnvSecretRefName }}
+                    EnvSecretRefName: {{ .EnvSecretRefName }}
+                    {{- end }}
+                    {{- if .Endpoint }}
+                    Endpoint:
+                      Type: {{ .Endpoint.Type }}
+                    {{- end }}
+                    {{- if .Logger }}
+                    Logger:
+                      Mode: {{ .Logger.Mode }}
+                      {{- if .Logger.URL }}
+                      URL: {{ .Logger.URL }}
+                      {{- end }}
+                    {{- end }}
+                    {{- if .Parameters }}
+                    Parameters:
+                      {{- range .Parameters }}
+                      - Name: {{ .Name }}
+                        Type: {{ .Type }}
+                        Value: {{ .Value }}
+                      {{- end }}
+                    {{- end }}
+                    {{- if .Children }}
+                    Children:
+                      {{- range .Children }}
+                      - Name: {{ .Name }}
+                        Type: {{ .Type }}
+                        {{- if .Implementation }}
+                        Implementation: {{ .Implementation }}
+                        {{- end }}
+                        {{- if .ModelUri }}
+                        ModelUri: {{ .ModelUri }}
+                        {{- end }}
+                        {{- if .EnvSecretRefName }}
+                        EnvSecretRefName: {{ .EnvSecretRefName }}
+                        {{- end }}
+                        {{- if .Endpoint }}
+                        Endpoint:
+                          Type: {{ .Endpoint.Type }}
+                        {{- end }}
+                        {{- if .Logger }}
+                        Logger:
+                          Mode: {{ .Logger.Mode }}
+                          {{- if .Logger.URL }}
+                          URL: {{ .Logger.URL }}
+                          {{- end }}
+                        {{- end }}
+                        {{- if .Parameters }}
+                        Parameters:
+                          {{- range .Parameters }}
+                          - Name: {{ .Name }}
+                            Type: {{ .Type }}
+                            Value: {{ .Value }}
+                          {{- end }}
+                        {{- end }}
+                        {{- if .Children }}
+                        Children:
+                          {{- range .Children }}
+                          - Name: {{ .Name }}
+                            Type: {{ .Type }}
+                            {{- if .Implementation }}
+                            Implementation: {{ .Implementation }}
+                            {{- end }}
+                            {{- if .ModelUri }}
+                            ModelUri: {{ .ModelUri }}
+                            {{- end }}
+                            {{- if .EnvSecretRefName }}
+                            EnvSecretRefName: {{ .EnvSecretRefName }}
+                            {{- end }}
+                            {{- if .Endpoint }}
+                            Endpoint:
+                              Type: {{ .Endpoint.Type }}
+                            {{- end }}
+                            {{- if .Logger }}
+                            Logger:
+                              Mode: {{ .Logger.Mode }}
+                              {{- if .Logger.URL }}
+                              URL: {{ .Logger.URL }}
+                              {{- end }}
+                            {{- end }}
+                            {{- if .Parameters }}
+                            Parameters:
+                              {{- range .Parameters }}
+                              - Name: {{ .Name }}
+                                Type: {{ .Type }}
+                                Value: {{ .Value }}
+                              {{- end }}
+                            {{- end }}
+                            Children: []
+                          {{- end }}
+                        {{- else }}
+                        Children: []
+                        {{- end }}
+                      {{- end }}
+                    {{- else }}
+                    Children: []
+                    {{- end }}
+                  {{- end }}
+                {{- else }}
+                Children: []
+                {{- end }}
               {{- end }}
-            {{- end }}  
+            {{- else }}
+            Children: []
+            {{- end }}
       {{- end }}
 
   - path: templates/seldon-deployment.yaml
@@ -271,40 +550,48 @@ files:
       metadata:
         name: {{ .Values.DeploymentName }}
         namespace: {{ .Values.Namespace }}
-        {{- if .Values.Metadata.Labels }}
         labels:
         {{- range $k, $v := .Values.Metadata.Labels }}
           {{ $k }}: {{ $v }}
         {{- end }}
-        {{- end }}
-        {{- if .Values.Metadata.Annotations }}
         annotations:
         {{- range $k, $v := .Values.Metadata.Annotations }}
           {{ $k }}: {{ $v }}
         {{- end }}
-        {{- end }}
       spec:
         name: {{ .Values.DeploymentName }}
+        protocol: {{ .Values.Protocol }}
+        transport: {{ .Values.Transport }}
+        annotations:
+          {{- range $k, $v := .Values.SpecAnnotations }}
+          {{ $k }}: {{ $v }}
+          {{- end }}
         predictors:
         {{- range .Values.Predictors }}
           - name: {{ .Name }}
             replicas: {{ .Replicas }}
             traffic: {{ .Traffic }}
-            {{- if .SvcOrchEnv }}
-            svcOrchSpec:
-              env:
-              {{- range .SvcOrchEnv }}
-                - name: {{ .Name }}
-                  {{- if .Value }}
-                  value: {{ .Value }}
-                  {{- else if .ValueFrom }}
-                  valueFrom:
-                    secretKeyRef:
-                      name: {{ .ValueFrom.SecretKeyRef.Name }}
-                      key: {{ .ValueFrom.SecretKeyRef.Key }}
-                  {{- end }}
-              {{- end }}
+            annotations:
+            {{- range $k, $v := .Annotations }}
+              {{ $k }}: {{ $v }}
             {{- end }}
+            svcOrchSpec:
+              {{- if .SvcOrchSpec.Resources }}
+              resources:
+                {{- range $k, $v := .SvcOrchSpec.Resources }}
+                {{ $k }}:
+                  {{- range $rk, $rv := $v }}
+                  {{ $rk }}: {{ $rv }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+              {{- if .SvcOrchSpec.Env }}
+              env:
+                {{- range .SvcOrchSpec.Env }}
+                - name: {{ .Name }}
+                  value: {{ .Value }}
+                {{- end }}
+              {{- end }}
             graph:
               name: {{ .Graph.Name }}
               type: {{ .Graph.Type }}
@@ -314,28 +601,31 @@ files:
               {{- if .Graph.ModelUri }}
               modelUri: {{ .Graph.ModelUri }}
               {{- end }}
-              {{- if .Graph.EndpointType }}
-              endpoint:
-                type: {{ .Graph.EndpointType }}
-              {{- end }}
               {{- if .Graph.EnvSecretRefName }}
               envSecretRefName: {{ .Graph.EnvSecretRefName }}
+              {{- end }}
+              {{- if .Graph.Endpoint }}
+              endpoint:
+                type: {{ .Graph.Endpoint.Type }}
               {{- end }}
               {{- if .Graph.Logger }}
               logger:
                 mode: {{ .Graph.Logger.Mode }}
+                {{- if .Graph.Logger.URL }}
+                url: {{ .Graph.Logger.URL }}
+                {{- end }}
               {{- end }}
               {{- if .Graph.Parameters }}
               parameters:
-              {{- range .Graph.Parameters }}
+                {{- range .Graph.Parameters }}
                 - name: {{ .Name }}
                   type: {{ .Type }}
                   value: {{ .Value }}
-              {{- end }}
+                {{- end }}
               {{- end }}
               {{- if .Graph.Children }}
               children:
-              {{- range .Graph.Children }}
+                {{- range .Graph.Children }}
                 - name: {{ .Name }}
                   type: {{ .Type }}
                   {{- if .Implementation }}
@@ -344,38 +634,167 @@ files:
                   {{- if .ModelUri }}
                   modelUri: {{ .ModelUri }}
                   {{- end }}
+                  {{- if .EnvSecretRefName }}
+                  envSecretRefName: {{ .EnvSecretRefName }}
+                  {{- end }}
+                  {{- if .Endpoint }}
+                  endpoint:
+                    type: {{ .Endpoint.Type }}
+                  {{- end }}
                   {{- if .Logger }}
                   logger:
                     mode: {{ .Logger.Mode }}
+                      {{- if .Logger.URL }}
+                      url: {{ .Logger.URL }}
+                    {{- end }}
                   {{- end }}
                   {{- if .Parameters }}
                   parameters:
-                  {{- range .Parameters }}
+                    {{- range .Parameters }}
                     - name: {{ .Name }}
                       type: {{ .Type }}
                       value: {{ .Value }}
+                    {{- end }}
                   {{- end }}
-                  {{- end }}
+                  {{- if .Children }}
+                  children:
+                    {{- range .Children }}
+                    - name: {{ .Name }}
+                      type: {{ .Type }}
+                      {{- if .Implementation }}
+                      implementation: {{ .Implementation }}
+                      {{- end }}
+                      {{- if .ModelUri }}
+                      modelUri: {{ .ModelUri }}
+                      {{- end }}
+                      {{- if .EnvSecretRefName }}
+                      envSecretRefName: {{ .EnvSecretRefName }}
+                      {{- end }}
+                      {{- if .Endpoint }}
+                      endpoint:
+                        Type: {{ .Endpoint.Type }}
+                      {{- end }}
+                      {{- if .Logger }}
+                      logger:
+                        mode: {{ .Logger.Mode }}
+                        {{- if .Logger.URL }}
+                        url: {{ .Logger.URL }}
+                        {{- end }}
+                      {{- end }}
+                      {{- if .Parameters }}
+                      parameters:
+                        {{- range .Parameters }}
+                        - name: {{ .Name }}
+                          type: {{ .Type }}
+                          value: {{ .Value }}
+                        {{- end }}
+                      {{- end }}
+                      {{- if .Children }}
+                      children:
+                        {{- range .Children }}
+                        - name: {{ .Name }}
+                          type: {{ .Type }}
+                          {{- if .Implementation }}
+                          implementation: {{ .Implementation }}
+                          {{- end }}
+                          {{- if .ModelUri }}
+                          modelUri: {{ .ModelUri }}
+                          {{- end }}
+                          {{- if .EnvSecretRefName }}
+                          envSecretRefName: {{ .EnvSecretRefName }}
+                          {{- end }}
+                          {{- if .Endpoint }}
+                          endpoint:
+                            Type: {{ .Endpoint.Type }}
+                          {{- end }}
+                          {{- if .Logger }}
+                          logger:
+                            mode: {{ .Logger.Mode }}
+                            {{- if .Logger.URL }}
+                            url: {{ .Logger.URL }}
+                            {{- end }}
+                          {{- end }}
+                          {{- if .Parameters }}
+                          parameters:
+                            {{- range .Parameters }}
+                            - name: {{ .Name }}
+                              type: {{ .Type }}
+                              value: {{ .Value }}
+                            {{- end }}
+                          {{- end }}
+                          {{- if .Children }}
+                          children:
+                            {{- range .Children }}
+                            - name: {{ .Name }}
+                              type: {{ .Type }}
+                              {{- if .Implementation }}
+                              implementation: {{ .Implementation }}
+                              {{- end }}
+                              {{- if .ModelUri }}
+                              modelUri: {{ .ModelUri }}
+                              {{- end }}
+                              {{- if .EnvSecretRefName }}
+                              envSecretRefName: {{ .EnvSecretRefName }}
+                              {{- end }}
+                              {{- if .Endpoint }}
+                              endpoint:
+                                type: {{ .Endpoint.Type }}
+                              {{- end }}
+                              {{- if .Logger }}
+                              logger:
+                                mode: {{ .Logger.Mode }}
+                                {{- if .Logger.URL }}
+                                url: {{ .Logger.URL }}
+                                {{- end }}
+                              {{- end }}
+                              {{- if .Parameters }}
+                              parameters:
+                                {{- range .Parameters }}
+                                - name: {{ .Name }}
+                                  type: {{ .Type }}
+                                  value: {{ .Value }}
+                                {{- end }}
+                              {{- end }}
+                              children: []
+                            {{- end }}
+                          {{- else }}
+                          children: []
+                          {{- end }}
+                        {{- end }}
+                      {{- else }}
+                      children: []
+                      {{- end }}
+                    {{- end }}
+                  {{- else }}
                   children: []
-              {{- end }}
+                  {{- end }}
+                {{- end }}
+              {{- else }}
+              children: []
               {{- end }}
             componentSpecs:
+              {{- if .HPASpec }}
+              - hpaSpec:
+                  minReplicas: {{ .HPASpec.MinReplicas }}
+                  maxReplicas: {{ .HPASpec.MaxReplicas }}
+                  metricsv2:
+                    {{- range .HPASpec.MetricsV2 }}
+                    - type: {{ .Type }}
+                      resource:
+                        name: {{ .Resource.Name }}
+                        target:
+                          type: {{ .Resource.Target.Type }}
+                          averageUtilization: {{ .Resource.Target.AverageUtilization }}
+                    {{- end }}
+              {{- end }}
               - spec:
-                  {{- if .ComponentSpec.ServiceAccountName }}
                   serviceAccountName: {{ .ComponentSpec.ServiceAccountName }}
-                  {{- end }}
-                  {{- if .ComponentSpec.TerminationGracePeriodSeconds }}
                   terminationGracePeriodSeconds: {{ .ComponentSpec.TerminationGracePeriodSeconds }}
-                  {{- end }}
                   containers:
-                  {{- range .ComponentSpec.Containers }}
+                    {{- range .ComponentSpec.Containers }}
                     - name: {{ .Name }}
-                      {{- if .Image }}
                       image: {{ .Image }}
-                      {{- end }}
-                      {{- if .ImagePullPolicy }}
                       imagePullPolicy: {{ .ImagePullPolicy }}
-                      {{- end }}
                       {{- if .Env }}
                       env:
                         {{- range .Env }}
@@ -420,7 +839,6 @@ files:
                         httpGet:
                           path: {{ .Liveness.Path }}
                           port: {{ .Liveness.Port }}
-                          scheme: HTTP
                         initialDelaySeconds: {{ .Liveness.InitialDelaySeconds }}
                         periodSeconds: {{ .Liveness.PeriodSeconds }}
                         failureThreshold: {{ .Liveness.FailureThreshold }}
@@ -431,54 +849,49 @@ files:
                         httpGet:
                           path: {{ .Readiness.Path }}
                           port: {{ .Readiness.Port }}
-                          scheme: HTTP
                         initialDelaySeconds: {{ .Readiness.InitialDelaySeconds }}
                         periodSeconds: {{ .Readiness.PeriodSeconds }}
                         failureThreshold: {{ .Readiness.FailureThreshold }}
                         successThreshold: {{ .Readiness.SuccessThreshold }}
                       {{- end }}
-                  {{- end }}
-                  {{- if .ComponentSpec.InitContainers }}
+                    {{- end }}
                   initContainers:
                     {{- range .ComponentSpec.InitContainers }}
                     - name: {{ .Name }}
                       image: {{ .Image }}
                       imagePullPolicy: {{ .ImagePullPolicy }}
+                      {{- if .Args }}
                       args:
                         {{- range .Args }}
                         - {{ . }}
                         {{- end }}
+                      {{- end }}
+                      {{- if .VolumeMounts }}
                       volumeMounts:
                         {{- range .VolumeMounts }}
                         - name: {{ .Name }}
                           mountPath: {{ .MountPath }}
                         {{- end }}
+                      {{- end }}
                       {{- if .EnvFrom }}
                       envFrom:
                         {{- range .EnvFrom }}
-                          {{- if .SecretRef }}
                         - secretRef:
                             name: {{ .SecretRef.Name }}
-                          {{- end }}
                         {{- end }}
                       {{- end }}
                     {{- end }}
-                  {{- end }}
-                  {{- if .ComponentSpec.Volumes }}
                   volumes:
                     {{- range .ComponentSpec.Volumes }}
                     - name: {{ .Name }}
                       {{- if .EmptyDir }}
                       emptyDir: {}
-                      {{- end }}
-                      {{- if .Secret }}
+                      {{- else if .Secret }}
                       secret:
                         secretName: {{ .Secret.SecretName }}
                       {{- end }}
                     {{- end }}
-                  {{- end }}
         {{- end }}
-
 
   - path: .helmignore
     template: false
@@ -489,6 +902,7 @@ files:
       *.swp
       __pycache__/
       .ipynb_checkpoints/
+
 
 valuesSchema:
   Environment:

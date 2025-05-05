@@ -1,43 +1,86 @@
 {
-  "Environment": "TEST",
   "ApiVersion": "machinelearning.seldon.io/v1",
+  "Environment": "TEST",
+  "Protocol": "seldon",
+  "Transport": "rest",
   "Chart": {
-    "Name": "router-graph",
+    "Name": "example-model",
     "Version": "0.1.0",
-    "Description": "A router with multiple child models"
+    "Description": "An example Seldon model with advanced features"
   },
-  "DeploymentName": "graph-metadata-router",
+  "DeploymentName": "example-deployment",
   "Namespace": "default",
   "Metadata": {
     "Labels": {
-      "team": "ml"
+      "app.kubernetes.io/managed-by": "Helm"
     },
-    "Annotations": {
-      "note": "test router graph"
-    }
+    "Annotations": {}
   },
   "Predictors": [
     {
       "Name": "example",
       "Replicas": 1,
       "Traffic": 100,
-      "SvcOrchEnv": [],
+      "Annotations": {
+        "seldon.io/no-engine": "true"
+      },
+      "SvcOrchSpec": {
+        "Resources": {
+          "requests": {
+            "cpu": "0.1",
+            "memory": "256Mi"
+          },
+          "limits": {
+            "cpu": "0.5",
+            "memory": "512Mi"
+          }
+        },
+        "Env": [
+          {
+            "Name": "LOG_LEVEL",
+            "Value": "DEBUG"
+          },
+          {
+            "Name": "JAEGER_AGENT_HOST",
+            "Value": "jaeger-agent"
+          }
+        ]
+      },
       "Graph": {
-        "Name": "node-router",
+        "Name": "router",
         "Type": "ROUTER",
+        "Implementation": "",
+        "ModelUri": "",
+        "EnvSecretRefName": "my-secret",
+        "Endpoint": {
+          "Type": "REST"
+        },
+        "Logger": {
+          "Mode": "all",
+          "URL": "http://logger.seldon"
+        },
+        "Parameters": [
+          {
+            "Name": "param1",
+            "Type": "STRING",
+            "Value": "value1"
+          }
+        ],
         "Children": [
           {
-            "Name": "node-one",
+            "Name": "model-a",
             "Type": "MODEL",
             "Implementation": "SKLEARN_SERVER",
-            "ModelUri": "gs://seldon-models/sklearn/iris-one",
+            "ModelUri": "gs://seldon-models/sklearn/iris",
+            "Parameters": [],
             "Children": []
           },
           {
-            "Name": "node-two",
+            "Name": "model-b",
             "Type": "MODEL",
             "Implementation": "SKLEARN_SERVER",
-            "ModelUri": "gs://seldon-models/sklearn/iris-two",
+            "ModelUri": "gs://seldon-models/sklearn/wine",
+            "Parameters": [],
             "Children": []
           }
         ]
@@ -47,53 +90,75 @@
         "TerminationGracePeriodSeconds": 20,
         "Containers": [
           {
-            "Name": "router",
-            "Image": "myregistry/router:latest",
+            "Name": "example-container",
+            "Image": "seldonio/mock_classifier:1.18.0",
             "ImagePullPolicy": "IfNotPresent",
             "Env": [
               {
-                "Name": "MODEL_ENV",
-                "Value": "router"
+                "Name": "MODEL_PARAM",
+                "Value": "xyz"
+              },
+              {
+                "Name": "SECRET_ENV",
+                "ValueFrom": {
+                  "SecretKeyRef": {
+                    "Name": "my-secret",
+                    "Key": "key1"
+                  }
+                }
               }
             ],
             "VolumeMounts": [
               {
-                "Name": "config-vol",
-                "MountPath": "/etc/config",
+                "Name": "data-volume",
+                "MountPath": "/mnt/data",
                 "ReadOnly": true
               }
             ],
             "Resources": {
               "Requests": {
-                "cpu": "100m",
-                "memory": "256Mi"
+                "cpu": "0.1",
+                "memory": "128Mi"
               },
               "Limits": {
-                "cpu": "500m",
-                "memory": "512Mi"
+                "cpu": "0.5",
+                "memory": "256Mi"
               }
+            },
+            "Liveness": {
+              "Path": "/health/live",
+              "Port": 8080,
+              "InitialDelaySeconds": 10,
+              "PeriodSeconds": 5,
+              "FailureThreshold": 3,
+              "SuccessThreshold": 1
+            },
+            "Readiness": {
+              "Path": "/health/ready",
+              "Port": 8080,
+              "InitialDelaySeconds": 10,
+              "PeriodSeconds": 5,
+              "FailureThreshold": 3,
+              "SuccessThreshold": 1
             }
           }
         ],
         "InitContainers": [
           {
-            "Name": "initRouter",
-            "Image": "myregistry/router:latest",
+            "Name": "init-example",
+            "Image": "busybox",
             "ImagePullPolicy": "IfNotPresent",
-            "Args": [
-              "initRouter"
-            ],
+            "Args": ["echo", "init"],
             "VolumeMounts": [
               {
-                "Name": "config-vol",
-                "MountPath": "/etc/config",
-                "ReadOnly": true
+                "Name": "data-volume",
+                "MountPath": "/mnt/data"
               }
             ],
             "EnvFrom": [
               {
                 "SecretRef": {
-                  "Name": "r-r-r"
+                  "Name": "init-secret"
                 }
               }
             ]
@@ -101,9 +166,13 @@
         ],
         "Volumes": [
           {
-            "Name": "config-vol",
+            "Name": "data-volume",
+            "EmptyDir": {}
+          },
+          {
+            "Name": "creds-volume",
             "Secret": {
-              "SecretName": "router-config-secret"
+              "SecretName": "my-secret"
             }
           }
         ]
