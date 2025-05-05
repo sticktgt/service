@@ -5,6 +5,7 @@
     "Version": "0.1.0",
     "Description": "An example Seldon model with advanced features"
   },
+  "Environment": "TEST",
   "DeploymentName": "fs33kafka",
   "Namespace": "app-fdd",
   "Metadata": {
