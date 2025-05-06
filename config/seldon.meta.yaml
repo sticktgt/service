@@ -256,7 +256,14 @@ files:
             Env:
               {{- range .SvcOrchSpec.Env }}
               - Name: {{ .Name }}
+                {{- if .Value }}
                 Value: {{ .Value }}
+                {{- else if .ValueFrom }}
+                ValueFrom:
+                  SecretKeyRef:
+                    Name: {{ .ValueFrom.SecretKeyRef.Name }}
+                    Key: {{ .ValueFrom.SecretKeyRef.Key }}
+                {{- end }}
               {{- end }}
             {{- end }}
           ComponentSpec:
@@ -560,26 +567,40 @@ files:
         {{- range $k, $v := .Values.Metadata.Labels }}
           {{ $k }}: {{ $v }}
         {{- end }}
+        {{- if .Values.Metadata.Annotations }}
         annotations:
         {{- range $k, $v := .Values.Metadata.Annotations }}
           {{ $k }}: {{ $v }}
         {{- end }}
+        {{- end }}
       spec:
         name: {{ .Values.DeploymentName }}
+        {{- if .Values.Protocol }}
         protocol: {{ .Values.Protocol }}
+        {{- end }}
+        {{- if .Values.Transport }}
         transport: {{ .Values.Transport }}
+        {{- end }}
+        {{- if .Values.SpecAnnotations }}
         annotations:
           {{- range $k, $v := .Values.SpecAnnotations }}
           {{ $k }}: {{ $v }}
           {{- end }}
+        {{- end }}
         predictors:
         {{- range .Values.Predictors }}
           - name: {{ .Name }}
+            {{- if .Replicas }}
             replicas: {{ .Replicas }}
+            {{- end }}
+            {{- if .Traffic }}
             traffic: {{ .Traffic }}
+            {{- end }}
+            {{- if .Annotations }}
             annotations:
             {{- range $k, $v := .Annotations }}
               {{ $k }}: {{ $v }}
+            {{- end }}
             {{- end }}
             svcOrchSpec:
               {{- if .SvcOrchSpec.Resources }}
@@ -601,12 +622,21 @@ files:
               env:
                 {{- range .SvcOrchSpec.Env }}
                 - name: {{ .Name }}
+                  {{- if .Value }}
                   value: {{ .Value }}
+                  {{- else if .ValueFrom }}
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .ValueFrom.SecretKeyRef.Name }}
+                      key: {{ .ValueFrom.SecretKeyRef.Key }}
+                  {{- end }}
                 {{- end }}
               {{- end }}
             graph:
               name: {{ .Graph.Name }}
+              {{- if .Graph.Type }}
               type: {{ .Graph.Type }}
+              {{- end }}
               {{- if .Graph.Implementation }}
               implementation: {{ .Graph.Implementation }}
               {{- end }}
@@ -639,7 +669,9 @@ files:
               children:
                 {{- range .Graph.Children }}
                 - name: {{ .Name }}
+                  {{- if .Type }}
                   type: {{ .Type }}
+                  {{- end }}
                   {{- if .Implementation }}
                   implementation: {{ .Implementation }}
                   {{- end }}
@@ -672,7 +704,9 @@ files:
                   children:
                     {{- range .Children }}
                     - name: {{ .Name }}
+                      {{- if .Type }}
                       type: {{ .Type }}
+                      {{- end }}
                       {{- if .Implementation }}
                       implementation: {{ .Implementation }}
                       {{- end }}
@@ -705,7 +739,9 @@ files:
                       children:
                         {{- range .Children }}
                         - name: {{ .Name }}
+                          {{- if .Type }}
                           type: {{ .Type }}
+                          {{- end }}
                           {{- if .Implementation }}
                           implementation: {{ .Implementation }}
                           {{- end }}
@@ -738,7 +774,9 @@ files:
                           children:
                             {{- range .Children }}
                             - name: {{ .Name }}
+                              {{- if .Type }}
                               type: {{ .Type }}
+                              {{- end }}
                               {{- if .Implementation }}
                               implementation: {{ .Implementation }}
                               {{- end }}
@@ -800,13 +838,22 @@ files:
                     {{- end }}
               {{- end }}
               - spec:
+                  {{- if .ComponentSpec.ServiceAccountName }}
                   serviceAccountName: {{ .ComponentSpec.ServiceAccountName }}
+                  {{- end }}
+                  {{- if .ComponentSpec.TerminationGracePeriodSeconds }}
                   terminationGracePeriodSeconds: {{ .ComponentSpec.TerminationGracePeriodSeconds }}
+                  {{- end }}
+                  {{- if .ComponentSpec.Containers }}      
                   containers:
                     {{- range .ComponentSpec.Containers }}
                     - name: {{ .Name }}
+                      {{- if .Image }}
                       image: {{ .Image }}
+                      {{- end }}
+                      {{- if .ImagePullPolicy }}
                       imagePullPolicy: {{ .ImagePullPolicy }}
+                      {{- end }}
                       {{- if .Env }}
                       env:
                         {{- range .Env }}
@@ -867,11 +914,17 @@ files:
                         successThreshold: {{ .Readiness.SuccessThreshold }}
                       {{- end }}
                     {{- end }}
+                  {{- end }}
+                  {{- if .ComponentSpec.InitContainers }}
                   initContainers:
                     {{- range .ComponentSpec.InitContainers }}
                     - name: {{ .Name }}
+                      {{- if .Image }}
                       image: {{ .Image }}
+                      {{- end }}  
+                      {{- if .ImagePullPolicy }}
                       imagePullPolicy: {{ .ImagePullPolicy }}
+                      {{- end }}
                       {{- if .Args }}
                       args:
                         {{- range .Args }}
@@ -893,6 +946,8 @@ files:
                         {{- end }}
                       {{- end }}
                     {{- end }}
+                  {{- end }}
+                  {{- if .ComponentSpec.Volumes }}
                   volumes:
                     {{- range .ComponentSpec.Volumes }}
                     - name: {{ .Name }}
@@ -903,6 +958,7 @@ files:
                         secretName: {{ .Secret.SecretName }}
                       {{- end }}
                     {{- end }}
+                  {{- end }}  
         {{- end }}
 
   - path: .helmignore
@@ -1011,6 +1067,14 @@ valuesSchema:
   Predictors[].SvcOrchSpec.Env[].Value:
     type: string
     description: Value of environment variable for orchestrator
+    required: false
+  Predictors[].SvcOrchSpec.Env[].ValueFrom.SecretKeyRef.Name:
+    type: string
+    description: Name of the Kubernetes secret to reference
+    required: false
+  Predictors[].SvcOrchSpec.Env[].ValueFrom.SecretKeyRef.Key:
+    type: string
+    description: Key inside the referenced secret
     required: false
   Predictors[].Graph.Name:
     type: string
