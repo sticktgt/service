@@ -555,6 +555,52 @@ files:
             {{- end }}
       {{- end }}
 
+  - path: templates/_helpers.tpl
+    template: false
+    content: |
+      {{- define "seldon.graph.node" }}
+      name: {{ .Name }}
+      {{- if .Type }}
+      type: {{ .Type }}
+      {{- end }}
+      {{- if .Implementation }}
+      implementation: {{ .Implementation }}
+      {{- end }}
+      {{- if .ModelUri }}
+      modelUri: {{ .ModelUri }}
+      {{- end }}
+      {{- if .EnvSecretRefName }}
+      envSecretRefName: {{ .EnvSecretRefName }}
+      {{- end }}
+      {{- if .Endpoint }}
+      endpoint:
+        type: {{ .Endpoint.Type }}
+      {{- end }}
+      {{- if .Logger }}
+      logger:
+        mode: {{ .Logger.Mode }}
+        {{- if .Logger.URL }}
+        url: {{ .Logger.URL }}
+        {{- end }}
+      {{- end }}
+      {{- if .Parameters }}
+      parameters:
+        {{- range .Parameters }}
+        - name: {{ .Name }}
+          type: {{ .Type }}
+          value: {{ .Value }}
+        {{- end }}
+      {{- end }}
+      {{- if .Children }}
+      children:
+        {{- range .Children }}
+        - {{ include "seldon.graph.node" . | indent 4 | trim }}
+        {{- end }}
+      {{- else }}
+      children: []
+      {{- end }}
+      {{- end }}
+
   - path: templates/seldon-deployment.yaml
     template: false
     content: |
@@ -633,195 +679,7 @@ files:
                 {{- end }}
               {{- end }}
             graph:
-              name: {{ .Graph.Name }}
-              {{- if .Graph.Type }}
-              type: {{ .Graph.Type }}
-              {{- end }}
-              {{- if .Graph.Implementation }}
-              implementation: {{ .Graph.Implementation }}
-              {{- end }}
-              {{- if .Graph.ModelUri }}
-              modelUri: {{ .Graph.ModelUri }}
-              {{- end }}
-              {{- if .Graph.EnvSecretRefName }}
-              envSecretRefName: {{ .Graph.EnvSecretRefName }}
-              {{- end }}
-              {{- if .Graph.Endpoint }}
-              endpoint:
-                type: {{ .Graph.Endpoint.Type }}
-              {{- end }}
-              {{- if .Graph.Logger }}
-              logger:
-                mode: {{ .Graph.Logger.Mode }}
-                {{- if .Graph.Logger.URL }}
-                url: {{ .Graph.Logger.URL }}
-                {{- end }}
-              {{- end }}
-              {{- if .Graph.Parameters }}
-              parameters:
-                {{- range .Graph.Parameters }}
-                - name: {{ .Name }}
-                  type: {{ .Type }}
-                  value: {{ .Value }}
-                {{- end }}
-              {{- end }}
-              {{- if .Graph.Children }}
-              children:
-                {{- range .Graph.Children }}
-                - name: {{ .Name }}
-                  {{- if .Type }}
-                  type: {{ .Type }}
-                  {{- end }}
-                  {{- if .Implementation }}
-                  implementation: {{ .Implementation }}
-                  {{- end }}
-                  {{- if .ModelUri }}
-                  modelUri: {{ .ModelUri }}
-                  {{- end }}
-                  {{- if .EnvSecretRefName }}
-                  envSecretRefName: {{ .EnvSecretRefName }}
-                  {{- end }}
-                  {{- if .Endpoint }}
-                  endpoint:
-                    type: {{ .Endpoint.Type }}
-                  {{- end }}
-                  {{- if .Logger }}
-                  logger:
-                    mode: {{ .Logger.Mode }}
-                      {{- if .Logger.URL }}
-                      url: {{ .Logger.URL }}
-                    {{- end }}
-                  {{- end }}
-                  {{- if .Parameters }}
-                  parameters:
-                    {{- range .Parameters }}
-                    - name: {{ .Name }}
-                      type: {{ .Type }}
-                      value: {{ .Value }}
-                    {{- end }}
-                  {{- end }}
-                  {{- if .Children }}
-                  children:
-                    {{- range .Children }}
-                    - name: {{ .Name }}
-                      {{- if .Type }}
-                      type: {{ .Type }}
-                      {{- end }}
-                      {{- if .Implementation }}
-                      implementation: {{ .Implementation }}
-                      {{- end }}
-                      {{- if .ModelUri }}
-                      modelUri: {{ .ModelUri }}
-                      {{- end }}
-                      {{- if .EnvSecretRefName }}
-                      envSecretRefName: {{ .EnvSecretRefName }}
-                      {{- end }}
-                      {{- if .Endpoint }}
-                      endpoint:
-                        Type: {{ .Endpoint.Type }}
-                      {{- end }}
-                      {{- if .Logger }}
-                      logger:
-                        mode: {{ .Logger.Mode }}
-                        {{- if .Logger.URL }}
-                        url: {{ .Logger.URL }}
-                        {{- end }}
-                      {{- end }}
-                      {{- if .Parameters }}
-                      parameters:
-                        {{- range .Parameters }}
-                        - name: {{ .Name }}
-                          type: {{ .Type }}
-                          value: {{ .Value }}
-                        {{- end }}
-                      {{- end }}
-                      {{- if .Children }}
-                      children:
-                        {{- range .Children }}
-                        - name: {{ .Name }}
-                          {{- if .Type }}
-                          type: {{ .Type }}
-                          {{- end }}
-                          {{- if .Implementation }}
-                          implementation: {{ .Implementation }}
-                          {{- end }}
-                          {{- if .ModelUri }}
-                          modelUri: {{ .ModelUri }}
-                          {{- end }}
-                          {{- if .EnvSecretRefName }}
-                          envSecretRefName: {{ .EnvSecretRefName }}
-                          {{- end }}
-                          {{- if .Endpoint }}
-                          endpoint:
-                            Type: {{ .Endpoint.Type }}
-                          {{- end }}
-                          {{- if .Logger }}
-                          logger:
-                            mode: {{ .Logger.Mode }}
-                            {{- if .Logger.URL }}
-                            url: {{ .Logger.URL }}
-                            {{- end }}
-                          {{- end }}
-                          {{- if .Parameters }}
-                          parameters:
-                            {{- range .Parameters }}
-                            - name: {{ .Name }}
-                              type: {{ .Type }}
-                              value: {{ .Value }}
-                            {{- end }}
-                          {{- end }}
-                          {{- if .Children }}
-                          children:
-                            {{- range .Children }}
-                            - name: {{ .Name }}
-                              {{- if .Type }}
-                              type: {{ .Type }}
-                              {{- end }}
-                              {{- if .Implementation }}
-                              implementation: {{ .Implementation }}
-                              {{- end }}
-                              {{- if .ModelUri }}
-                              modelUri: {{ .ModelUri }}
-                              {{- end }}
-                              {{- if .EnvSecretRefName }}
-                              envSecretRefName: {{ .EnvSecretRefName }}
-                              {{- end }}
-                              {{- if .Endpoint }}
-                              endpoint:
-                                type: {{ .Endpoint.Type }}
-                              {{- end }}
-                              {{- if .Logger }}
-                              logger:
-                                mode: {{ .Logger.Mode }}
-                                {{- if .Logger.URL }}
-                                url: {{ .Logger.URL }}
-                                {{- end }}
-                              {{- end }}
-                              {{- if .Parameters }}
-                              parameters:
-                                {{- range .Parameters }}
-                                - name: {{ .Name }}
-                                  type: {{ .Type }}
-                                  value: {{ .Value }}
-                                {{- end }}
-                              {{- end }}
-                              children: []
-                            {{- end }}
-                          {{- else }}
-                          children: []
-                          {{- end }}
-                        {{- end }}
-                      {{- else }}
-                      children: []
-                      {{- end }}
-                    {{- end }}
-                  {{- else }}
-                  children: []
-                  {{- end }}
-                {{- end }}
-              {{- else }}
-              children: []
-              {{- end }}
+              {{- include "seldon.graph.node" .Graph | indent 8 }}
             componentSpecs:
               {{- if .HPASpec }}
               - hpaSpec:
