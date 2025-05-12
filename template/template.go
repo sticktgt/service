@@ -95,11 +95,14 @@ type Container struct {
 	Name            string        `json:"Name"`
 	Image           string        `json:"Image,omitempty"`
 	ImagePullPolicy string        `json:"ImagePullPolicy,omitempty"`
+	Args            []string      `json:"Args,omitempty"`
 	Env             []EnvVar      `json:"Env,omitempty"`
+	EnvFrom         []EnvFromItem `json:"EnvFrom,omitempty"`
 	VolumeMounts    []VolumeMount `json:"VolumeMounts,omitempty"`
 	Resources       *Resources    `json:"Resources,omitempty"`
 	Liveness        *Probe        `json:"Liveness,omitempty"`
 	Readiness       *Probe        `json:"Readiness,omitempty"`
+	Lifecycle       *Lifecycle    `json:"Lifecycle,omitempty"`
 }
 
 type VolumeMount struct {
@@ -137,16 +140,26 @@ type InitContainer struct {
 	Name            string        `json:"Name"`
 	Image           string        `json:"Image"`
 	ImagePullPolicy string        `json:"ImagePullPolicy"`
-	Args            []string      `json:"Args"`
-	VolumeMounts    []VolumeMount `json:"VolumeMounts"`
+	Args            []string      `json:"Args,omitempty"`
+	Env             []EnvVar      `json:"Env,omitempty"`
 	EnvFrom         []EnvFromItem `json:"EnvFrom,omitempty"`
+	VolumeMounts    []VolumeMount `json:"VolumeMounts,omitempty"`
+	Resources       *Resources    `json:"Resources,omitempty"`
+	Liveness        *Probe        `json:"Liveness,omitempty"`
+	Readiness       *Probe        `json:"Readiness,omitempty"`
+	Lifecycle       *Lifecycle    `json:"Lifecycle,omitempty"`
 }
 
 type EnvFromItem struct {
-	SecretRef *SecretRef `json:"SecretRef,omitempty"`
+	SecretRef    *SecretRef    `json:"SecretRef,omitempty"`
+	ConfigMapRef *ConfigMapRef `json:"ConfigMapRef,omitempty"`
 }
 
 type SecretRef struct {
+	Name string `json:"Name"`
+}
+
+type ConfigMapRef struct {
 	Name string `json:"Name"`
 }
 
@@ -178,6 +191,34 @@ type HPASpec struct {
 type SvcOrchSpec struct {
 	Resources *Resources `json:"resources,omitempty"`
 	Env       []EnvVar   `json:"env,omitempty"`
+}
+
+type Lifecycle struct {
+	PostStart *LifecycleHandler `json:"PostStart,omitempty"`
+	PreStop   *LifecycleHandler `json:"PreStop,omitempty"`
+}
+
+type LifecycleHandler struct {
+	Exec      *ExecAction      `json:"Exec,omitempty"`
+	HTTPGet   *HTTPGetAction   `json:"HttpGet,omitempty"`
+	TCPSocket *TCPSocketAction `json:"TcpSocket,omitempty"`
+}
+
+type ExecAction struct {
+	Command []string `json:"Command"`
+}
+
+type HTTPGetAction struct {
+	Path        string            `json:"Path,omitempty"`
+	Port        string            `json:"Port"`
+	Host        string            `json:"Host,omitempty"`
+	Scheme      string            `json:"Scheme,omitempty"`
+	HTTPHeaders map[string]string `json:"HttpHeaders,omitempty"`
+}
+
+type TCPSocketAction struct {
+	Port string `json:"Port"`
+	Host string `json:"Host,omitempty"`
 }
 
 type ChartTemplate struct {

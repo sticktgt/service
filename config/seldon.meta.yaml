@@ -270,18 +270,18 @@ files:
             ServiceAccountName: {{ .ComponentSpec.ServiceAccountName }}
             TerminationGracePeriodSeconds: {{ .ComponentSpec.TerminationGracePeriodSeconds }}
             {{- if .ComponentSpec.HPASpec }}
-            - HpaSpec:
-                MinReplicas: {{ .ComponentSpec.HPASpec.MinReplicas }}
-                MaxReplicas: {{ .ComponentSpec.HPASpec.MaxReplicas }}
-                Metricsv2:
-                  {{- range .ComponentSpec.HPASpec.MetricsV2 }}
-                  - Type: {{ .Type }}
-                    Resource:
-                      Name: {{ .Resource.Name }}
-                      Target:
-                        Type: {{ .Resource.Target.Type }}
-                        AverageUtilization: {{ .Resource.Target.AverageUtilization }}
-                  {{- end }}
+            HpaSpec:
+              MinReplicas: {{ .ComponentSpec.HPASpec.MinReplicas }}
+              MaxReplicas: {{ .ComponentSpec.HPASpec.MaxReplicas }}
+              Metricsv2:
+                {{- range .ComponentSpec.HPASpec.MetricsV2 }}
+                - Type: {{ .Type }}
+                  Resource:
+                    Name: {{ .Resource.Name }}
+                    Target:
+                      Type: {{ .Resource.Target.Type }}
+                      AverageUtilization: {{ .Resource.Target.AverageUtilization }}
+                {{- end }}
             {{- end }}
             Volumes:
             {{- range .ComponentSpec.Volumes }}
@@ -293,38 +293,19 @@ files:
                   SecretName: {{ .Secret.SecretName }}
                 {{- end }}
             {{- end }}
-            InitContainers:
-            {{- range .ComponentSpec.InitContainers }}
-              - Name: {{ .Name }}
-                Image: {{ .Image }}
-                ImagePullPolicy: {{ .ImagePullPolicy }}
-                Args:
-                {{- range .Args }}
-                  - {{ . }}
-                {{- end }}
-                VolumeMounts:
-                {{- range .VolumeMounts }}
-                  - Name: {{ .Name }}
-                    MountPath: {{ .MountPath }}
-                    {{- if .ReadOnly }}
-                    ReadOnly: {{ .ReadOnly }}
-                    {{- end }}
-                {{- end }}
-                EnvFrom:
-                {{- range .EnvFrom }}
-                  {{- if .SecretRef }}
-                  - SecretRef:
-                      Name: {{ .SecretRef.Name }}
-                  {{- end }}
-                {{- end }}
-            {{- end }}
             Containers:
             {{- range .ComponentSpec.Containers }}
               - Name: {{ .Name }}
                 Image: {{ .Image }}
                 ImagePullPolicy: {{ .ImagePullPolicy }}
+                {{- if .Args }}
+                Args:
+                  {{- range .Args }}
+                  - {{ . }}
+                  {{- end }}
+                {{- end }}
                 Env:
-                {{- range .Env }}
+                  {{- range .Env }}
                   - Name: {{ .Name }}
                     {{- if .Value }}
                     Value: {{ .Value }}
@@ -334,15 +315,28 @@ files:
                         Name: {{ .ValueFrom.SecretKeyRef.Name }}
                         Key: {{ .ValueFrom.SecretKeyRef.Key }}
                     {{- end }}
+                  {{- end }}
+                {{- if .EnvFrom }}
+                EnvFrom:
+                  {{- range .EnvFrom }}
+                  {{- if .SecretRef }}
+                  - SecretRef:
+                      Name: {{ .SecretRef.Name }}
+                  {{- end }}
+                  {{- if .ConfigMapRef }}
+                  - ConfigMapRef:
+                      Name: {{ .ConfigMapRef.Name }}
+                  {{- end }}
+                  {{- end }}
                 {{- end }}
                 VolumeMounts:
-                {{- range .VolumeMounts }}
+                  {{- range .VolumeMounts }}
                   - Name: {{ .Name }}
                     MountPath: {{ .MountPath }}
                     {{- if .ReadOnly }}
                     ReadOnly: {{ .ReadOnly }}
                     {{- end }}
-                {{- end }}
+                  {{- end }}
                 {{- if .Resources }}
                 Resources:
                   Requests:
@@ -362,6 +356,9 @@ files:
                   PeriodSeconds: {{ .Liveness.PeriodSeconds }}
                   FailureThreshold: {{ .Liveness.FailureThreshold }}
                   SuccessThreshold: {{ .Liveness.SuccessThreshold }}
+                  {{- if .Liveness.Scheme }}
+                  Scheme: {{ .Liveness.Scheme }}
+                  {{- end }}
                 {{- end }}
                 {{- if .Readiness }}
                 Readiness:
@@ -371,6 +368,179 @@ files:
                   PeriodSeconds: {{ .Readiness.PeriodSeconds }}
                   FailureThreshold: {{ .Readiness.FailureThreshold }}
                   SuccessThreshold: {{ .Readiness.SuccessThreshold }}
+                  {{- if .Readiness.Scheme }}
+                  Scheme: {{ .Readiness.Scheme }}
+                  {{- end }}
+                {{- end }}
+                {{- if .Lifecycle }}
+                Lifecycle:
+                  {{- if .Lifecycle.PostStart }}
+                  PostStart:
+                    {{- if .Lifecycle.PostStart.Exec }}
+                    Exec:
+                      Command:
+                        {{- range .Lifecycle.PostStart.Exec.Command }}
+                        - {{ . }}
+                        {{- end }}
+                    {{- end }}
+                    {{- if .Lifecycle.PostStart.HTTPGet }}
+                    HttpGet:
+                      Path: {{ .Lifecycle.PostStart.HTTPGet.Path }}
+                      Port: {{ .Lifecycle.PostStart.HTTPGet.Port }}
+                      {{- if .Lifecycle.PostStart.HTTPGet.Scheme }}
+                      Scheme: {{ .Lifecycle.PostStart.HTTPGet.Scheme }}
+                      {{- end }}
+                      {{- if .Lifecycle.PostStart.HTTPGet.Host }}
+                      Host: {{ .Lifecycle.PostStart.HTTPGet.Host }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .Lifecycle.PreStop }}
+                  PreStop:
+                    {{- if .Lifecycle.PreStop.Exec }}
+                    Exec:
+                      Command:
+                        {{- range .Lifecycle.PreStop.Exec.Command }}
+                        - {{ . }}
+                        {{- end }}
+                    {{- end }}
+                    {{- if .Lifecycle.PreStop.HTTPGet }}
+                    HttpGet:
+                      Path: {{ .Lifecycle.PreStop.HTTPGet.Path }}
+                      Port: {{ .Lifecycle.PreStop.HTTPGet.Port }}
+                      {{- if .Lifecycle.PreStop.HTTPGet.Scheme }}
+                      Scheme: {{ .Lifecycle.PreStop.HTTPGet.Scheme }}
+                      {{- end }}
+                      {{- if .Lifecycle.PreStop.HTTPGet.Host }}
+                      Host: {{ .Lifecycle.PreStop.HTTPGet.Host }}
+                      {{- end }}                      
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
+            {{- end }}
+            InitContainers:    
+            {{- range .ComponentSpec.InitContainers }}
+              - Name: {{ .Name }}
+                Image: {{ .Image }}
+                ImagePullPolicy: {{ .ImagePullPolicy }}
+                {{- if .Args }}
+                Args:
+                  {{- range .Args }}
+                  - {{ . }}
+                  {{- end }}
+                {{- end }}
+                Env:
+                  {{- range .Env }}
+                  - Name: {{ .Name }}
+                    {{- if .Value }}
+                    Value: {{ .Value }}
+                    {{- else if .ValueFrom }}
+                    ValueFrom:
+                      SecretKeyRef:
+                        Name: {{ .ValueFrom.SecretKeyRef.Name }}
+                        Key: {{ .ValueFrom.SecretKeyRef.Key }}
+                    {{- end }}
+                  {{- end }}
+                {{- if .EnvFrom }}
+                EnvFrom:
+                  {{- range .EnvFrom }}
+                  {{- if .SecretRef }}
+                  - SecretRef:
+                      Name: {{ .SecretRef.Name }}
+                  {{- end }}
+                  {{- if .ConfigMapRef }}
+                  - ConfigMapRef:
+                      Name: {{ .ConfigMapRef.Name }}
+                  {{- end }}
+                  {{- end }}
+                {{- end }}
+                VolumeMounts:
+                  {{- range .VolumeMounts }}
+                  - Name: {{ .Name }}
+                    MountPath: {{ .MountPath }}
+                    {{- if .ReadOnly }}
+                    ReadOnly: {{ .ReadOnly }}
+                    {{- end }}
+                  {{- end }}
+                {{- if .Resources }}
+                Resources:
+                  Requests:
+                    {{- range $k, $v := .Resources.Requests }}
+                    {{ $k }}: {{ $v }}
+                    {{- end }}
+                  Limits:
+                    {{- range $k, $v := .Resources.Limits }}
+                    {{ $k }}: {{ $v }}
+                    {{- end }}
+                {{- end }}
+                {{- if .Liveness }}
+                Liveness:
+                  Path: {{ .Liveness.Path }}
+                  Port: {{ .Liveness.Port }}
+                  InitialDelaySeconds: {{ .Liveness.InitialDelaySeconds }}
+                  PeriodSeconds: {{ .Liveness.PeriodSeconds }}
+                  FailureThreshold: {{ .Liveness.FailureThreshold }}
+                  SuccessThreshold: {{ .Liveness.SuccessThreshold }}
+                  {{- if .Liveness.Scheme }}
+                  Scheme: {{ .Liveness.Scheme }}
+                  {{- end }}
+                {{- end }}
+                {{- if .Readiness }}
+                Readiness:
+                  Path: {{ .Readiness.Path }}
+                  Port: {{ .Readiness.Port }}
+                  InitialDelaySeconds: {{ .Readiness.InitialDelaySeconds }}
+                  PeriodSeconds: {{ .Readiness.PeriodSeconds }}
+                  FailureThreshold: {{ .Readiness.FailureThreshold }}
+                  SuccessThreshold: {{ .Readiness.SuccessThreshold }}
+                  {{- if .Readiness.Scheme }}
+                  Scheme: {{ .Readiness.Scheme }}
+                  {{- end }}
+                {{- end }}
+                {{- if .Lifecycle }}
+                Lifecycle:
+                  {{- if .Lifecycle.PostStart }}
+                  PostStart:
+                    {{- if .Lifecycle.PostStart.Exec }}
+                    Exec:
+                      Command:
+                        {{- range .Lifecycle.PostStart.Exec.Command }}
+                        - {{ . }}
+                        {{- end }}
+                    {{- end }}
+                    {{- if .Lifecycle.PostStart.HTTPGet }}
+                    HttpGet:
+                      Path: {{ .Lifecycle.PostStart.HTTPGet.Path }}
+                      Port: {{ .Lifecycle.PostStart.HTTPGet.Port }}
+                      {{- if .Lifecycle.PostStart.HTTPGet.Scheme }}
+                      Scheme: {{ .Lifecycle.PostStart.HTTPGet.Scheme }}
+                      {{- end }}
+                      {{- if .Lifecycle.PostStart.HTTPGet.Host }}
+                      Host: {{ .Lifecycle.PostStart.HTTPGet.Host }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .Lifecycle.PreStop }}
+                  PreStop:
+                    {{- if .Lifecycle.PreStop.Exec }}
+                    Exec:
+                      Command:
+                        {{- range .Lifecycle.PreStop.Exec.Command }}
+                        - {{ . }}
+                        {{- end }}
+                    {{- end }}
+                    {{- if .Lifecycle.PreStop.HTTPGet }}
+                    HttpGet:
+                      Path: {{ .Lifecycle.PreStop.HTTPGet.Path }}
+                      Port: {{ .Lifecycle.PreStop.HTTPGet.Port }}
+                      {{- if .Lifecycle.PreStop.HTTPGet.Scheme }}
+                      Scheme: {{ .Lifecycle.PreStop.HTTPGet.Scheme }}
+                      {{- end }}
+                      {{- if .Lifecycle.PreStop.HTTPGet.Host }}
+                      Host: {{ .Lifecycle.PreStop.HTTPGet.Host }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
                 {{- end }}
             {{- end }}
           Graph:
@@ -600,6 +770,145 @@ files:
       children: []
       {{- end }}
       {{- end }}
+      {{- define "seldon.container" }}
+      - name: {{ .Name }}
+        {{- if .Image }}
+        image: {{ .Image }}
+        {{- end }}
+        {{- if .ImagePullPolicy }}
+        imagePullPolicy: {{ .ImagePullPolicy }}
+        {{- end }}
+        {{- if .Args }}
+        args:
+          {{- range .Args }}
+          - {{ . }}
+          {{- end }}
+        {{- end }}
+        {{- if .Env }}
+        env:
+          {{- range .Env }}
+          - name: {{ .Name }}
+            {{- if .Value }}
+            value: {{ .Value }}
+            {{- else if .ValueFrom }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ .ValueFrom.SecretKeyRef.Name }}
+                key: {{ .ValueFrom.SecretKeyRef.Key }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- if .EnvFrom }}
+        envFrom:
+          {{- range .EnvFrom }}
+          {{- if .SecretRef }}
+          - secretRef:
+              name: {{ .SecretRef.Name }}
+          {{- end }}
+          {{- if .ConfigMapRef }}
+          - configMapRef:
+              name: {{ .ConfigMapRef.Name }}
+          {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- if .VolumeMounts }}
+        volumeMounts:
+          {{- range .VolumeMounts }}
+          - name: {{ .Name }}
+            mountPath: {{ .MountPath }}
+            {{- if .ReadOnly }}
+            readOnly: {{ .ReadOnly }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- if .Resources }}
+        resources:
+          {{- if .Resources.Requests }}
+          requests:
+            {{- range $k, $v := .Resources.Requests }}
+            {{ $k }}: {{ $v }}
+            {{- end }}
+          {{- end }}
+          {{- if .Resources.Limits }}
+          limits:
+            {{- range $k, $v := .Resources.Limits }}
+            {{ $k }}: {{ $v }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- if .Liveness }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Liveness.Path }}
+            port: {{ .Liveness.Port }}
+            {{- if .Liveness.Scheme }}
+            scheme: {{ .Liveness.Scheme }}
+            {{- end }}
+          initialDelaySeconds: {{ .Liveness.InitialDelaySeconds }}
+          periodSeconds: {{ .Liveness.PeriodSeconds }}
+          failureThreshold: {{ .Liveness.FailureThreshold }}
+          successThreshold: {{ .Liveness.SuccessThreshold }}
+        {{- end }}
+        {{- if .Readiness }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Readiness.Path }}
+            port: {{ .Readiness.Port }}
+            {{- if .Readiness.Scheme }}
+            scheme: {{ .Readiness.Scheme }}
+            {{- end }}
+          initialDelaySeconds: {{ .Readiness.InitialDelaySeconds }}
+          periodSeconds: {{ .Readiness.PeriodSeconds }}
+          failureThreshold: {{ .Readiness.FailureThreshold }}
+          successThreshold: {{ .Readiness.SuccessThreshold }}
+        {{- end }}
+        {{- if .Lifecycle }}
+        lifecycle:
+          {{- if .Lifecycle.PostStart }}
+          postStart:
+            {{- if .Lifecycle.PostStart.Exec }}
+            exec:
+              command:
+                {{- range .Lifecycle.PostStart.Exec.Command }}
+                - {{ . }}
+                {{- end }}
+            {{- end }}
+            {{- if .Lifecycle.PostStart.HttpGet }}
+            httpGet:
+              path: {{ .Lifecycle.PostStart.HttpGet.Path }}
+              port: {{ .Lifecycle.PostStart.HttpGet.Port }}
+              {{- if .Lifecycle.PostStart.HttpGet.Scheme }}
+              scheme: {{ .Lifecycle.PostStart.HttpGet.Scheme }}
+              {{- end }}
+              {{- if .Lifecycle.PostStart.HttpGet.Host }}
+              host: {{ .Lifecycle.PostStart.HttpGet.Host }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- if .Lifecycle.PreStop }}
+          preStop:
+            {{- if .Lifecycle.PreStop.Exec }}
+            exec:
+              command:
+                {{- range .Lifecycle.PreStop.Exec.Command }}
+                - {{ . }}
+                {{- end }}
+            {{- end }}
+            {{- if .Lifecycle.PreStop.HttpGet }}
+            httpGet:
+              path: {{ .Lifecycle.PreStop.HttpGet.Path }}
+              port: {{ .Lifecycle.PreStop.HttpGet.Port }}
+              {{- if .Lifecycle.PreStop.HttpGet.Scheme }}
+              scheme: {{ .Lifecycle.PreStop.HttpGet.Scheme }}
+              {{- end }}
+              {{- if .Lifecycle.PreStop.HttpGet.Host }}
+              host: {{.Lifecycle.PreStop.HttpGet.Host }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+
 
   - path: templates/seldon-deployment.yaml
     template: false
@@ -682,18 +991,18 @@ files:
               {{- include "seldon.graph.node" .Graph | indent 8 }}
             componentSpecs:
               {{- if .HPASpec }}
-              - hpaSpec:
-                  minReplicas: {{ .HPASpec.MinReplicas }}
-                  maxReplicas: {{ .HPASpec.MaxReplicas }}
-                  metricsv2:
-                    {{- range .HPASpec.MetricsV2 }}
-                    - type: {{ .Type }}
-                      resource:
-                        name: {{ .Resource.Name }}
-                        target:
-                          type: {{ .Resource.Target.Type }}
-                          averageUtilization: {{ .Resource.Target.AverageUtilization }}
-                    {{- end }}
+              hpaSpec:
+                minReplicas: {{ .HPASpec.MinReplicas }}
+                maxReplicas: {{ .HPASpec.MaxReplicas }}
+                metricsv2:
+                  {{- range .HPASpec.MetricsV2 }}
+                  - type: {{ .Type }}
+                    resource:
+                      name: {{ .Resource.Name }}
+                      target:
+                        type: {{ .Resource.Target.Type }}
+                        averageUtilization: {{ .Resource.Target.AverageUtilization }}
+                  {{- end }}
               {{- end }}
               - spec:
                   {{- if .ComponentSpec.ServiceAccountName }}
@@ -705,104 +1014,13 @@ files:
                   {{- if .ComponentSpec.Containers }}      
                   containers:
                     {{- range .ComponentSpec.Containers }}
-                    - name: {{ .Name }}
-                      {{- if .Image }}
-                      image: {{ .Image }}
-                      {{- end }}
-                      {{- if .ImagePullPolicy }}
-                      imagePullPolicy: {{ .ImagePullPolicy }}
-                      {{- end }}
-                      {{- if .Env }}
-                      env:
-                        {{- range .Env }}
-                        - name: {{ .Name }}
-                          {{- if .Value }}
-                          value: {{ .Value }}
-                          {{- else if .ValueFrom }}
-                          valueFrom:
-                            secretKeyRef:
-                              name: {{ .ValueFrom.SecretKeyRef.Name }}
-                              key: {{ .ValueFrom.SecretKeyRef.Key }}
-                          {{- end }}
-                        {{- end }}
-                      {{- end }}
-                      {{- if .VolumeMounts }}
-                      volumeMounts:
-                        {{- range .VolumeMounts }}
-                        - name: {{ .Name }}
-                          mountPath: {{ .MountPath }}
-                          {{- if .ReadOnly }}
-                          readOnly: {{ .ReadOnly }}
-                          {{- end }}
-                        {{- end }}
-                      {{- end }}
-                      {{- if .Resources }}
-                      resources:
-                        {{- if .Resources.Requests }}
-                        requests:
-                          {{- range $k, $v := .Resources.Requests }}
-                          {{ $k }}: {{ $v }}
-                          {{- end }}
-                        {{- end }}
-                        {{- if .Resources.Limits }}
-                        limits:
-                          {{- range $k, $v := .Resources.Limits }}
-                          {{ $k }}: {{ $v }}
-                          {{- end }}
-                        {{- end }}
-                      {{- end }}
-                      {{- if .Liveness }}
-                      livenessProbe:
-                        httpGet:
-                          path: {{ .Liveness.Path }}
-                          port: {{ .Liveness.Port }}
-                        initialDelaySeconds: {{ .Liveness.InitialDelaySeconds }}
-                        periodSeconds: {{ .Liveness.PeriodSeconds }}
-                        failureThreshold: {{ .Liveness.FailureThreshold }}
-                        successThreshold: {{ .Liveness.SuccessThreshold }}
-                      {{- end }}
-                      {{- if .Readiness }}
-                      readinessProbe:
-                        httpGet:
-                          path: {{ .Readiness.Path }}
-                          port: {{ .Readiness.Port }}
-                        initialDelaySeconds: {{ .Readiness.InitialDelaySeconds }}
-                        periodSeconds: {{ .Readiness.PeriodSeconds }}
-                        failureThreshold: {{ .Readiness.FailureThreshold }}
-                        successThreshold: {{ .Readiness.SuccessThreshold }}
-                      {{- end }}
+                    {{- include "seldon.container" . | indent 14 }}
                     {{- end }}
                   {{- end }}
                   {{- if .ComponentSpec.InitContainers }}
                   initContainers:
                     {{- range .ComponentSpec.InitContainers }}
-                    - name: {{ .Name }}
-                      {{- if .Image }}
-                      image: {{ .Image }}
-                      {{- end }}  
-                      {{- if .ImagePullPolicy }}
-                      imagePullPolicy: {{ .ImagePullPolicy }}
-                      {{- end }}
-                      {{- if .Args }}
-                      args:
-                        {{- range .Args }}
-                        - {{ . }}
-                        {{- end }}
-                      {{- end }}
-                      {{- if .VolumeMounts }}
-                      volumeMounts:
-                        {{- range .VolumeMounts }}
-                        - name: {{ .Name }}
-                          mountPath: {{ .MountPath }}
-                        {{- end }}
-                      {{- end }}
-                      {{- if .EnvFrom }}
-                      envFrom:
-                        {{- range .EnvFrom }}
-                        - secretRef:
-                            name: {{ .SecretRef.Name }}
-                        {{- end }}
-                      {{- end }}
+                    {{- include "seldon.container" . | indent 14 }}
                     {{- end }}
                   {{- end }}
                   {{- if .ComponentSpec.Volumes }}
@@ -1010,6 +1228,10 @@ valuesSchema:
     type: string
     description: Kubernetes image pull policy (Always, IfNotPresent, Never)
     required: false
+  Predictors[].ComponentSpec.Containers[].Args:
+    type: array
+    description: Command-line arguments passed to the container entrypoint
+    required: false
   Predictors[].ComponentSpec.Containers[].Env:
     type: array
     description: Environment variables for the container
@@ -1029,6 +1251,18 @@ valuesSchema:
   Predictors[].ComponentSpec.Containers[].Env[].ValueFrom.SecretKeyRef.Key:
     type: string
     description: Key inside the referenced secret
+    required: false
+  Predictors[].ComponentSpec.Containers[].EnvFrom:
+    type: array
+    description: List of sources to populate environment variables from (ConfigMaps or Secrets)
+    required: false
+  Predictors[].ComponentSpec.Containers[].EnvFrom[].SecretRef.Name:
+    type: string
+    description: Name of the Secret for env import
+    required: false
+  Predictors[].ComponentSpec.Containers[].EnvFrom[].ConfigMapRef.Name:
+    type: string
+    description: Name of the ConfigMap for env import
     required: false
   Predictors[].ComponentSpec.Containers[].VolumeMounts:
     type: array
@@ -1061,6 +1295,34 @@ valuesSchema:
   Predictors[].ComponentSpec.Containers[].Readiness:
     type: object
     description: Readiness probe configuration for container
+    required: false
+  Predictors[].ComponentSpec.Containers[].Lifecycle:
+    type: object
+    description: Lifecycle hooks for the container (preStop and postStart)
+    required: false
+  Predictors[].ComponentSpec.Containers[].Lifecycle.PreStop.Exec.Command:
+    type: array
+    description: Command to run in preStop lifecycle hook (exec)
+    required: false
+  Predictors[].ComponentSpec.Containers[].Lifecycle.PreStop.HttpGet.Path:
+    type: string
+    description: HTTP path to access on the server for preStop hook
+    required: false
+  Predictors[].ComponentSpec.Containers[].Lifecycle.PreStop.HttpGet.Port:
+    type: string
+    description: Port to access on the server for preStop hook
+    required: false
+  Predictors[].ComponentSpec.Containers[].Lifecycle.PostStart.Exec.Command:
+    type: array
+    description: Command to run in postStart lifecycle hook (exec)
+    required: false
+  Predictors[].ComponentSpec.Containers[].Lifecycle.PostStart.HttpGet.Path:
+    type: string
+    description: HTTP path to access on the server for postStart hook
+    required: false
+  Predictors[].ComponentSpec.Containers[].Lifecycle.PostStart.HttpGet.Port:
+    type: string
+    description: Port to access on the server for postStart hook
     required: false
   Predictors[].ComponentSpec.Volumes:
     type: array
@@ -1098,6 +1360,38 @@ valuesSchema:
     type: array
     description: Arguments passed to init container on start
     required: false
+  Predictors[].ComponentSpec.InitContainers[].Env:
+    type: array
+    description: Environment variables for the init container
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Env[].Name:
+    type: string
+    description: Name of the environment variable
+    required: true
+  Predictors[].ComponentSpec.InitContainers[].Env[].Value:
+    type: string
+    description: Value of the environment variable
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Env[].ValueFrom.SecretKeyRef.Name:
+    type: string
+    description: Name of the Kubernetes secret for env valueFrom
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Env[].ValueFrom.SecretKeyRef.Key:
+    type: string
+    description: Key within the Kubernetes secret for env valueFrom
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].EnvFrom:
+    type: array
+    description: List of sources to populate environment variables from (ConfigMaps or Secrets)
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].EnvFrom[].SecretRef.Name:
+    type: string
+    description: Name of the Secret for env import
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].EnvFrom[].ConfigMapRef.Name:
+    type: string
+    description: Name of the ConfigMap for env import
+    required: false
   Predictors[].ComponentSpec.InitContainers[].VolumeMounts:
     type: array
     description: Volume mounts for the init container
@@ -1114,13 +1408,49 @@ valuesSchema:
     type: boolean
     description: Whether the mount is read-only
     required: false
-  Predictors[].ComponentSpec.InitContainers[].EnvFrom:
-    type: array
-    description: Import environment variables from Kubernetes secrets or configmaps
+  Predictors[].ComponentSpec.InitContainers[].Resources.Requests:
+    type: object
+    description: Minimum resources required by init container
     required: false
-  Predictors[].ComponentSpec.InitContainers[].EnvFrom[].SecretRef.Name:
+  Predictors[].ComponentSpec.InitContainers[].Resources.Limits:
+    type: object
+    description: Maximum resources allowed for init container
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Liveness:
+    type: object
+    description: Liveness probe for the init container
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Readiness:
+    type: object
+    description: Readiness probe for the init container
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Lifecycle:
+    type: object
+    description: Lifecycle hooks for the init container
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Lifecycle.PreStop.Exec.Command:
+    type: array
+    description: Command to run in preStop lifecycle hook (exec)
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Lifecycle.PostStart.Exec.Command:
+    type: array
+    description: Command to run in postStart lifecycle hook (exec)
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Lifecycle.PreStop.HttpGet.Path:
     type: string
-    description: Secret name to import env vars into init container
+    description: HTTP path to access on the server for preStop hook
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Lifecycle.PreStop.HttpGet.Port:
+    type: string
+    description: Port to access on the server for preStop hook
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Lifecycle.PostStart.HttpGet.Path:
+    type: string
+    description: HTTP path to access on the server for postStart hook
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Lifecycle.PostStart.HttpGet.Port:
+    type: string
+    description: Port to access on the server for postStart hook
     required: false
   Predictors[].ComponentSpec.HPASpec:
     type: object
