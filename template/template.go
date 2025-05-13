@@ -36,12 +36,35 @@ type Metadata struct {
 }
 
 type Predictor struct {
-	Name          string        `json:"Name"`
-	Replicas      int           `json:"Replicas"`
-	Traffic       int           `json:"Traffic"`
-	SvcOrchSpec   *SvcOrchSpec  `json:"svcOrchSpec,omitempty"`
-	Graph         GraphNode     `json:"Graph"`
-	ComponentSpec ComponentSpec `json:"ComponentSpec"`
+	Name                    string            `json:"Name"`
+	Replicas                int               `json:"Replicas"`
+	Traffic                 int               `json:"Traffic"`
+	SvcOrchSpec             *SvcOrchSpec      `json:"svcOrchSpec,omitempty"`
+	Graph                   GraphNode         `json:"Graph"`
+	ComponentSpec           ComponentSpec     `json:"ComponentSpec"`
+	EngineResources         *Resources        `json:"EngineResources,omitempty"`
+	Labels                  map[string]string `json:"Labels,omitempty"`
+	Explainer               *Explainer        `json:"Explainer,omitempty"`
+	Shadow                  bool              `json:"Shadow,omitempty"`
+	SSL                     *SSL              `json:"SSL,omitempty"`
+	ProgressDeadlineSeconds int               `json:"ProgressDeadlineSeconds,omitempty"`
+}
+
+type SSL struct {
+	CertSecretName string `json:"certSecretName,omitempty" protobuf:"string,2,opt,name=certSecretName"`
+}
+
+type Explainer struct {
+	Type                    string            `json:"Type,omitempty"`
+	ModelUri                string            `json:"ModelUri,omitempty"`
+	ServiceAccountName      string            `json:"ServiceAccountName,omitempty"`
+	Config                  map[string]string `json:"Config,omitempty"`
+	ContainerSpec           *Container        `json:"ContainerSpec,omitempty"` // or InitContainer if you use init-style explainers
+	Endpoint                *Endpoint         `json:"Endpoint,omitempty"`
+	EnvSecretRefName        string            `json:"EnvSecretRefName,omitempty"`
+	StorageInitializerImage string            `json:"StorageInitializerImage,omitempty"`
+	Replicas                int               `json:"Replicas,omitempty"`
+	InitParameters          string            `json:"InitParameters,omitempty"`
 }
 
 type EnvVar struct {
@@ -83,12 +106,12 @@ type Parameter struct {
 }
 
 type ComponentSpec struct {
-	ServiceAccountName            string          `json:"ServiceAccountName,omitempty"`
-	TerminationGracePeriodSeconds int             `json:"TerminationGracePeriodSeconds,omitempty"`
-	Containers                    []Container     `json:"Containers"`
-	Volumes                       []Volume        `json:"Volumes,omitempty"`
-	InitContainers                []InitContainer `json:"InitContainers,omitempty"`
-	HPASpec                       *HPASpec        `json:"hpaSpec,omitempty"`
+	ServiceAccountName            string      `json:"ServiceAccountName,omitempty"`
+	TerminationGracePeriodSeconds int         `json:"TerminationGracePeriodSeconds,omitempty"`
+	Containers                    []Container `json:"Containers,omitempty"`
+	Volumes                       []Volume    `json:"Volumes,omitempty"`
+	InitContainers                []Container `json:"InitContainers,omitempty"`
+	HPASpec                       *HPASpec    `json:"hpaSpec,omitempty"`
 }
 
 type Container struct {

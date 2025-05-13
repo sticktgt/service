@@ -236,6 +236,86 @@ files:
         - Name: {{ .Name }}
           Replicas: {{ .Replicas }}
           Traffic: {{ .Traffic }}
+          {{- if .EngineResources }}
+          EngineResources:
+            {{- if .EngineResources.Requests }}
+            Requests:
+              {{- range $k, $v := .EngineResources.Requests }}
+              {{ $k }}: {{ $v }}
+              {{- end }}
+            {{- end }}
+            {{- if .EngineResources.Limits }}
+            Limits:
+              {{- range $k, $v := .EngineResources.Limits }}
+              {{ $k }}: {{ $v }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- if .Labels }}
+          Labels:
+            {{- range $k, $v := .Labels }}
+            {{ $k }}: {{ $v }}
+            {{- end }}
+          {{- end }}
+          {{- if .Shadow }}
+          Shadow: {{ .Shadow }}
+          {{- end }}
+          {{- if .SSL }}
+          SSL:
+            CertSecretName: {{ .SSL.CertSecretName }}
+          {{- end }}
+          {{- if .ProgressDeadlineSeconds }}
+          ProgressDeadlineSeconds: {{ .ProgressDeadlineSeconds }}
+          {{- end }}
+          {{- if .Explainer }}
+          Explainer:
+            {{- if .Explainer.Type }}
+            Type: {{ .Explainer.Type }}
+            {{- end }}
+            {{- if .Explainer.ModelUri }}
+            ModelUri: {{ .Explainer.ModelUri }}
+            {{- end }}
+            {{- if .Explainer.ServiceAccountName }}
+            ServiceAccountName: {{ .Explainer.ServiceAccountName }}
+            {{- end }}
+            {{- if .Explainer.StorageInitializerImage }}
+            StorageInitializerImage: {{ .Explainer.StorageInitializerImage }}
+            {{- end }}
+            {{- if .Explainer.EnvSecretRefName }}
+            EnvSecretRefName: {{ .Explainer.EnvSecretRefName }}
+            {{- end }}
+            {{- if .Explainer.InitParameters }}
+            InitParameters: {{ .Explainer.InitParameters }}
+            {{- end }}
+            {{- if .Explainer.Replicas }}
+            Replicas: {{ .Explainer.Replicas }}
+            {{- end }}
+            {{- if .Explainer.Endpoint }}
+            Endpoint:
+              Type: {{ .Explainer.Endpoint.Type }}
+            {{- end }}
+            {{- if .Explainer.Config }}
+            Config:
+              {{- range $k, $v := .Explainer.Config }}
+              {{ $k }}: {{ $v }}
+              {{- end }}
+            {{- end }}
+            {{- if .Explainer.ContainerSpec }}
+            ContainerSpec:
+              Name: {{ .Explainer.ContainerSpec.Name }}
+              Image: {{ .Explainer.ContainerSpec.Image }}
+              {{- if .Explainer.ContainerSpec.ImagePullPolicy }}
+              ImagePullPolicy: {{ .Explainer.ContainerSpec.ImagePullPolicy }}
+              {{- end }}
+              {{- if .Explainer.ContainerSpec.Args }}
+              Args:
+                {{- range .Explainer.ContainerSpec.Args }}
+                - {{ . }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- if .SvcOrchSpec }}
           SvcOrchSpec:
             {{- if .SvcOrchSpec.Resources }}
             Resources:
@@ -266,6 +346,7 @@ files:
                 {{- end }}
               {{- end }}
             {{- end }}
+          {{- end }}
           ComponentSpec:
             ServiceAccountName: {{ .ComponentSpec.ServiceAccountName }}
             TerminationGracePeriodSeconds: {{ .ComponentSpec.TerminationGracePeriodSeconds }}
@@ -283,6 +364,7 @@ files:
                       AverageUtilization: {{ .Resource.Target.AverageUtilization }}
                 {{- end }}
             {{- end }}
+            {{- if .ComponentSpec.Volumes }}
             Volumes:
             {{- range .ComponentSpec.Volumes }}
               - Name: {{ .Name }}
@@ -293,11 +375,15 @@ files:
                   SecretName: {{ .Secret.SecretName }}
                 {{- end }}
             {{- end }}
+            {{- end }}
+            {{- if .ComponentSpec.Containers }}
             Containers:
             {{- range .ComponentSpec.Containers }}
               - Name: {{ .Name }}
                 Image: {{ .Image }}
+                {{- if .ImagePullPolicy }}
                 ImagePullPolicy: {{ .ImagePullPolicy }}
+                {{- end }}
                 {{- if .Args }}
                 Args:
                   {{- range .Args }}
@@ -329,6 +415,7 @@ files:
                   {{- end }}
                   {{- end }}
                 {{- end }}
+                {{- if .VolumeMounts }}
                 VolumeMounts:
                   {{- range .VolumeMounts }}
                   - Name: {{ .Name }}
@@ -337,6 +424,7 @@ files:
                     ReadOnly: {{ .ReadOnly }}
                     {{- end }}
                   {{- end }}
+                {{- end }}
                 {{- if .Resources }}
                 Resources:
                   Requests:
@@ -418,11 +506,15 @@ files:
                   {{- end }}
                 {{- end }}
             {{- end }}
+            {{- end }}
+            {{- if .ComponentSpec.InitContainers }}
             InitContainers:    
             {{- range .ComponentSpec.InitContainers }}
               - Name: {{ .Name }}
                 Image: {{ .Image }}
+                {{- if .ImagePullPolicy }}
                 ImagePullPolicy: {{ .ImagePullPolicy }}
+                {{- end }}
                 {{- if .Args }}
                 Args:
                   {{- range .Args }}
@@ -542,6 +634,7 @@ files:
                     {{- end }}
                   {{- end }}
                 {{- end }}
+            {{- end }}
             {{- end }}
           Graph:
             Name: {{ .Graph.Name }}
@@ -957,6 +1050,76 @@ files:
               {{ $k }}: {{ $v }}
             {{- end }}
             {{- end }}
+            {{- if .EngineResources }}
+            engineResources:
+              {{- if .EngineResources.Requests }}
+              requests:
+                {{- range $k, $v := .EngineResources.Requests }}
+                {{ $k }}: {{ $v }}
+                {{- end }}
+              {{- end }}
+              {{- if .EngineResources.Limits }}
+              limits:
+                {{- range $k, $v := .EngineResources.Limits }}
+                {{ $k }}: {{ $v }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+            {{- if .Labels }}
+            labels:
+              {{- range $k, $v := .Labels }}
+              {{ $k }}: {{ $v }}
+              {{- end }}
+            {{- end }}
+            {{- if .Shadow }}
+            shadow: {{ .Shadow }}
+            {{- end }}
+            {{- if .SSL }}
+            ssl:
+              certSecretName: {{ .SSL.CertSecretName }}
+            {{- end }}
+            {{- if .ProgressDeadlineSeconds }}
+            progressDeadlineSeconds: {{ .ProgressDeadlineSeconds }}
+            {{- end }}
+            {{- if .Explainer }}
+            explainer:
+              {{- if .Explainer.Type }}
+              type: {{ .Explainer.Type }}
+              {{- end }}
+              {{- if .Explainer.ModelUri }}
+              modelUri: {{ .Explainer.ModelUri }}
+              {{- end }}
+              {{- if .Explainer.ServiceAccountName }}
+              serviceAccountName: {{ .Explainer.ServiceAccountName }}
+              {{- end }}
+              {{- if .Explainer.StorageInitializerImage }}
+              storageInitializerImage: {{ .Explainer.StorageInitializerImage }}
+              {{- end }}
+              {{- if .Explainer.EnvSecretRefName }}
+              envSecretRefName: {{ .Explainer.EnvSecretRefName }}
+              {{- end }}
+              {{- if .Explainer.InitParameters }}
+              initParameters: {{ .Explainer.InitParameters | quote }}
+              {{- end }}
+              {{- if .Explainer.Replicas }}
+              replicas: {{ .Explainer.Replicas }}
+              {{- end }}
+              {{- if .Explainer.Endpoint }}
+              endpoint:
+                type: {{ .Explainer.Endpoint.Type }}
+              {{- end }}
+              {{- if .Explainer.Config }}
+              config:
+                {{- range $k, $v := .Explainer.Config }}
+                {{ $k }}: {{ $v }}
+                {{- end }}
+              {{- end }}
+              {{- if .Explainer.ContainerSpec }}
+              containerSpec:
+              {{- include "seldon.container" .Explainer.ContainerSpec | indent 10 }}
+              {{- end }}
+            {{- end }}
+            {{- if .SvcOrchSpec }}
             svcOrchSpec:
               {{- if .SvcOrchSpec.Resources }}
               resources:
@@ -987,6 +1150,7 @@ files:
                   {{- end }}
                 {{- end }}
               {{- end }}
+            {{- end }}
             graph:
               {{- include "seldon.graph.node" .Graph | indent 8 }}
             componentSpecs:
@@ -1484,3 +1648,75 @@ valuesSchema:
     type: integer
     description: Target average utilization percentage
     required: false
+  Predictors[].EngineResources.Requests:
+    type: object
+    description: Resource requests (e.g., cpu and memory) for the Seldon engine sidecar container
+    required: false
+  Predictors[].EngineResources.Limits:
+    type: object
+    description: Resource limits (e.g., cpu and memory) for the Seldon engine sidecar container
+    required: false
+  Predictors[].Labels:
+    type: object
+    description: Custom labels applied to the predictor deployment
+    required: false
+  Predictors[].Shadow:
+    type: boolean
+    description: If true, all traffic is shadowed to this predictor without impacting the response
+    required: false
+  Predictors[].SSL.CertSecretName:
+    type: string
+    description: SSL sertificate secrete name for this predictor
+    required: false
+  Predictors[].ProgressDeadlineSeconds:
+    type: integer
+    description: Time in seconds the deployment controller should wait before marking the predictor as failed
+    required: false
+  Predictors[].Explainer.Type:
+    type: string
+    description: The type of explainer (e.g., "anchor_tabular", "alibi") used to interpret model predictions
+    required: false
+  Predictors[].Explainer.ModelUri:
+    type: string
+    description: URI pointing to the explainer model location
+    required: false
+  Predictors[].Explainer.Config:
+    type: object
+    description: Key-value configuration settings passed to the explainer
+    required: false
+  Predictors[].Explainer.Endpoint.Type:
+    type: string
+    description: Type of the endpoint protocol (e.g., REST or GRPC)
+    required: false
+  Predictors[].Explainer.EnvSecretRefName:
+    type: string
+    description: Name of the secret containing environment variables for the explainer
+    required: false
+  Predictors[].Explainer.StorageInitializerImage:
+    type: string
+    description: Custom image to use for the explainer's storage initializer
+    required: false
+  Predictors[].Explainer.Replicas:
+    type: integer
+    description: Number of replicas to run for the explainer deployment
+    required: false
+  Predictors[].Explainer.InitParameters:
+    type: string
+    description: JSON-formatted string with initialization parameters for the explainer
+    required: false
+  Predictors[].Explainer.ContainerSpec.Name:
+    type: string
+    description: Name of the explainer container
+    required: false
+  Predictors[].Explainer.ContainerSpec.Image:
+    type: string
+    description: Container image for the explainer
+    required: false
+  Predictors[].Explainer.ContainerSpec.Args:
+    type: array
+    description: Command-line arguments passed to the explainer container
+    required: false
+  Predictors[].Explainer.ContainerSpec.ImagePullPolicy:
+    type: string
+    description: Policy for pulling init container image
+    required: false  
