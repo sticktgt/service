@@ -12,16 +12,20 @@ import (
 )
 
 type Values struct {
-	Environment    string            `json:"Environment"`
-	ApiVersion     string            `json:"ApiVersion"`
-	Chart          Chart             `json:"Chart"`
-	DeploymentName string            `json:"DeploymentName"`
-	Namespace      string            `json:"Namespace"`
-	Metadata       Metadata          `json:"Metadata"`
-	Predictors     []Predictor       `json:"Predictors"`
-	Annotations    map[string]string `json:"annotations,omitempty"`
-	Protocol       string            `json:"protocol,omitempty"`
-	Transport      string            `json:"transport,omitempty"`
+	Environment          string            `json:"Environment"`
+	ApiVersion           string            `json:"ApiVersion"`
+	Chart                Chart             `json:"Chart"`
+	DeploymentName       string            `json:"DeploymentName"`
+	Namespace            string            `json:"Namespace"`
+	Metadata             Metadata          `json:"Metadata"`
+	Predictors           []Predictor       `json:"Predictors"`
+	Annotations          map[string]string `json:"annotations,omitempty"`
+	Protocol             string            `json:"protocol,omitempty"`
+	Transport            string            `json:"transport,omitempty"`
+	SubjectArea          string            `json:"subjectArea,omitempty"`
+	SourceMetafileName   string            `json:"sourceMetafileName,omitempty"`
+	SourceMetafileRepo   string            `json:"sourceMetafileRepo,omitempty"`
+	SourceMetafileBranch string            `json:"sourceMetafileBranch,omitempty"`
 }
 
 type Chart struct {
@@ -83,15 +87,18 @@ type SecretKeyRef struct {
 }
 
 type GraphNode struct {
-	Name             string      `json:"Name"`
-	Type             string      `json:"Type"`
-	Implementation   string      `json:"Implementation,omitempty"`
-	ModelUri         string      `json:"ModelUri,omitempty"`
-	EnvSecretRefName string      `json:"EnvSecretRefName,omitempty"`
-	Logger           *Logger     `json:"Logger,omitempty"`
-	Endpoint         *Endpoint   `json:"Endpoint,omitempty"`
-	Parameters       []Parameter `json:"Parameters,omitempty"`
-	Children         []GraphNode `json:"Children,omitempty"`
+	Name                    string      `json:"Name"`
+	Type                    string      `json:"Type"`
+	Implementation          string      `json:"Implementation,omitempty"`
+	ModelUri                string      `json:"ModelUri,omitempty"`
+	EnvSecretRefName        string      `json:"EnvSecretRefName,omitempty"`
+	Logger                  *Logger     `json:"Logger,omitempty"`
+	Endpoint                *Endpoint   `json:"Endpoint,omitempty"`
+	Parameters              []Parameter `json:"Parameters,omitempty"`
+	Children                []GraphNode `json:"Children,omitempty"`
+	Methods                 []string    `json:"Methods,omitempty"`
+	ServiceAccountName      string      `json:"ServiceAccountName,omitempty"`
+	StorageInitializerImage string      `json:"StorageInitializerImage,omitempty"`
 }
 
 type Logger struct {
@@ -112,6 +119,37 @@ type ComponentSpec struct {
 	Volumes                       []Volume    `json:"Volumes,omitempty"`
 	InitContainers                []Container `json:"InitContainers,omitempty"`
 	HPASpec                       *HPASpec    `json:"hpaSpec,omitempty"`
+	KedaSpec                      *KedaSpec   `json:"KedaSpec,omitempty"`
+	PdbSpec                       *PdbSpec    `json:"PdbSpec,omitempty"`
+}
+
+type KedaSpec struct {
+	MinReplicaCount *int32            `json:"minReplicaCount,omitempty"`
+	MaxReplicaCount *int32            `json:"maxReplicaCount,omitempty"`
+	CooldownPeriod  *int32            `json:"cooldownPeriod,omitempty"`
+	PollingInterval *int32            `json:"pollingInterval,omitempty"`
+	Triggers        []KedaTrigger     `json:"triggers,omitempty"`
+	Advanced        *KedaAdvancedSpec `json:"advanced,omitempty"`
+}
+
+type KedaTrigger struct {
+	Type              string            `json:"type"`
+	Metadata          map[string]string `json:"metadata,omitempty"`
+	AuthenticationRef *struct {
+		Name string `json:"name"`
+	} `json:"authenticationRef,omitempty"`
+}
+
+type KedaAdvancedSpec struct {
+	RestoreToOriginalReplicaCount *bool `json:"restoreToOriginalReplicaCount,omitempty"`
+	HorizontalPodAutoscalerConfig *struct {
+		Behavior map[string]interface{} `json:"behavior,omitempty"`
+	} `json:"horizontalPodAutoscalerConfig,omitempty"`
+}
+
+type PdbSpec struct {
+	MinAvailable   string `json:"minAvailable,omitempty"`
+	MaxUnavailable string `json:"maxUnavailable,omitempty"`
 }
 
 type Container struct {
@@ -128,6 +166,16 @@ type Container struct {
 	Lifecycle       *Lifecycle    `json:"Lifecycle,omitempty"`
 }
 
+type ResourceQuantities struct {
+	CPU    string `json:"cpu,omitempty"`
+	Memory string `json:"memory,omitempty"`
+}
+
+type Resources struct {
+	Requests *ResourceQuantities `json:"Requests,omitempty"`
+	Limits   *ResourceQuantities `json:"Limits,omitempty"`
+}
+
 type VolumeMount struct {
 	Name      string `json:"Name"`
 	MountPath string `json:"MountPath"`
@@ -142,11 +190,6 @@ type Volume struct {
 
 type SecretVolumeSource struct {
 	SecretName string `json:"SecretName"`
-}
-
-type Resources struct {
-	Requests map[string]string `json:"Requests,omitempty"`
-	Limits   map[string]string `json:"Limits,omitempty"`
 }
 
 type Probe struct {

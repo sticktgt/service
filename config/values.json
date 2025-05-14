@@ -8,6 +8,10 @@
   },
   "DeploymentName": "test-explainer-model",
   "Namespace": "default",
+  "SubjectArea": "seldon-test-project",
+  "SourceMetafileName": "seldon.meta.yaml",
+  "SourceMetafileRepo": "https://neogit.neoflex.ru/vsemenov/tservice/",
+  "SourceMetafileBranch": "main",  
   "Predictors": [
     {
       "Name": "default",

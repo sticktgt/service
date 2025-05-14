@@ -7,6 +7,14 @@ files:
       version: {{ .Chart.Version }}
       description: {{ .Chart.Description }}
       type: application
+      app.dognauts:
+        subjectArea: {{ .SubjectArea }}
+        sourceMetafileRepo: {{ .SourceMetafileRepo }}
+        sourceMetafileBranch: {{ .SourceMetafileBranch }}
+        sourceMetafileName: {{ .SourceMetafileName }}
+      annotations:
+        app.dognauts/platform-generated: true
+        app.dognauts/subjectArea: {{ .SubjectArea }}
 
   - path: values.yaml
     template: true
@@ -240,14 +248,20 @@ files:
           EngineResources:
             {{- if .EngineResources.Requests }}
             Requests:
-              {{- range $k, $v := .EngineResources.Requests }}
-              {{ $k }}: {{ $v }}
+              {{- if .EngineResources.Requests.CPU }}
+              CPU: {{ .EngineResources.Requests.CPU }}
+              {{- end }}
+              {{- if .EngineResources.Requests.Memory }}
+              Memory: {{ .EngineResources.Requests.Memory }}
               {{- end }}
             {{- end }}
             {{- if .EngineResources.Limits }}
             Limits:
-              {{- range $k, $v := .EngineResources.Limits }}
-              {{ $k }}: {{ $v }}
+              {{- if .EngineResources.Limits.CPU }}
+              CPU: {{ .EngineResources.Limits.CPU }}
+              {{- end }}
+              {{- if .EngineResources.Limits.Memory }}
+              Memory: {{ .EngineResources.Limits.Memory }}
               {{- end }}
             {{- end }}
           {{- end }}
@@ -321,14 +335,20 @@ files:
             Resources:
               {{- if .SvcOrchSpec.Resources.Requests }}
               Requests:
-                {{- range $k, $v := .SvcOrchSpec.Resources.Requests }}
-                {{ $k }}: {{ $v }}
+                {{- if .SvcOrchSpec.Resources.Requests.CPU }}
+                CPU: {{ .SvcOrchSpec.Resources.Requests.CPU }}
+                {{- end }}
+                {{- if .SvcOrchSpec.Resources.Requests.Memory }}
+                Memory: {{ .SvcOrchSpec.Resources.Requests.Memory }}
                 {{- end }}
               {{- end }}
               {{- if .SvcOrchSpec.Resources.Limits }}
               Limits:
-                {{- range $k, $v := .SvcOrchSpec.Resources.Limits }}
-                {{ $k }}: {{ $v }}
+                {{- if .SvcOrchSpec.Resources.Limits.CPU }}
+                CPU: {{ .SvcOrchSpec.Resources.Limits.CPU }}
+                {{- end }}
+                {{- if .SvcOrchSpec.Resources.Limits.Memory }}
+                Memory: {{ .SvcOrchSpec.Resources.Limits.Memory }}
                 {{- end }}
               {{- end }}
             {{- end }}
@@ -363,6 +383,56 @@ files:
                       Type: {{ .Resource.Target.Type }}
                       AverageUtilization: {{ .Resource.Target.AverageUtilization }}
                 {{- end }}
+            {{- end }}
+            {{- if .ComponentSpec.KedaSpec }}
+            KedaSpec:
+              {{- if .ComponentSpec.KedaSpec.MinReplicaCount }}
+              MinReplicaCount: {{ .ComponentSpec.KedaSpec.MinReplicaCount }}
+              {{- end }}
+              {{- if .ComponentSpec.KedaSpec.MaxReplicaCount }}
+              MaxReplicaCount: {{ .ComponentSpec.KedaSpec.MaxReplicaCount }}
+              {{- end }}
+              {{- if .ComponentSpec.KedaSpec.CooldownPeriod }}
+              CooldownPeriod: {{ .ComponentSpec.KedaSpec.CooldownPeriod }}
+              {{- end }}
+              {{- if .ComponentSpec.KedaSpec.PollingInterval }}
+              PollingInterval: {{ .ComponentSpec.KedaSpec.PollingInterval }}
+              {{- end }}
+              {{- if .ComponentSpec.KedaSpec.Triggers }}
+              Triggers:
+                {{- range .ComponentSpec.KedaSpec.Triggers }}
+                - Type: {{ .Type }}
+                  {{- if .Metadata }}
+                  Metadata:
+                    {{- range $k, $v := .Metadata }}
+                    {{ $k }}: {{ $v }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .AuthenticationRef }}
+                  AuthenticationRef:
+                    Name: {{ .AuthenticationRef.Name }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+              {{- if .ComponentSpec.KedaSpec.Advanced }}
+              Advanced:
+                {{- if .ComponentSpec.KedaSpec.Advanced.RestoreToOriginalReplicaCount }}
+                RestoreToOriginalReplicaCount: {{ .ComponentSpec.KedaSpec.Advanced.RestoreToOriginalReplicaCount }}
+                {{- end }}
+                {{- if .ComponentSpec.KedaSpec.Advanced.HorizontalPodAutoscalerConfig }}
+                HorizontalPodAutoscalerConfig:
+                  {{ .ComponentSpec.KedaSpec.Advanced.HorizontalPodAutoscalerConfig }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+            {{- if .ComponentSpec.PdbSpec }}
+            PdbSpec:
+              {{- if .ComponentSpec.PdbSpec.MinAvailable }}
+              MinAvailable: {{ .ComponentSpec.PdbSpec.MinAvailable }}
+              {{- end }}
+              {{- if .ComponentSpec.PdbSpec.MaxUnavailable }}
+              MaxUnavailable: {{ .ComponentSpec.PdbSpec.MaxUnavailable }}
+              {{- end }}
             {{- end }}
             {{- if .ComponentSpec.Volumes }}
             Volumes:
@@ -427,14 +497,24 @@ files:
                 {{- end }}
                 {{- if .Resources }}
                 Resources:
+                  {{- if .Resources.Requests }}
                   Requests:
-                    {{- range $k, $v := .Resources.Requests }}
-                    {{ $k }}: {{ $v }}
+                    {{- if .Resources.Requests.CPU }}
+                    CPU: {{ .Resources.Requests.CPU }}
                     {{- end }}
+                    {{- if .Resources.Requests.Memory }}
+                    Memory: {{ .Resources.Requests.Memory }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .Resources.Limits }}
                   Limits:
-                    {{- range $k, $v := .Resources.Limits }}
-                    {{ $k }}: {{ $v }}
+                    {{- if .Resources.Limits.CPU }}
+                    CPU: {{ .Resources.Limits.CPU }}
                     {{- end }}
+                    {{- if .Resources.Limits.Memory }}
+                    Memory: {{ .Resources.Limits.Memory }}
+                    {{- end }}
+                  {{- end }}  
                 {{- end }}
                 {{- if .Liveness }}
                 Liveness:
@@ -556,14 +636,24 @@ files:
                   {{- end }}
                 {{- if .Resources }}
                 Resources:
+                  {{- if .Resources.Requests }}
                   Requests:
-                    {{- range $k, $v := .Resources.Requests }}
-                    {{ $k }}: {{ $v }}
+                    {{- if .Resources.Requests.CPU }}
+                    CPU: {{ .Resources.Requests.CPU }}
                     {{- end }}
+                    {{- if .Resources.Requests.Memory }}
+                    Memory: {{ .Resources.Requests.Memory }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .Resources.Limits }}  
                   Limits:
-                    {{- range $k, $v := .Resources.Limits }}
-                    {{ $k }}: {{ $v }}
+                    {{- if .Resources.Limits.CPU }}
+                    CPU: {{ .Resources.Limits.CPU }}
                     {{- end }}
+                    {{- if .Resources.Limits.Memory }}
+                    Memory: {{ .Resources.Limits.Memory }}
+                    {{- end }}
+                  {{- end }}
                 {{- end }}
                 {{- if .Liveness }}
                 Liveness:
@@ -667,6 +757,18 @@ files:
                 Value: {{ .Value }}
               {{- end }}
             {{- end }}
+            {{- if .Graph.Methods }}
+            Methods:
+              {{- range .Graph.Methods }}
+              - {{ . }}
+              {{- end }}
+            {{- end }}
+            {{- if .Graph.ServiceAccountName }}
+            ServiceAccountName: {{ .Graph.ServiceAccountName }}
+            {{- end }}
+            {{- if .Graph.StorageInitializerImage }}
+            StorageInitializerImage: {{ .Graph.StorageInitializerImage }}
+            {{- end }}
             {{- if .Graph.Children }}
             Children:
               {{- range .Graph.Children }}
@@ -699,6 +801,18 @@ files:
                     Type: {{ .Type }}
                     Value: {{ .Value }}
                   {{- end }}
+                {{- end }}
+                {{- if .Methods }}
+                Methods:
+                  {{- range .Methods }}
+                  - {{ . }}
+                  {{- end }}
+                {{- end }}
+                {{- if .ServiceAccountName }}
+                ServiceAccountName: {{ .ServiceAccountName }}
+                {{- end }}
+                {{- if .StorageInitializerImage }}
+                StorageInitializerImage: {{ .StorageInitializerImage }}
                 {{- end }}
                 {{- if .Children }}
                 Children:
@@ -733,6 +847,18 @@ files:
                         Value: {{ .Value }}
                       {{- end }}
                     {{- end }}
+                    {{- if .Methods }}
+                    Methods:
+                      {{- range .Methods }}
+                      - {{ . }}
+                      {{- end }}
+                    {{- end }}
+                    {{- if .ServiceAccountName }}
+                    ServiceAccountName: {{ .ServiceAccountName }}
+                    {{- end }}
+                    {{- if .StorageInitializerImage }}
+                    StorageInitializerImage: {{ .StorageInitializerImage }}
+                    {{- end }}
                     {{- if .Children }}
                     Children:
                       {{- range .Children }}
@@ -765,6 +891,18 @@ files:
                             Type: {{ .Type }}
                             Value: {{ .Value }}
                           {{- end }}
+                        {{- end }}
+                        {{- if .Methods }}
+                        Methods:
+                          {{- range .Methods }}
+                          - {{ . }}
+                          {{- end }}
+                        {{- end }}
+                        {{- if .ServiceAccountName }}
+                        ServiceAccountName: {{ .ServiceAccountName }}
+                        {{- end }}
+                        {{- if .StorageInitializerImage }}
+                        StorageInitializerImage: {{ .StorageInitializerImage }}
                         {{- end }}
                         {{- if .Children }}
                         Children:
@@ -799,6 +937,18 @@ files:
                                 Value: {{ .Value }}
                               {{- end }}
                             {{- end }}
+                            {{- if .Methods }}
+                            Methods:
+                              {{- range .Methods }}
+                              - {{ . }}
+                              {{- end }}
+                            {{- end }}
+                            {{- if .ServiceAccountName }}
+                            ServiceAccountName: {{ .ServiceAccountName }}
+                            {{- end }}
+                            {{- if .StorageInitializerImage }}
+                            StorageInitializerImage: {{ .StorageInitializerImage }}
+                            {{- end }}                            
                             Children: []
                           {{- end }}
                         {{- else }}
@@ -853,6 +1003,18 @@ files:
           type: {{ .Type }}
           value: {{ .Value }}
         {{- end }}
+      {{- end }}
+      {{- if .Methods }}
+      methods:
+        {{- range .Methods }}
+        - {{ . }}
+        {{- end }}
+      {{- end }}
+      {{- if .ServiceAccountName }}
+      serviceAccountName: {{ .ServiceAccountName }}
+      {{- end }}
+      {{- if .StorageInitializerImage }}
+      storageInitializerImage: {{ .StorageInitializerImage }}
       {{- end }}
       {{- if .Children }}
       children:
@@ -918,14 +1080,20 @@ files:
         resources:
           {{- if .Resources.Requests }}
           requests:
-            {{- range $k, $v := .Resources.Requests }}
-            {{ $k }}: {{ $v }}
+            {{- if .Resources.Requests.CPU }}
+            cpu: {{ .Resources.Requests.CPU }}
+            {{- end }}
+            {{- if .Resources.Requests.Memory }}
+            memory: {{ .Resources.Requests.Memory }}
             {{- end }}
           {{- end }}
           {{- if .Resources.Limits }}
           limits:
-            {{- range $k, $v := .Resources.Limits }}
-            {{ $k }}: {{ $v }}
+            {{- if .Resources.Limits.CPU }}
+            cpu: {{ .Resources.Limits.CPU }}
+            {{- end }}
+            {{- if .Resources.Limits.Memory }}
+            memory: {{ .Resources.Limits.Memory }}
             {{- end }}
           {{- end }}
         {{- end }}
@@ -1054,14 +1222,20 @@ files:
             engineResources:
               {{- if .EngineResources.Requests }}
               requests:
-                {{- range $k, $v := .EngineResources.Requests }}
-                {{ $k }}: {{ $v }}
+                {{- if .EngineResources.Requests.CPU }}
+                cpu: {{ .EngineResources.Requests.CPU }}
+                {{- end }}
+                {{- if .EngineResources.Requests.Memory }}
+                memory: {{ .EngineResources.Requests.Memory }}
                 {{- end }}
               {{- end }}
               {{- if .EngineResources.Limits }}
               limits:
-                {{- range $k, $v := .EngineResources.Limits }}
-                {{ $k }}: {{ $v }}
+                {{- if .EngineResources.Limits.CPU }}
+                cpu: {{ .EngineResources.Limits.CPU }}
+                {{- end }}
+                {{- if .EngineResources.Limits.Memory }}
+                memory: {{ .EngineResources.Limits.Memory }}
                 {{- end }}
               {{- end }}
             {{- end }}
@@ -1125,14 +1299,20 @@ files:
               resources:
                 {{- if .SvcOrchSpec.Resources.Requests }}
                 requests:
-                  {{- range $k, $v := .SvcOrchSpec.Resources.Requests }}
-                  {{ $k }}: {{ $v }}
+                  {{- if .SvcOrchSpec.Resources.Requests.CPU }}
+                  cpu: {{ .SvcOrchSpec.Resources.Requests.CPU }}
+                  {{- end }}
+                  {{- if .SvcOrchSpec.Resources.Requests.Memory }}
+                  memory: {{ .SvcOrchSpec.Resources.Requests.Memory }}
                   {{- end }}
                 {{- end }}
                 {{- if .SvcOrchSpec.Resources.Limits }}
                 limits:
-                  {{- range $k, $v := .SvcOrchSpec.Resources.Limits }}
-                  {{ $k }}: {{ $v }}
+                  {{- if .SvcOrchSpec.Resources.Limits.CPU }}
+                  cpu: {{ .SvcOrchSpec.Resources.Limits.CPU }}
+                  {{- end }}
+                  {{- if .SvcOrchSpec.Resources.Limits.Memory }}
+                  memory: {{ .SvcOrchSpec.Resources.Limits.Memory }}
                   {{- end }}
                 {{- end }}
               {{- end }}
@@ -1174,6 +1354,56 @@ files:
                   {{- end }}
                   {{- if .ComponentSpec.TerminationGracePeriodSeconds }}
                   terminationGracePeriodSeconds: {{ .ComponentSpec.TerminationGracePeriodSeconds }}
+                  {{- end }}
+                  {{- if .ComponentSpec.KedaSpec }}
+                  kedaSpec:
+                    {{- if .ComponentSpec.KedaSpec.MinReplicaCount }}
+                    minReplicaCount: {{ .ComponentSpec.KedaSpec.MinReplicaCount }}
+                    {{- end }}
+                    {{- if .ComponentSpec.KedaSpec.MaxReplicaCount }}
+                    maxReplicaCount: {{ .ComponentSpec.KedaSpec.MaxReplicaCount }}
+                    {{- end }}
+                    {{- if .ComponentSpec.KedaSpec.CooldownPeriod }}
+                    cooldownPeriod: {{ .ComponentSpec.KedaSpec.CooldownPeriod }}
+                    {{- end }}
+                    {{- if .ComponentSpec.KedaSpec.PollingInterval }}
+                    pollingInterval: {{ .ComponentSpec.KedaSpec.PollingInterval }}
+                    {{- end }}
+                    {{- if .ComponentSpec.KedaSpec.Triggers }}
+                    triggers:
+                      {{- range .ComponentSpec.KedaSpec.Triggers }}
+                      - type: {{ .Type }}
+                        {{- if .Metadata }}
+                        metadata:
+                          {{- range $k, $v := .Metadata }}
+                          {{ $k }}: {{ $v }}
+                          {{- end }}
+                        {{- end }}
+                        {{- if .AuthenticationRef }}
+                        authenticationRef:
+                          name: {{ .AuthenticationRef.Name }}
+                        {{- end }}
+                      {{- end }}
+                    {{- end }}
+                    {{- if .ComponentSpec.KedaSpec.Advanced }}
+                    advanced:
+                      {{- if .ComponentSpec.KedaSpec.Advanced.RestoreToOriginalReplicaCount }}
+                      restoreToOriginalReplicaCount: {{ .ComponentSpec.KedaSpec.Advanced.RestoreToOriginalReplicaCount }}
+                      {{- end }}
+                      {{- if .ComponentSpec.KedaSpec.Advanced.HorizontalPodAutoscalerConfig }}
+                      horizontalPodAutoscalerConfig:
+                        {{ .ComponentSpec.KedaSpec.Advanced.HorizontalPodAutoscalerConfig }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .ComponentSpec.PdbSpec }}
+                  pdbSpec:
+                    {{- if .ComponentSpec.PdbSpec.MinAvailable }}
+                    minAvailable: {{ .ComponentSpec.PdbSpec.MinAvailable }}
+                    {{- end }}
+                    {{- if .ComponentSpec.PdbSpec.MaxUnavailable }}
+                    maxUnavailable: {{ .ComponentSpec.PdbSpec.MaxUnavailable }}
+                    {{- end }}
                   {{- end }}
                   {{- if .ComponentSpec.Containers }}      
                   containers:
@@ -1240,6 +1470,26 @@ valuesSchema:
     type: string
     description: Kubernetes namespace to deploy the resources in
     required: true
+  SubjectArea:
+    type: string
+    description: A tag to classify a subject area of the target chart.
+    required: true
+    default: batch-model-inference
+  SourceMetafileName:
+    type: string
+    description: Source metafile name
+    required: true
+    default: no_data
+  SourceMetafileRepo:
+    type: string
+    description: Source metafile name
+    required: true
+    default: no_data
+  SourceMetafileBranch:
+    type: string
+    description: Source metafile name
+    required: true
+    default: no_data
   Metadata.Labels:
     type: object
     description: Key-value pairs used to categorize and select Kubernetes objects
@@ -1250,11 +1500,11 @@ valuesSchema:
     required: false
   Protocol:
     type: string
-    description: Inference protocol to use (e.g., seldon, tensorflow, v2)
+    description: Inference protocol to use. Allowed values- seldon, tensorflow, kafka, v2
     required: false
   Transport:
     type: string
-    description: Transport mechanism to use (e.g., rest, grpc)
+    description: Transport mechanism to use. Allowed values- rest, grpc
     required: false
   Annotations:
     type: object
@@ -1284,17 +1534,21 @@ valuesSchema:
     type: object
     description: Annotations applied to this predictor instance
     required: false
-  Predictors[].SvcOrchSpec.Resources:
-    type: object
-    description: Resource requests and limits for the service orchestrator (keys limits, requests)
+  Predictors[].SvcOrchSpec.Resources.Requests.CPU:
+    type: string
+    description: CPU requested by the service orchestrator container
     required: false
-  Predictors[].SvcOrchSpec.Resources.requests:
-    type: object
-    description: Requested CPU and memory resources
+  Predictors[].SvcOrchSpec.Resources.Requests.Memory:
+    type: string
+    description: Memory requested by the service orchestrator container
     required: false
-  Predictors[].SvcOrchSpec.Resources.limits:
-    type: object
-    description: Maximum allowed CPU and memory resources
+  Predictors[].SvcOrchSpec.Resources.Limits.CPU:
+    type: string
+    description: Maximum CPU allowed for the service orchestrator
+    required: false
+  Predictors[].SvcOrchSpec.Resources.Limits.Memory:
+    type: string
+    description: Maximum memory allowed for the service orchestrator
     required: false
   Predictors[].SvcOrchSpec.Env:
     type: array
@@ -1322,11 +1576,11 @@ valuesSchema:
     required: true
   Predictors[].Graph.Type:
     type: string
-    description: Type of the node (MODEL, ROUTER, TRANSFORMER, etc.)
+    description: Type. Allowed values- MODEL, TRANSFORMER, COMBINER, ROUTER, OUTPUT_TRANSFORMER, UNKNOWN_TYPE of the node (MODEL, ROUTER, TRANSFORMER, etc.)
     required: true
   Predictors[].Graph.Implementation:
     type: string
-    description: Predefined implementation for the model server (e.g., SKLEARN_SERVER, MLFLOW)
+    description: Predefined implementation for the model server. Allowed values- UNKNOWN_IMPLEMENTATION, SKLEARN_SERVER, XGBOOST_SERVER, TENSORFLOW_SERVER, PYTORCH_SERVER, LIGHTGBM_SERVER, CUSTOM, TRITON_SERVER, HUGGINGFACE_SERVER, MLFLOW_SERVER, ONNX_SERVER, R_SERVER
     required: false
   Predictors[].Graph.ModelUri:
     type: string
@@ -1334,7 +1588,7 @@ valuesSchema:
     required: false
   Predictors[].Graph.Endpoint.Type:
     type: string
-    description: Type of endpoint exposed by the graph (REST or GRPC)
+    description: Type of endpoint exposed by the graph. Allowed values- REST, GRPC
     required: false
   Predictors[].Graph.EnvSecretRefName:
     type: string
@@ -1342,7 +1596,7 @@ valuesSchema:
     required: false
   Predictors[].Graph.Logger.Mode:
     type: string
-    description: Logging mode (all, request, response, none)
+    description: Logging mode. Allowed values- all, request, response, none
     required: false
   Predictors[].Graph.Logger.URL:
     type: string
@@ -1358,7 +1612,7 @@ valuesSchema:
     required: true
   Predictors[].Graph.Parameters[].Type:
     type: string
-    description: Data type of the parameter (STRING, INT, FLOAT)
+    description: Data type of the parameter. Allowed values- STRING, BOOL, INT, FLOAT, DOUBLE
     required: true
   Predictors[].Graph.Parameters[].Value:
     type: string
@@ -1367,6 +1621,18 @@ valuesSchema:
   Predictors[].Graph.Children:
     type: array
     description: Child nodes in the prediction graph
+    required: false
+  Predictors[].Graph.Methods:
+    type: array
+    description: List of inference methods supported by this graph node. Common values- predict, transform, route, aggregate, send_feedback, custom
+    required: false
+  Predictors[].Graph.ServiceAccountName:
+    type: string
+    description: Kubernetes service account name to use for this graph node
+    required: false
+  Predictors[].Graph.StorageInitializerImage:
+    type: string
+    description: Optional override image for storage initializer for this node
     required: false
   Predictors[].ComponentSpec.ServiceAccountName:
     type: string
@@ -1444,21 +1710,77 @@ valuesSchema:
     type: boolean
     description: Whether the volume mount should be read-only
     required: false
-  Predictors[].ComponentSpec.Containers[].Resources.Requests:
-    type: object
-    description: Minimum amount of compute resources required
+  Predictors[].ComponentSpec.Containers[].Resources.Requests.CPU:
+    type: string
+    description: Amount of CPU requested by the container (e.g. "200m")
     required: false
-  Predictors[].ComponentSpec.Containers[].Resources.Limits:
-    type: object
-    description: Maximum amount of compute resources allowed
+  Predictors[].ComponentSpec.Containers[].Resources.Requests.Memory:
+    type: string
+    description: Amount of memory requested by the container (e.g. "256Mi")
     required: false
-  Predictors[].ComponentSpec.Containers[].Liveness:
-    type: object
-    description: Liveness probe configuration for container
+  Predictors[].ComponentSpec.Containers[].Resources.Limits.CPU:
+    type: string
+    description: Maximum amount of CPU allowed for the container
     required: false
-  Predictors[].ComponentSpec.Containers[].Readiness:
-    type: object
-    description: Readiness probe configuration for container
+  Predictors[].ComponentSpec.Containers[].Resources.Limits.Memory:
+    type: string
+    description: Maximum amount of memory allowed for the container
+    required: false
+  Predictors[].ComponentSpec.Containers[].Liveness.Path:
+    type: string
+    description: HTTP path to access on the container to perform liveness check
+    required: false
+  Predictors[].ComponentSpec.Containers[].Liveness.Port:
+    type: string
+    description: Port to access for the liveness probe
+    required: false
+  Predictors[].ComponentSpec.Containers[].Liveness.Scheme:
+    type: string
+    description: Scheme to use for connecting to the host (HTTP or HTTPS)
+    required: false
+  Predictors[].ComponentSpec.Containers[].Liveness.InitialDelaySeconds:
+    type: integer
+    description: Number of seconds after the container has started before liveness probe is initiated
+    required: false
+  Predictors[].ComponentSpec.Containers[].Liveness.PeriodSeconds:
+    type: integer
+    description: How often (in seconds) to perform the liveness probe
+    required: false
+  Predictors[].ComponentSpec.Containers[].Liveness.FailureThreshold:
+    type: integer
+    description: Number of times the liveness probe can fail before the container is restarted
+    required: false
+  Predictors[].ComponentSpec.Containers[].Liveness.SuccessThreshold:
+    type: integer
+    description: Minimum consecutive successes for the liveness probe to be considered successful
+    required: false
+  Predictors[].ComponentSpec.Containers[].Readiness.Path:
+    type: string
+    description: HTTP path to access on the container to perform readiness check
+    required: false
+  Predictors[].ComponentSpec.Containers[].Readiness.Port:
+    type: string
+    description: Port to access for the readiness probe
+    required: false
+  Predictors[].ComponentSpec.Containers[].Readiness.Scheme:
+    type: string
+    description: Scheme to use for connecting to the host (HTTP or HTTPS)
+    required: false
+  Predictors[].ComponentSpec.Containers[].Readiness.InitialDelaySeconds:
+    type: integer
+    description: Number of seconds after the container has started before readiness probe is initiated
+    required: false
+  Predictors[].ComponentSpec.Containers[].Readiness.PeriodSeconds:
+    type: integer
+    description: How often (in seconds) to perform the readiness probe
+    required: false
+  Predictors[].ComponentSpec.Containers[].Readiness.FailureThreshold:
+    type: integer
+    description: Number of times the readiness probe can fail before the container is marked unhealthy
+    required: false
+  Predictors[].ComponentSpec.Containers[].Readiness.SuccessThreshold:
+    type: integer
+    description: Minimum consecutive successes for the readiness probe to be considered successful
     required: false
   Predictors[].ComponentSpec.Containers[].Lifecycle:
     type: object
@@ -1572,21 +1894,77 @@ valuesSchema:
     type: boolean
     description: Whether the mount is read-only
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Resources.Requests:
-    type: object
-    description: Minimum resources required by init container
+  Predictors[].ComponentSpec.InitContainers[].Resources.Requests.CPU:
+    type: string
+    description: Amount of CPU requested by the init container
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Resources.Limits:
-    type: object
-    description: Maximum resources allowed for init container
+  Predictors[].ComponentSpec.InitContainers[].Resources.Requests.Memory:
+    type: string
+    description: Amount of memory requested by the init container
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Liveness:
-    type: object
-    description: Liveness probe for the init container
+  Predictors[].ComponentSpec.InitContainers[].Resources.Limits.CPU:
+    type: string
+    description: Maximum amount of CPU allowed for the init container
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Readiness:
-    type: object
-    description: Readiness probe for the init container
+  Predictors[].ComponentSpec.InitContainers[].Resources.Limits.Memory:
+    type: string
+    description: Maximum amount of memory allowed for the init container
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Liveness.Path:
+    type: string
+    description: HTTP path to access on the container to perform liveness check
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Liveness.Port:
+    type: string
+    description: Port to access for the liveness probe
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Liveness.Scheme:
+    type: string
+    description: Scheme to use for connecting to the host (HTTP or HTTPS)
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Liveness.InitialDelaySeconds:
+    type: integer
+    description: Number of seconds after the container has started before liveness probe is initiated
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Liveness.PeriodSeconds:
+    type: integer
+    description: How often (in seconds) to perform the liveness probe
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Liveness.FailureThreshold:
+    type: integer
+    description: Number of times the liveness probe can fail before the container is restarted
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Liveness.SuccessThreshold:
+    type: integer
+    description: Minimum consecutive successes for the liveness probe to be considered successful
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Readiness.Path:
+    type: string
+    description: HTTP path to access on the container to perform readiness check
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Readiness.Port:
+    type: string
+    description: Port to access for the readiness probe
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Readiness.Scheme:
+    type: string
+    description: Scheme to use for connecting to the host (HTTP or HTTPS)
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Readiness.InitialDelaySeconds:
+    type: integer
+    description: Number of seconds after the container has started before readiness probe is initiated
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Readiness.PeriodSeconds:
+    type: integer
+    description: How often (in seconds) to perform the readiness probe
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Readiness.FailureThreshold:
+    type: integer
+    description: Number of times the readiness probe can fail before the container is marked unhealthy
+    required: false
+  Predictors[].ComponentSpec.InitContainers[].Readiness.SuccessThreshold:
+    type: integer
+    description: Minimum consecutive successes for the readiness probe to be considered successful
     required: false
   Predictors[].ComponentSpec.InitContainers[].Lifecycle:
     type: object
@@ -1648,13 +2026,69 @@ valuesSchema:
     type: integer
     description: Target average utilization percentage
     required: false
-  Predictors[].EngineResources.Requests:
-    type: object
-    description: Resource requests (e.g., cpu and memory) for the Seldon engine sidecar container
+  Predictors[].ComponentSpec.KedaSpec.MinReplicaCount:
+    type: integer
+    description: Minimum number of replicas to scale down to with KEDA
     required: false
-  Predictors[].EngineResources.Limits:
+  Predictors[].ComponentSpec.KedaSpec.MaxReplicaCount:
+    type: integer
+    description: Maximum number of replicas to scale up to with KEDA
+    required: false
+  Predictors[].ComponentSpec.KedaSpec.CooldownPeriod:
+    type: integer
+    description: Number of seconds to wait before scaling down
+    required: false
+  Predictors[].ComponentSpec.KedaSpec.PollingInterval:
+    type: integer
+    description: Interval in seconds to check for scaling metrics
+    required: false
+  Predictors[].ComponentSpec.KedaSpec.Triggers:
+    type: array
+    description: List of KEDA triggers to define scaling behavior
+    required: false
+  Predictors[].ComponentSpec.KedaSpec.Triggers[].Type:
+    type: string
+    description: Type of KEDA trigger (e.g. cpu, kafka, prometheus)
+    required: true
+  Predictors[].ComponentSpec.KedaSpec.Triggers[].Metadata:
     type: object
-    description: Resource limits (e.g., cpu and memory) for the Seldon engine sidecar container
+    description: Key-value map with trigger-specific metadata
+    required: false
+  Predictors[].ComponentSpec.KedaSpec.Triggers[].AuthenticationRef.Name:
+    type: string
+    description: Name of the KEDA authentication reference to use
+    required: false
+  Predictors[].ComponentSpec.KedaSpec.Advanced.RestoreToOriginalReplicaCount:
+    type: boolean
+    description: Restore to the original replica count after scaling is no longer needed
+    required: false
+  Predictors[].ComponentSpec.KedaSpec.Advanced.HorizontalPodAutoscalerConfig:
+    type: object
+    description: HPA behavior configuration as a key-value map
+    required: false
+  Predictors[].ComponentSpec.PdbSpec.MinAvailable:
+    type: string
+    description: Minimum number or percentage of pods that must be available during disruptions
+    required: false
+  Predictors[].ComponentSpec.PdbSpec.MaxUnavailable:
+    type: string
+    description: Maximum number or percentage of pods that may be unavailable during disruptions
+    required: false
+  Predictors[].EngineResources.Requests.CPU:
+    type: string
+    description: CPU requested for the Seldon engine sidecar
+    required: false
+  Predictors[].EngineResources.Requests.Memory:
+    type: string
+    description: Memory requested for the Seldon engine sidecar
+    required: false
+  Predictors[].EngineResources.Limits.CPU:
+    type: string
+    description: Maximum CPU allowed for the Seldon engine sidecar
+    required: false
+  Predictors[].EngineResources.Limits.Memory:
+    type: string
+    description: Maximum memory allowed for the Seldon engine sidecar
     required: false
   Predictors[].Labels:
     type: object
@@ -1674,7 +2108,7 @@ valuesSchema:
     required: false
   Predictors[].Explainer.Type:
     type: string
-    description: The type of explainer (e.g., "anchor_tabular", "alibi") used to interpret model predictions
+    description: The type of explainer used to interpret model predictions. Allowed values- anchor_tabular, anchor_text, anchor_image, kernel_shap, tree_shap, integrated_gradients, contrastive, cfproto, counterfactual, alibi, custom
     required: false
   Predictors[].Explainer.ModelUri:
     type: string
@@ -1686,7 +2120,7 @@ valuesSchema:
     required: false
   Predictors[].Explainer.Endpoint.Type:
     type: string
-    description: Type of the endpoint protocol (e.g., REST or GRPC)
+    description: Type of the endpoint protocol. Allowed values- REST, GRPC
     required: false
   Predictors[].Explainer.EnvSecretRefName:
     type: string
