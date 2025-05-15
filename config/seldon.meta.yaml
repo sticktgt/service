@@ -3,968 +3,968 @@ files:
     template: true
     content: |
       apiVersion: v2
-      name: {{ .Chart.Name }}
-      version: {{ .Chart.Version }}
-      description: {{ .Chart.Description }}
+      name: {{ .chart.name }}
+      version: {{ .chart.version }}
+      description: {{ .chart.description }}
       type: application
       app.dognauts:
-        subjectArea: {{ .SubjectArea }}
-        sourceMetafileRepo: {{ .SourceMetafileRepo }}
-        sourceMetafileBranch: {{ .SourceMetafileBranch }}
-        sourceMetafileName: {{ .SourceMetafileName }}
+        subjectArea: {{ .subjectArea }}
+        sourceMetafileRepo: {{ .sourceMetafileRepo }}
+        sourceMetafileBranch: {{ .sourceMetafileBranch }}
+        sourceMetafileName: {{ .sourceMetafileName }}
       annotations:
         app.dognauts/platform-generated: true
-        app.dognauts/subjectArea: {{ .SubjectArea }}
+        app.dognauts/subjectArea: {{ .subjectArea }}
 
   - path: values.yaml
     template: true
     content: |
-      ApiVersion: {{ .ApiVersion }}
-      {{- if .Environment }}
-      Environment: {{ .Environment }}
+      apiVersion: {{ .apiVersion }}
+      {{- if .environment }}
+      environment: {{ .environment }}
       {{- end }}
-      {{- if .Protocol }}
-      Protocol: {{ .Protocol }}
+      {{- if .protocol }}
+      protocol: {{ .protocol }}
       {{- end }}
-      {{- if .Transport }}
-      Transport: {{ .Transport }}
+      {{- if .transport }}
+      transport: {{ .transport }}
       {{- end }}
-      {{- if .Annotations }}
-      SpecAnnotations:
-        {{- range $k, $v := .Annotations }}
+      {{- if .annotations }}
+      specAnnotations:
+        {{- range $k, $v := .annotations }}
         {{ $k }}: {{ $v }}
         {{- end }}
       {{- end }}
-      Chart:
-        Name: {{ .Chart.Name }}
-        Version: {{ .Chart.Version }}
-        Description: {{ .Chart.Description }}
-      DeploymentName: {{ .DeploymentName }}
-      Namespace: {{ .Namespace }}
-      Metadata:
-        Labels:
-          {{- range $k, $v := .Metadata.Labels }}
+      chart:
+        name: {{ .chart.name }}
+        version: {{ .chart.version }}
+        description: {{ .chart.description }}
+      deploymentName: {{ .deploymentName }}
+      namespace: {{ .namespace }}
+      metadata:
+        labels:
+          {{- range $k, $v := .metadata.labels }}
           {{ $k }}: {{ $v }}
           {{- end }}
-        Annotations:
-          {{- range $k, $v := .Metadata.Annotations }}
+        annotations:
+          {{- range $k, $v := .metadata.annotations }}
           {{ $k }}: {{ $v }}
           {{- end }}
-      Predictors:
-      {{- range .Predictors }}
-        - Name: {{ .Name }}
-          Graph:
-            Name: {{ .Graph.Name }}
-            Type: {{ .Graph.Type }}
-            {{- if .Graph.Implementation }}
-            Implementation: {{ .Graph.Implementation }}
+      predictors:
+      {{- range .predictors }}
+        - name: {{ .name }}
+          replicas: {{ .replicas }}        
+          graph:
+            name: {{ .graph.name }}
+            type: {{ .graph.type }}
+            {{- if .graph.implementation }}
+            implementation: {{ .graph.implementation }}
             {{- end }}
-            {{- if .Graph.ModelUri }}
-            ModelUri: {{ .Graph.ModelUri }}
+            {{- if .graph.modelUri }}
+            modelUri: {{ .graph.modelUri }}
             {{- end }}
-            {{- if .Graph.EnvSecretRefName }}
-            EnvSecretRefName: {{ .Graph.EnvSecretRefName }}
+            {{- if .graph.envSecretRefName }}
+            envSecretRefName: {{ .graph.envSecretRefName }}
             {{- end }}
-            {{- if .Graph.Endpoint }}
-            Endpoint:
-              Type: {{ .Graph.Endpoint.Type }}
+            {{- if .graph.endpoint }}
+            endpoint:
+              type: {{ .graph.endpoint.type }}
             {{- end }}
-            {{- if .Graph.Logger }}
-            Logger:
-              Mode: {{ .Graph.Logger.Mode }}
-              {{- if .Graph.Logger.URL }}
-              URL: {{ .Graph.Logger.URL }}
+            {{- if .graph.logger }}
+            logger:
+              mode: {{ .graph.logger.mode }}
+              {{- if .graph.logger.url }}
+              url: {{ .graph.logger.url }}
               {{- end }}
             {{- end }}
-            {{- if .Graph.Parameters }}
-            Parameters:
-              {{- range .Graph.Parameters }}
-              - Name: {{ .Name }}
-                Type: {{ .Type }}
-                Value: {{ .Value }}
+            {{- if .graph.parameters }}
+            parameters:
+              {{- range .graph.parameters }}
+              - name: {{ .name }}
+                type: {{ .type }}
+                value: {{ .value }}
               {{- end }}
             {{- end }}
-            {{- if .Graph.Children }}
-            Children:
-              {{- range .Graph.Children }}
-              - Name: {{ .Name }}
-                Type: {{ .Type }}
-                {{- if .Implementation }}
-                Implementation: {{ .Implementation }}
+            {{- if .graph.children }}
+            children:
+              {{- range .graph.children }}
+              - name: {{ .name }}
+                type: {{ .type }}
+                {{- if .implementation }}
+                implementation: {{ .implementation }}
                 {{- end }}
-                {{- if .ModelUri }}
-                ModelUri: {{ .ModelUri }}
+                {{- if .modelUri }}
+                modelUri: {{ .modelUri }}
                 {{- end }}
-                {{- if .EnvSecretRefName }}
-                EnvSecretRefName: {{ .EnvSecretRefName }}
+                {{- if .envSecretRefName }}
+                envSecretRefName: {{ .envSecretRefName }}
                 {{- end }}
-                {{- if .Endpoint }}
-                Endpoint:
-                  Type: {{ .Endpoint.Type }}
+                {{- if .endpoint }}
+                endpoint:
+                  type: {{ .endpoint.type }}
                 {{- end }}
-                {{- if .Logger }}
-                Logger:
-                  Mode: {{ .Logger.Mode }}
-                  {{- if .Logger.URL }}
-                  URL: {{ .Logger.URL }}
+                {{- if .logger }}
+                logger:
+                  mode: {{ .logger.mode }}
+                  {{- if .logger.url }}
+                  url: {{ .logger.url }}
                   {{- end }}
                 {{- end }}
-                {{- if .Parameters }}
-                Parameters:
-                  {{- range .Parameters }}
-                  - Name: {{ .Name }}
-                    Type: {{ .Type }}
-                    Value: {{ .Value }}
+                {{- if .parameters }}
+                parameters:
+                  {{- range .parameters }}
+                  - name: {{ .name }}
+                    type: {{ .type }}
+                    value: {{ .value }}
                   {{- end }}
                 {{- end }}
-                {{- if .Children }}
-                Children:
-                  {{- range .Children }}
-                  - Name: {{ .Name }}
-                    Type: {{ .Type }}
-                    {{- if .Implementation }}
-                    Implementation: {{ .Implementation }}
+                {{- if .children }}
+                children:
+                  {{- range .children }}
+                  - name: {{ .name }}
+                    type: {{ .type }}
+                    {{- if .implementation }}
+                    implementation: {{ .implementation }}
                     {{- end }}
-                    {{- if .ModelUri }}
-                    ModelUri: {{ .ModelUri }}
+                    {{- if .modelUri }}
+                    modelUri: {{ .modelUri }}
                     {{- end }}
-                    {{- if .EnvSecretRefName }}
-                    EnvSecretRefName: {{ .EnvSecretRefName }}
+                    {{- if .envSecretRefName }}
+                    envSecretRefName: {{ .envSecretRefName }}
                     {{- end }}
-                    {{- if .Endpoint }}
-                    Endpoint:
-                      Type: {{ .Endpoint.Type }}
+                    {{- if .endpoint }}
+                    endpoint:
+                      type: {{ .endpoint.type }}
                     {{- end }}
-                    {{- if .Logger }}
-                    Logger:
-                      Mode: {{ .Logger.Mode }}
-                      {{- if .Logger.URL }}
-                      URL: {{ .Logger.URL }}
+                    {{- if .logger }}
+                    logger:
+                      mode: {{ .logger.mode }}
+                      {{- if .logger.url }}
+                      url: {{ .logger.url }}
                       {{- end }}
                     {{- end }}
-                    {{- if .Parameters }}
-                    Parameters:
-                      {{- range .Parameters }}
-                      - Name: {{ .Name }}
-                        Type: {{ .Type }}
-                        Value: {{ .Value }}
+                    {{- if .parameters }}
+                    parameters:
+                      {{- range .parameters }}
+                      - name: {{ .name }}
+                        type: {{ .type }}
+                        value: {{ .value }}
                       {{- end }}
                     {{- end }}
-                    {{- if .Children }}
-                    Children:
-                      {{- range .Children }}
-                      - Name: {{ .Name }}
-                        Type: {{ .Type }}
-                        {{- if .Implementation }}
-                        Implementation: {{ .Implementation }}
+                    {{- if .children }}
+                    children:
+                      {{- range .children }}
+                      - name: {{ .name }}
+                        type: {{ .type }}
+                        {{- if .implementation }}
+                        implementation: {{ .implementation }}
                         {{- end }}
-                        {{- if .ModelUri }}
-                        ModelUri: {{ .ModelUri }}
+                        {{- if .modelUri }}
+                        modelUri: {{ .modelUri }}
                         {{- end }}
-                        {{- if .EnvSecretRefName }}
-                        EnvSecretRefName: {{ .EnvSecretRefName }}
+                        {{- if .envSecretRefName }}
+                        envSecretRefName: {{ .envSecretRefName }}
                         {{- end }}
-                        {{- if .Endpoint }}
-                        Endpoint:
-                          Type: {{ .Endpoint.Type }}
+                        {{- if .endpoint }}
+                        endpoint:
+                          type: {{ .endpoint.type }}
                         {{- end }}
-                        {{- if .Logger }}
-                        Logger:
-                          Mode: {{ .Logger.Mode }}
-                          {{- if .Logger.URL }}
-                          URL: {{ .Logger.URL }}
+                        {{- if .logger }}
+                        logger:
+                          mode: {{ .logger.mode }}
+                          {{- if .logger.url }}
+                          url: {{ .logger.url }}
                           {{- end }}
                         {{- end }}
-                        {{- if .Parameters }}
-                        Parameters:
-                          {{- range .Parameters }}
-                          - Name: {{ .Name }}
-                            Type: {{ .Type }}
-                            Value: {{ .Value }}
+                        {{- if .parameters }}
+                        parameters:
+                          {{- range .parameters }}
+                          - name: {{ .name }}
+                            type: {{ .type }}
+                            value: {{ .value }}
                           {{- end }}
                         {{- end }}
-                        {{- if .Children }}
-                        Children:
-                          {{- range .Children }}
-                          - Name: {{ .Name }}
-                            Type: {{ .Type }}
-                            {{- if .Implementation }}
-                            Implementation: {{ .Implementation }}
+                        {{- if .children }}
+                        children:
+                          {{- range .children }}
+                          - name: {{ .name }}
+                            type: {{ .type }}
+                            {{- if .implementation }}
+                            implementation: {{ .implementation }}
                             {{- end }}
-                            {{- if .ModelUri }}
-                            ModelUri: {{ .ModelUri }}
+                            {{- if .modelUri }}
+                            modelUri: {{ .modelUri }}
                             {{- end }}
-                            {{- if .EnvSecretRefName }}
-                            EnvSecretRefName: {{ .EnvSecretRefName }}
+                            {{- if .envSecretRefName }}
+                            envSecretRefName: {{ .envSecretRefName }}
                             {{- end }}
-                            {{- if .Endpoint }}
-                            Endpoint:
-                              Type: {{ .Endpoint.Type }}
+                            {{- if .endpoint }}
+                            endpoint:
+                              type: {{ .endpoint.Type }}
                             {{- end }}
-                            {{- if .Logger }}
-                            Logger:
-                              Mode: {{ .Logger.Mode }}
-                              {{- if .Logger.URL }}
-                              URL: {{ .Logger.URL }}
+                            {{- if .logger }}
+                            logger:
+                              Mode: {{ .logger.Mode }}
+                              {{- if .logger.URL }}
+                              URL: {{ .logger.URL }}
                               {{- end }}
                             {{- end }}
-                            {{- if .Parameters }}
-                            Parameters:
-                              {{- range .Parameters }}
-                              - Name: {{ .Name }}
-                                Type: {{ .Type }}
-                                Value: {{ .Value }}
+                            {{- if .parameters }}
+                            parameters:
+                              {{- range .parameters }}
+                              - name: {{ .name }}
+                                type: {{ .type }}
+                                value: {{ .value }}
                               {{- end }}
                             {{- end }}
-                            Children: []
+                            children: []
                           {{- end }}
                         {{- else }}
-                        Children: []
+                        children: []
                         {{- end }}
                       {{- end }}
                     {{- else }}
-                    Children: []
+                    children: []
                     {{- end }}
                   {{- end }}
                 {{- else }}
-                Children: []
+                children: []
                 {{- end }}
               {{- end }}
             {{- else }}
-            Children: []
+            children: []
             {{- end }}
       {{- end }}
-
 
   - path: values-ENV.yaml
     template: true
     content: |
-      Predictors:
-      {{- range .Predictors }}
-        - Name: {{ .Name }}
-          Replicas: {{ .Replicas }}
-          Traffic: {{ .Traffic }}
-          {{- if .EngineResources }}
-          EngineResources:
-            {{- if .EngineResources.Requests }}
-            Requests:
-              {{- if .EngineResources.Requests.CPU }}
-              CPU: {{ .EngineResources.Requests.CPU }}
+      predictors:
+      {{- range .predictors }}
+        - name: {{ .name }}
+          replicas: {{ .replicas }}
+          traffic: {{ .traffic }}
+          {{- if .engineResources }}
+          engineResources:
+            {{- if .engineResources.requests }}
+            requests:
+              {{- if .engineResources.requests.cpu }}
+              cpu: {{ .engineResources.requests.cpu }}
               {{- end }}
-              {{- if .EngineResources.Requests.Memory }}
-              Memory: {{ .EngineResources.Requests.Memory }}
+              {{- if .engineResources.requests.memory }}
+              memory: {{ .engineResources.requests.memory }}
               {{- end }}
             {{- end }}
-            {{- if .EngineResources.Limits }}
-            Limits:
-              {{- if .EngineResources.Limits.CPU }}
-              CPU: {{ .EngineResources.Limits.CPU }}
+            {{- if .engineResources.limits }}
+            limits:
+              {{- if .engineResources.limits.cpu }}
+              cpu: {{ .engineResources.limits.cpu }}
               {{- end }}
-              {{- if .EngineResources.Limits.Memory }}
-              Memory: {{ .EngineResources.Limits.Memory }}
+              {{- if .engineResources.limits.memory }}
+              memory: {{ .engineResources.limits.memory }}
               {{- end }}
             {{- end }}
           {{- end }}
-          {{- if .Labels }}
-          Labels:
-            {{- range $k, $v := .Labels }}
+          {{- if .labels }}
+          labels:
+            {{- range $k, $v := .labels }}
             {{ $k }}: {{ $v }}
             {{- end }}
           {{- end }}
-          {{- if .Shadow }}
-          Shadow: {{ .Shadow }}
+          {{- if .shadow }}
+          shadow: {{ .shadow }}
           {{- end }}
-          {{- if .SSL }}
-          SSL:
-            CertSecretName: {{ .SSL.CertSecretName }}
+          {{- if .ssl }}
+          ssl:
+            certSecretName: {{ .ssl.certSecretName }}
           {{- end }}
-          {{- if .ProgressDeadlineSeconds }}
-          ProgressDeadlineSeconds: {{ .ProgressDeadlineSeconds }}
+          {{- if .progressDeadlineSeconds }}
+          progressDeadlineSeconds: {{ .progressDeadlineSeconds }}
           {{- end }}
-          {{- if .Explainer }}
-          Explainer:
-            {{- if .Explainer.Type }}
-            Type: {{ .Explainer.Type }}
+          {{- if .explainer }}
+          explainer:
+            {{- if .explainer.type }}
+            type: {{ .explainer.type }}
             {{- end }}
-            {{- if .Explainer.ModelUri }}
-            ModelUri: {{ .Explainer.ModelUri }}
+            {{- if .explainer.modelUri }}
+            modelUri: {{ .explainer.modelUri }}
             {{- end }}
-            {{- if .Explainer.ServiceAccountName }}
-            ServiceAccountName: {{ .Explainer.ServiceAccountName }}
+            {{- if .explainer.serviceAccountName }}
+            serviceAccountName: {{ .explainer.serviceAccountName }}
             {{- end }}
-            {{- if .Explainer.StorageInitializerImage }}
-            StorageInitializerImage: {{ .Explainer.StorageInitializerImage }}
+            {{- if .explainer.storageInitializerImage }}
+            storageInitializerImage: {{ .explainer.storageInitializerImage }}
             {{- end }}
-            {{- if .Explainer.EnvSecretRefName }}
-            EnvSecretRefName: {{ .Explainer.EnvSecretRefName }}
+            {{- if .explainer.envSecretRefName }}
+            envSecretRefName: {{ .explainer.envSecretRefName }}
             {{- end }}
-            {{- if .Explainer.InitParameters }}
-            InitParameters: {{ .Explainer.InitParameters }}
+            {{- if .explainer.initParameters }}
+            initParameters: {{ .explainer.initParameters }}
             {{- end }}
-            {{- if .Explainer.Replicas }}
-            Replicas: {{ .Explainer.Replicas }}
+            {{- if .explainer.replicas }}
+            replicas: {{ .explainer.replicas }}
             {{- end }}
-            {{- if .Explainer.Endpoint }}
-            Endpoint:
-              Type: {{ .Explainer.Endpoint.Type }}
+            {{- if .explainer.endpoint }}
+            endpoint:
+              type: {{ .explainer.endpoint.type }}
             {{- end }}
-            {{- if .Explainer.Config }}
-            Config:
-              {{- range $k, $v := .Explainer.Config }}
+            {{- if .explainer.config }}
+            config:
+              {{- range $k, $v := .explainer.config }}
               {{ $k }}: {{ $v }}
               {{- end }}
             {{- end }}
-            {{- if .Explainer.ContainerSpec }}
-            ContainerSpec:
-              Name: {{ .Explainer.ContainerSpec.Name }}
-              Image: {{ .Explainer.ContainerSpec.Image }}
-              {{- if .Explainer.ContainerSpec.ImagePullPolicy }}
-              ImagePullPolicy: {{ .Explainer.ContainerSpec.ImagePullPolicy }}
+            {{- if .explainer.containerSpec }}
+            containerSpec:
+              name: {{ .explainer.containerSpec.name }}
+              image: {{ .explainer.containerSpec.image }}
+              {{- if .explainer.containerSpec.imagePullPolicy }}
+              imagePullPolicy: {{ .explainer.containerSpec.imagePullPolicy }}
               {{- end }}
-              {{- if .Explainer.ContainerSpec.Args }}
-              Args:
-                {{- range .Explainer.ContainerSpec.Args }}
+              {{- if .explainer.containerSpec.args }}
+              args:
+                {{- range .explainer.containerSpec.args }}
                 - {{ . }}
                 {{- end }}
               {{- end }}
             {{- end }}
           {{- end }}
-          {{- if .SvcOrchSpec }}
-          SvcOrchSpec:
-            {{- if .SvcOrchSpec.Resources }}
-            Resources:
-              {{- if .SvcOrchSpec.Resources.Requests }}
-              Requests:
-                {{- if .SvcOrchSpec.Resources.Requests.CPU }}
-                CPU: {{ .SvcOrchSpec.Resources.Requests.CPU }}
+          {{- if .svcOrchSpec }}
+          svcOrchSpec:
+            {{- if .svcOrchSpec.resources }}
+            resources:
+              {{- if .svcOrchSpec.resources.requests }}
+              requests:
+                {{- if .svcOrchSpec.resources.requests.cpu }}
+                cpu: {{ .svcOrchSpec.resources.requests.cpu }}
                 {{- end }}
-                {{- if .SvcOrchSpec.Resources.Requests.Memory }}
-                Memory: {{ .SvcOrchSpec.Resources.Requests.Memory }}
+                {{- if .svcOrchSpec.resources.requests.memory }}
+                memory: {{ .svcOrchSpec.resources.requests.memory }}
                 {{- end }}
               {{- end }}
-              {{- if .SvcOrchSpec.Resources.Limits }}
-              Limits:
-                {{- if .SvcOrchSpec.Resources.Limits.CPU }}
-                CPU: {{ .SvcOrchSpec.Resources.Limits.CPU }}
+              {{- if .svcOrchSpec.resources.limits }}
+              limits:
+                {{- if .svcOrchSpec.resources.limits.cpu }}
+                cpu: {{ .svcOrchSpec.resources.limits.cpu }}
                 {{- end }}
-                {{- if .SvcOrchSpec.Resources.Limits.Memory }}
-                Memory: {{ .SvcOrchSpec.Resources.Limits.Memory }}
+                {{- if .svcOrchSpec.resources.limits.memory }}
+                memory: {{ .svcOrchSpec.resources.limits.memory }}
                 {{- end }}
               {{- end }}
             {{- end }}
-            {{- if .SvcOrchSpec.Env }}
-            Env:
-              {{- range .SvcOrchSpec.Env }}
-              - Name: {{ .Name }}
-                {{- if .Value }}
-                Value: {{ .Value }}
-                {{- else if .ValueFrom }}
-                ValueFrom:
-                  SecretKeyRef:
-                    Name: {{ .ValueFrom.SecretKeyRef.Name }}
-                    Key: {{ .ValueFrom.SecretKeyRef.Key }}
+            {{- if .svcOrchSpec.env }}
+            env:
+              {{- range .svcOrchSpec.env }}
+              - name: {{ .name }}
+                {{- if .value }}
+                value: {{ .value }}
+                {{- else if .valueFrom }}
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ .valueFrom.secretKeyRef.name }}
+                    key: {{ .valueFrom.secretKeyRef.key }}
                 {{- end }}
               {{- end }}
             {{- end }}
           {{- end }}
-          ComponentSpec:
-            ServiceAccountName: {{ .ComponentSpec.ServiceAccountName }}
-            TerminationGracePeriodSeconds: {{ .ComponentSpec.TerminationGracePeriodSeconds }}
-            {{- if .ComponentSpec.HPASpec }}
-            HpaSpec:
-              MinReplicas: {{ .ComponentSpec.HPASpec.MinReplicas }}
-              MaxReplicas: {{ .ComponentSpec.HPASpec.MaxReplicas }}
-              Metricsv2:
-                {{- range .ComponentSpec.HPASpec.MetricsV2 }}
-                - Type: {{ .Type }}
-                  Resource:
-                    Name: {{ .Resource.Name }}
-                    Target:
-                      Type: {{ .Resource.Target.Type }}
-                      AverageUtilization: {{ .Resource.Target.AverageUtilization }}
+          componentSpec:
+            serviceAccountName: {{ .componentSpec.serviceAccountName }}
+            terminationGracePeriodSeconds: {{ .componentSpec.terminationGracePeriodSeconds }}
+            {{- if .componentSpec.hpaSpec }}
+            hpaSpec:
+              minReplicas: {{ .componentSpec.hpaSpec.minReplicas }}
+              maxReplicas: {{ .componentSpec.hpaSpec.maxReplicas }}
+              metricsv2:
+                {{- range .componentSpec.hpaSpec.metricsv2 }}
+                - type: {{ .type }}
+                  resource:
+                    name: {{ .resource.name }}
+                    target:
+                      type: {{ .resource.target.type }}
+                      averageUtilization: {{ .resource.target.averageUtilization }}
                 {{- end }}
             {{- end }}
-            {{- if .ComponentSpec.KedaSpec }}
-            KedaSpec:
-              {{- if .ComponentSpec.KedaSpec.MinReplicaCount }}
-              MinReplicaCount: {{ .ComponentSpec.KedaSpec.MinReplicaCount }}
+            {{- if .componentSpec.kedaSpec }}
+            kedaSpec:
+              {{- if .componentSpec.kedaSpec.minReplicaCount }}
+              minReplicaCount: {{ .componentSpec.kedaSpec.minReplicaCount }}
               {{- end }}
-              {{- if .ComponentSpec.KedaSpec.MaxReplicaCount }}
-              MaxReplicaCount: {{ .ComponentSpec.KedaSpec.MaxReplicaCount }}
+              {{- if .componentSpec.kedaSpec.maxReplicaCount }}
+              maxReplicaCount: {{ .componentSpec.kedaSpec.maxReplicaCount }}
               {{- end }}
-              {{- if .ComponentSpec.KedaSpec.CooldownPeriod }}
-              CooldownPeriod: {{ .ComponentSpec.KedaSpec.CooldownPeriod }}
+              {{- if .componentSpec.kedaSpec.cooldownPeriod }}
+              cooldownPeriod: {{ .componentSpec.kedaSpec.cooldownPeriod }}
               {{- end }}
-              {{- if .ComponentSpec.KedaSpec.PollingInterval }}
-              PollingInterval: {{ .ComponentSpec.KedaSpec.PollingInterval }}
+              {{- if .componentSpec.kedaSpec.pollingInterval }}
+              pollingInterval: {{ .componentSpec.kedaSpec.pollingInterval }}
               {{- end }}
-              {{- if .ComponentSpec.KedaSpec.Triggers }}
-              Triggers:
-                {{- range .ComponentSpec.KedaSpec.Triggers }}
-                - Type: {{ .Type }}
-                  {{- if .Metadata }}
-                  Metadata:
-                    {{- range $k, $v := .Metadata }}
+              {{- if .componentSpec.kedaSpec.triggers }}
+              triggers:
+                {{- range .componentSpec.kedaSpec.triggers }}
+                - type: {{ .type }}
+                  {{- if .metadata }}
+                  metadata:
+                    {{- range $k, $v := .metadata }}
                     {{ $k }}: {{ $v }}
                     {{- end }}
                   {{- end }}
-                  {{- if .AuthenticationRef }}
-                  AuthenticationRef:
-                    Name: {{ .AuthenticationRef.Name }}
+                  {{- if .authenticationRef }}
+                  authenticationRef:
+                    name: {{ .authenticationRef.name }}
                   {{- end }}
                 {{- end }}
               {{- end }}
-              {{- if .ComponentSpec.KedaSpec.Advanced }}
-              Advanced:
-                {{- if .ComponentSpec.KedaSpec.Advanced.RestoreToOriginalReplicaCount }}
-                RestoreToOriginalReplicaCount: {{ .ComponentSpec.KedaSpec.Advanced.RestoreToOriginalReplicaCount }}
+              {{- if .componentSpec.kedaSpec.advanced }}
+              advanced:
+                {{- if .componentSpec.kedaSpec.advanced.restoreToOriginalReplicaCount }}
+                restoreToOriginalReplicaCount: {{ .componentSpec.kedaSpec.advanced.restoreToOriginalReplicaCount }}
                 {{- end }}
-                {{- if .ComponentSpec.KedaSpec.Advanced.HorizontalPodAutoscalerConfig }}
-                HorizontalPodAutoscalerConfig:
-                  {{ .ComponentSpec.KedaSpec.Advanced.HorizontalPodAutoscalerConfig }}
+                {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig }}
+                horizontalPodAutoscalerConfig:
+                  {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig }}
                 {{- end }}
               {{- end }}
             {{- end }}
-            {{- if .ComponentSpec.PdbSpec }}
-            PdbSpec:
-              {{- if .ComponentSpec.PdbSpec.MinAvailable }}
-              MinAvailable: {{ .ComponentSpec.PdbSpec.MinAvailable }}
+            {{- if .componentSpec.pdbSpec }}
+            pdbSpec:
+              {{- if .componentSpec.pdbSpec.minAvailable }}
+              minAvailable: {{ .componentSpec.pdbSpec.minAvailable }}
               {{- end }}
-              {{- if .ComponentSpec.PdbSpec.MaxUnavailable }}
-              MaxUnavailable: {{ .ComponentSpec.PdbSpec.MaxUnavailable }}
+              {{- if .componentSpec.pdbSpec.maxUnavailable }}
+              maxUnavailable: {{ .componentSpec.pdbSpec.maxUnavailable }}
               {{- end }}
             {{- end }}
-            {{- if .ComponentSpec.Volumes }}
-            Volumes:
-            {{- range .ComponentSpec.Volumes }}
-              - Name: {{ .Name }}
-                {{- if .EmptyDir }}
-                EmptyDir: {}
-                {{- else if .Secret }}
-                Secret:
-                  SecretName: {{ .Secret.SecretName }}
+            {{- if .componentSpec.volumes }}
+            volumes:
+            {{- range .componentSpec.volumes }}
+              - name: {{ .name }}
+                {{- if .emptyDir }}
+                emptyDir: {}
+                {{- else if .secret }}
+                secret:
+                  secretName: {{ .secret.secretName }}
                 {{- end }}
             {{- end }}
             {{- end }}
-            {{- if .ComponentSpec.Containers }}
-            Containers:
-            {{- range .ComponentSpec.Containers }}
-              - Name: {{ .Name }}
-                Image: {{ .Image }}
-                {{- if .ImagePullPolicy }}
-                ImagePullPolicy: {{ .ImagePullPolicy }}
+            {{- if .componentSpec.containers }}
+            containers:
+            {{- range .componentSpec.containers }}
+              - name: {{ .name }}
+                image: {{ .image }}
+                {{- if .imagePullPolicy }}
+                imagePullPolicy: {{ .imagePullPolicy }}
                 {{- end }}
-                {{- if .Args }}
-                Args:
-                  {{- range .Args }}
+                {{- if .args }}
+                args:
+                  {{- range .args }}
                   - {{ . }}
                   {{- end }}
                 {{- end }}
-                Env:
-                  {{- range .Env }}
-                  - Name: {{ .Name }}
-                    {{- if .Value }}
-                    Value: {{ .Value }}
-                    {{- else if .ValueFrom }}
-                    ValueFrom:
-                      SecretKeyRef:
-                        Name: {{ .ValueFrom.SecretKeyRef.Name }}
-                        Key: {{ .ValueFrom.SecretKeyRef.Key }}
+                env:
+                  {{- range .env }}
+                  - name: {{ .name }}
+                    {{- if .value }}
+                    value: {{ .value }}
+                    {{- else if .valueFrom }}
+                    valueFrom:
+                      secretKeyRef:
+                        name: {{ .valueFrom.secretKeyRef.name }}
+                        key: {{ .valueFrom.secretKeyRef.key }}
                     {{- end }}
                   {{- end }}
-                {{- if .EnvFrom }}
-                EnvFrom:
-                  {{- range .EnvFrom }}
-                  {{- if .SecretRef }}
-                  - SecretRef:
-                      Name: {{ .SecretRef.Name }}
+                {{- if .envFrom }}
+                envFrom:
+                  {{- range .envFrom }}
+                  {{- if .secretRef }}
+                  - secretRef:
+                      name: {{ .secretRef.name }}
                   {{- end }}
-                  {{- if .ConfigMapRef }}
-                  - ConfigMapRef:
-                      Name: {{ .ConfigMapRef.Name }}
+                  {{- if .configMapRef }}
+                  - configMapRef:
+                      name: {{ .configMapRef.name }}
                   {{- end }}
                   {{- end }}
                 {{- end }}
-                {{- if .VolumeMounts }}
-                VolumeMounts:
-                  {{- range .VolumeMounts }}
-                  - Name: {{ .Name }}
-                    MountPath: {{ .MountPath }}
-                    {{- if .ReadOnly }}
-                    ReadOnly: {{ .ReadOnly }}
+                {{- if .volumeMounts }}
+                volumeMounts:
+                  {{- range .volumeMounts }}
+                  - name: {{ .name }}
+                    mountPath: {{ .mountPath }}
+                    {{- if .readOnly }}
+                    readOnly: {{ .readOnly }}
                     {{- end }}
                   {{- end }}
                 {{- end }}
-                {{- if .Resources }}
-                Resources:
-                  {{- if .Resources.Requests }}
-                  Requests:
-                    {{- if .Resources.Requests.CPU }}
-                    CPU: {{ .Resources.Requests.CPU }}
+                {{- if .resources }}
+                resources:
+                  {{- if .resources.requests }}
+                  requests:
+                    {{- if .resources.requests.cpu }}
+                    cpu: {{ .resources.requests.cpu }}
                     {{- end }}
-                    {{- if .Resources.Requests.Memory }}
-                    Memory: {{ .Resources.Requests.Memory }}
+                    {{- if .resources.requests.memory }}
+                    memory: {{ .resources.requests.memory }}
                     {{- end }}
                   {{- end }}
-                  {{- if .Resources.Limits }}
-                  Limits:
-                    {{- if .Resources.Limits.CPU }}
-                    CPU: {{ .Resources.Limits.CPU }}
+                  {{- if .resources.limits }}
+                  limits:
+                    {{- if .resources.limits.cpu }}
+                    cpu: {{ .resources.limits.cpu }}
                     {{- end }}
-                    {{- if .Resources.Limits.Memory }}
-                    Memory: {{ .Resources.Limits.Memory }}
+                    {{- if .resources.limits.memory }}
+                    memory: {{ .resources.limits.memory }}
                     {{- end }}
-                  {{- end }}  
-                {{- end }}
-                {{- if .Liveness }}
-                Liveness:
-                  Path: {{ .Liveness.Path }}
-                  Port: {{ .Liveness.Port }}
-                  InitialDelaySeconds: {{ .Liveness.InitialDelaySeconds }}
-                  PeriodSeconds: {{ .Liveness.PeriodSeconds }}
-                  FailureThreshold: {{ .Liveness.FailureThreshold }}
-                  SuccessThreshold: {{ .Liveness.SuccessThreshold }}
-                  {{- if .Liveness.Scheme }}
-                  Scheme: {{ .Liveness.Scheme }}
                   {{- end }}
                 {{- end }}
-                {{- if .Readiness }}
-                Readiness:
-                  Path: {{ .Readiness.Path }}
-                  Port: {{ .Readiness.Port }}
-                  InitialDelaySeconds: {{ .Readiness.InitialDelaySeconds }}
-                  PeriodSeconds: {{ .Readiness.PeriodSeconds }}
-                  FailureThreshold: {{ .Readiness.FailureThreshold }}
-                  SuccessThreshold: {{ .Readiness.SuccessThreshold }}
-                  {{- if .Readiness.Scheme }}
-                  Scheme: {{ .Readiness.Scheme }}
+                {{- if .liveness }}
+                liveness:
+                  path: {{ .liveness.path }}
+                  port: {{ .liveness.port }}
+                  initialDelaySeconds: {{ .liveness.initialDelaySeconds }}
+                  periodSeconds: {{ .liveness.periodSeconds }}
+                  failureThreshold: {{ .liveness.failureThreshold }}
+                  successThreshold: {{ .liveness.successThreshold }}
+                  {{- if .liveness.scheme }}
+                  scheme: {{ .liveness.scheme }}
                   {{- end }}
                 {{- end }}
-                {{- if .Lifecycle }}
-                Lifecycle:
-                  {{- if .Lifecycle.PostStart }}
-                  PostStart:
-                    {{- if .Lifecycle.PostStart.Exec }}
-                    Exec:
-                      Command:
-                        {{- range .Lifecycle.PostStart.Exec.Command }}
+                {{- if .readiness }}
+                readiness:
+                  path: {{ .readiness.path }}
+                  port: {{ .readiness.port }}
+                  initialDelaySeconds: {{ .readiness.initialDelaySeconds }}
+                  periodSeconds: {{ .readiness.periodSeconds }}
+                  failureThreshold: {{ .readiness.failureThreshold }}
+                  successThreshold: {{ .readiness.successThreshold }}
+                  {{- if .readiness.scheme }}
+                  scheme: {{ .readiness.scheme }}
+                  {{- end }}
+                {{- end }}
+                {{- if .lifecycle }}
+                lifecycle:
+                  {{- if .lifecycle.postStart }}
+                  postStart:
+                    {{- if .lifecycle.postStart.exec }}
+                    exec:
+                      command:
+                        {{- range .lifecycle.postStart.exec.command }}
                         - {{ . }}
                         {{- end }}
                     {{- end }}
-                    {{- if .Lifecycle.PostStart.HTTPGet }}
-                    HttpGet:
-                      Path: {{ .Lifecycle.PostStart.HTTPGet.Path }}
-                      Port: {{ .Lifecycle.PostStart.HTTPGet.Port }}
-                      {{- if .Lifecycle.PostStart.HTTPGet.Scheme }}
-                      Scheme: {{ .Lifecycle.PostStart.HTTPGet.Scheme }}
+                    {{- if .lifecycle.postStart.httpGet }}
+                    httpGet:
+                      path: {{ .lifecycle.postStart.httpGet.path }}
+                      port: {{ .lifecycle.postStart.httpGet.port }}
+                      {{- if .lifecycle.postStart.httpGet.scheme }}
+                      scheme: {{ .lifecycle.postStart.httpGet.scheme }}
                       {{- end }}
-                      {{- if .Lifecycle.PostStart.HTTPGet.Host }}
-                      Host: {{ .Lifecycle.PostStart.HTTPGet.Host }}
+                      {{- if .lifecycle.postStart.httpGet.host }}
+                      host: {{ .lifecycle.postStart.httpGet.host }}
                       {{- end }}
                     {{- end }}
                   {{- end }}
-                  {{- if .Lifecycle.PreStop }}
-                  PreStop:
-                    {{- if .Lifecycle.PreStop.Exec }}
-                    Exec:
-                      Command:
-                        {{- range .Lifecycle.PreStop.Exec.Command }}
+                  {{- if .lifecycle.preStop }}
+                  preStop:
+                    {{- if .lifecycle.preStop.exec }}
+                    exec:
+                      command:
+                        {{- range .lifecycle.preStop.exec.command }}
                         - {{ . }}
                         {{- end }}
                     {{- end }}
-                    {{- if .Lifecycle.PreStop.HTTPGet }}
-                    HttpGet:
-                      Path: {{ .Lifecycle.PreStop.HTTPGet.Path }}
-                      Port: {{ .Lifecycle.PreStop.HTTPGet.Port }}
-                      {{- if .Lifecycle.PreStop.HTTPGet.Scheme }}
-                      Scheme: {{ .Lifecycle.PreStop.HTTPGet.Scheme }}
+                    {{- if .lifecycle.preStop.httpGet }}
+                    httpGet:
+                      path: {{ .lifecycle.preStop.httpGet.path }}
+                      port: {{ .lifecycle.preStop.httpGet.port }}
+                      {{- if .lifecycle.preStop.httpGet.scheme }}
+                      scheme: {{ .lifecycle.preStop.httpGet.scheme }}
                       {{- end }}
-                      {{- if .Lifecycle.PreStop.HTTPGet.Host }}
-                      Host: {{ .Lifecycle.PreStop.HTTPGet.Host }}
-                      {{- end }}                      
+                      {{- if .lifecycle.preStop.httpGet.host }}
+                      host: {{ .lifecycle.preStop.httpGet.host }}
+                      {{- end }}
                     {{- end }}
                   {{- end }}
                 {{- end }}
             {{- end }}
             {{- end }}
-            {{- if .ComponentSpec.InitContainers }}
-            InitContainers:    
-            {{- range .ComponentSpec.InitContainers }}
-              - Name: {{ .Name }}
-                Image: {{ .Image }}
-                {{- if .ImagePullPolicy }}
-                ImagePullPolicy: {{ .ImagePullPolicy }}
+            {{- if .componentSpec.initContainers }}
+            initContainers:
+            {{- range .componentSpec.initContainers }}
+              - name: {{ .name }}
+                image: {{ .image }}
+                {{- if .imagePullPolicy }}
+                imagePullPolicy: {{ .imagePullPolicy }}
                 {{- end }}
-                {{- if .Args }}
-                Args:
-                  {{- range .Args }}
+                {{- if .args }}
+                args:
+                  {{- range .args }}
                   - {{ . }}
                   {{- end }}
                 {{- end }}
-                Env:
-                  {{- range .Env }}
-                  - Name: {{ .Name }}
-                    {{- if .Value }}
-                    Value: {{ .Value }}
-                    {{- else if .ValueFrom }}
-                    ValueFrom:
-                      SecretKeyRef:
-                        Name: {{ .ValueFrom.SecretKeyRef.Name }}
-                        Key: {{ .ValueFrom.SecretKeyRef.Key }}
+                env:
+                  {{- range .env }}
+                  - name: {{ .name }}
+                    {{- if .value }}
+                    value: {{ .value }}
+                    {{- else if .valueFrom }}
+                    valueFrom:
+                      secretKeyRef:
+                        name: {{ .valueFrom.secretKeyRef.name }}
+                        key: {{ .valueFrom.secretKeyRef.key }}
                     {{- end }}
                   {{- end }}
-                {{- if .EnvFrom }}
-                EnvFrom:
-                  {{- range .EnvFrom }}
-                  {{- if .SecretRef }}
-                  - SecretRef:
-                      Name: {{ .SecretRef.Name }}
+                {{- if .envFrom }}
+                envFrom:
+                  {{- range .envFrom }}
+                  {{- if .secretRef }}
+                  - secretRef:
+                      name: {{ .secretRef.name }}
                   {{- end }}
-                  {{- if .ConfigMapRef }}
-                  - ConfigMapRef:
-                      Name: {{ .ConfigMapRef.Name }}
+                  {{- if .configMapRef }}
+                  - configMapRef:
+                      name: {{ .configMapRef.name }}
                   {{- end }}
                   {{- end }}
                 {{- end }}
-                VolumeMounts:
-                  {{- range .VolumeMounts }}
-                  - Name: {{ .Name }}
-                    MountPath: {{ .MountPath }}
-                    {{- if .ReadOnly }}
-                    ReadOnly: {{ .ReadOnly }}
+                volumeMounts:
+                  {{- range .volumeMounts }}
+                  - name: {{ .name }}
+                    mountPath: {{ .mountPath }}
+                    {{- if .readOnly }}
+                    readOnly: {{ .readOnly }}
                     {{- end }}
                   {{- end }}
-                {{- if .Resources }}
-                Resources:
-                  {{- if .Resources.Requests }}
-                  Requests:
-                    {{- if .Resources.Requests.CPU }}
-                    CPU: {{ .Resources.Requests.CPU }}
+                {{- if .resources }}
+                resources:
+                  {{- if .resources.requests }}
+                  requests:
+                    {{- if .resources.requests.cpu }}
+                    cpu: {{ .resources.requests.cpu }}
                     {{- end }}
-                    {{- if .Resources.Requests.Memory }}
-                    Memory: {{ .Resources.Requests.Memory }}
+                    {{- if .resources.requests.memory }}
+                    memory: {{ .resources.requests.memory }}
                     {{- end }}
                   {{- end }}
-                  {{- if .Resources.Limits }}  
-                  Limits:
-                    {{- if .Resources.Limits.CPU }}
-                    CPU: {{ .Resources.Limits.CPU }}
+                  {{- if .resources.limits }}
+                  limits:
+                    {{- if .resources.limits.cpu }}
+                    cpu: {{ .resources.limits.cpu }}
                     {{- end }}
-                    {{- if .Resources.Limits.Memory }}
-                    Memory: {{ .Resources.Limits.Memory }}
+                    {{- if .resources.limits.memory }}
+                    memory: {{ .resources.limits.memory }}
                     {{- end }}
                   {{- end }}
                 {{- end }}
-                {{- if .Liveness }}
-                Liveness:
-                  Path: {{ .Liveness.Path }}
-                  Port: {{ .Liveness.Port }}
-                  InitialDelaySeconds: {{ .Liveness.InitialDelaySeconds }}
-                  PeriodSeconds: {{ .Liveness.PeriodSeconds }}
-                  FailureThreshold: {{ .Liveness.FailureThreshold }}
-                  SuccessThreshold: {{ .Liveness.SuccessThreshold }}
-                  {{- if .Liveness.Scheme }}
-                  Scheme: {{ .Liveness.Scheme }}
+                {{- if .liveness }}
+                liveness:
+                  path: {{ .liveness.path }}
+                  port: {{ .liveness.port }}
+                  initialDelaySeconds: {{ .liveness.initialDelaySeconds }}
+                  periodSeconds: {{ .liveness.periodSeconds }}
+                  failureThreshold: {{ .liveness.failureThreshold }}
+                  successThreshold: {{ .liveness.successThreshold }}
+                  {{- if .liveness.scheme }}
+                  scheme: {{ .liveness.scheme }}
                   {{- end }}
                 {{- end }}
-                {{- if .Readiness }}
-                Readiness:
-                  Path: {{ .Readiness.Path }}
-                  Port: {{ .Readiness.Port }}
-                  InitialDelaySeconds: {{ .Readiness.InitialDelaySeconds }}
-                  PeriodSeconds: {{ .Readiness.PeriodSeconds }}
-                  FailureThreshold: {{ .Readiness.FailureThreshold }}
-                  SuccessThreshold: {{ .Readiness.SuccessThreshold }}
-                  {{- if .Readiness.Scheme }}
-                  Scheme: {{ .Readiness.Scheme }}
+                {{- if .readiness }}
+                readiness:
+                  path: {{ .readiness.path }}
+                  port: {{ .readiness.port }}
+                  initialDelaySeconds: {{ .readiness.initialDelaySeconds }}
+                  periodSeconds: {{ .readiness.periodSeconds }}
+                  failureThreshold: {{ .readiness.failureThreshold }}
+                  successThreshold: {{ .readiness.successThreshold }}
+                  {{- if .readiness.scheme }}
+                  scheme: {{ .readiness.scheme }}
                   {{- end }}
                 {{- end }}
-                {{- if .Lifecycle }}
-                Lifecycle:
-                  {{- if .Lifecycle.PostStart }}
-                  PostStart:
-                    {{- if .Lifecycle.PostStart.Exec }}
-                    Exec:
-                      Command:
-                        {{- range .Lifecycle.PostStart.Exec.Command }}
+                {{- if .lifecycle }}
+                lifecycle:
+                  {{- if .lifecycle.postStart }}
+                  postStart:
+                    {{- if .lifecycle.postStart.exec }}
+                    exec:
+                      command:
+                        {{- range .lifecycle.postStart.exec.command }}
                         - {{ . }}
                         {{- end }}
                     {{- end }}
-                    {{- if .Lifecycle.PostStart.HTTPGet }}
-                    HttpGet:
-                      Path: {{ .Lifecycle.PostStart.HTTPGet.Path }}
-                      Port: {{ .Lifecycle.PostStart.HTTPGet.Port }}
-                      {{- if .Lifecycle.PostStart.HTTPGet.Scheme }}
-                      Scheme: {{ .Lifecycle.PostStart.HTTPGet.Scheme }}
+                    {{- if .lifecycle.postStart.httpGet }}
+                    httpGet:
+                      path: {{ .lifecycle.postStart.httpGet.path }}
+                      port: {{ .lifecycle.postStart.httpGet.port }}
+                      {{- if .lifecycle.postStart.httpGet.scheme }}
+                      scheme: {{ .lifecycle.postStart.httpGet.scheme }}
                       {{- end }}
-                      {{- if .Lifecycle.PostStart.HTTPGet.Host }}
-                      Host: {{ .Lifecycle.PostStart.HTTPGet.Host }}
+                      {{- if .lifecycle.postStart.httpGet.host }}
+                      host: {{ .lifecycle.postStart.httpGet.host }}
                       {{- end }}
                     {{- end }}
                   {{- end }}
-                  {{- if .Lifecycle.PreStop }}
-                  PreStop:
-                    {{- if .Lifecycle.PreStop.Exec }}
-                    Exec:
-                      Command:
-                        {{- range .Lifecycle.PreStop.Exec.Command }}
+                  {{- if .lifecycle.preStop }}
+                  preStop:
+                    {{- if .lifecycle.preStop.exec }}
+                    exec:
+                      command:
+                        {{- range .lifecycle.preStop.exec.command }}
                         - {{ . }}
                         {{- end }}
                     {{- end }}
-                    {{- if .Lifecycle.PreStop.HTTPGet }}
-                    HttpGet:
-                      Path: {{ .Lifecycle.PreStop.HTTPGet.Path }}
-                      Port: {{ .Lifecycle.PreStop.HTTPGet.Port }}
-                      {{- if .Lifecycle.PreStop.HTTPGet.Scheme }}
-                      Scheme: {{ .Lifecycle.PreStop.HTTPGet.Scheme }}
+                    {{- if .lifecycle.preStop.httpGet }}
+                    httpGet:
+                      path: {{ .lifecycle.preStop.httpGet.path }}
+                      port: {{ .lifecycle.preStop.httpGet.port }}
+                      {{- if .lifecycle.preStop.httpGet.scheme }}
+                      scheme: {{ .lifecycle.preStop.httpGet.scheme }}
                       {{- end }}
-                      {{- if .Lifecycle.PreStop.HTTPGet.Host }}
-                      Host: {{ .Lifecycle.PreStop.HTTPGet.Host }}
+                      {{- if .lifecycle.preStop.httpGet.host }}
+                      host: {{ .lifecycle.preStop.httpGet.host }}
                       {{- end }}
                     {{- end }}
                   {{- end }}
                 {{- end }}
             {{- end }}
             {{- end }}
-          Graph:
-            Name: {{ .Graph.Name }}
-            Type: {{ .Graph.Type }}
-            {{- if .Graph.Implementation }}
-            Implementation: {{ .Graph.Implementation }}
+          graph:
+            name: {{ .graph.name }}
+            type: {{ .graph.type }}
+            {{- if .graph.implementation }}
+            implementation: {{ .graph.implementation }}
             {{- end }}
-            {{- if .Graph.ModelUri }}
-            ModelUri: {{ .Graph.ModelUri }}
+            {{- if .graph.modelUri }}
+            modelUri: {{ .graph.modelUri }}
             {{- end }}
-            {{- if .Graph.EnvSecretRefName }}
-            EnvSecretRefName: {{ .Graph.EnvSecretRefName }}
+            {{- if .graph.envSecretRefName }}
+            envSecretRefName: {{ .graph.envSecretRefName }}
             {{- end }}
-            {{- if .Graph.Endpoint }}
-            Endpoint:
-              Type: {{ .Graph.Endpoint.Type }}
+            {{- if .graph.endpoint }}
+            endpoint:
+              type: {{ .graph.endpoint.type }}
             {{- end }}
-            {{- if .Graph.Logger }}
-            Logger:
-              Mode: {{ .Graph.Logger.Mode }}
-              {{- if .Graph.Logger.URL }}
-              URL: {{ .Graph.Logger.URL }}
+            {{- if .graph.logger }}
+            logger:
+              mode: {{ .graph.logger.mode }}
+              {{- if .graph.logger.url }}
+              url: {{ .graph.logger.url }}
               {{- end }}
             {{- end }}
-            {{- if .Graph.Parameters }}
-            Parameters:
-              {{- range .Graph.Parameters }}
-              - Name: {{ .Name }}
-                Type: {{ .Type }}
-                Value: {{ .Value }}
+            {{- if .graph.parameters }}
+            parameters:
+              {{- range .graph.parameters }}
+              - name: {{ .name }}
+                type: {{ .type }}
+                value: {{ .value }}
               {{- end }}
             {{- end }}
-            {{- if .Graph.Methods }}
-            Methods:
-              {{- range .Graph.Methods }}
+            {{- if .graph.methods }}
+            methods:
+              {{- range .graph.methods }}
               - {{ . }}
               {{- end }}
             {{- end }}
-            {{- if .Graph.ServiceAccountName }}
-            ServiceAccountName: {{ .Graph.ServiceAccountName }}
+            {{- if .graph.serviceAccountName }}
+            serviceAccountName: {{ .graph.serviceAccountName }}
             {{- end }}
-            {{- if .Graph.StorageInitializerImage }}
-            StorageInitializerImage: {{ .Graph.StorageInitializerImage }}
+            {{- if .graph.storageInitializerImage }}
+            storageInitializerImage: {{ .graph.storageInitializerImage }}
             {{- end }}
-            {{- if .Graph.Children }}
-            Children:
-              {{- range .Graph.Children }}
-              - Name: {{ .Name }}
-                Type: {{ .Type }}
-                {{- if .Implementation }}
-                Implementation: {{ .Implementation }}
+            {{- if .graph.children }}
+            children:
+              {{- range .graph.children }}
+              - name: {{ .name }}
+                type: {{ .type }}
+                {{- if .implementation }}
+                implementation: {{ .implementation }}
                 {{- end }}
-                {{- if .ModelUri }}
-                ModelUri: {{ .ModelUri }}
+                {{- if .modelUri }}
+                modelUri: {{ .modelUri }}
                 {{- end }}
-                {{- if .EnvSecretRefName }}
-                EnvSecretRefName: {{ .EnvSecretRefName }}
+                {{- if .envSecretRefName }}
+                envSecretRefName: {{ .envSecretRefName }}
                 {{- end }}
-                {{- if .Endpoint }}
-                Endpoint:
-                  Type: {{ .Endpoint.Type }}
+                {{- if .endpoint }}
+                endpoint:
+                  type: {{ .endpoint.type }}
                 {{- end }}
-                {{- if .Logger }}
-                Logger:
-                  Mode: {{ .Logger.Mode }}
-                  {{- if .Logger.URL }}
-                  URL: {{ .Logger.URL }}
+                {{- if .logger }}
+                logger:
+                  mode: {{ .logger.mode }}
+                  {{- if .logger.url }}
+                  url: {{ .logger.url }}
                   {{- end }}
                 {{- end }}
-                {{- if .Parameters }}
-                Parameters:
-                  {{- range .Parameters }}
-                  - Name: {{ .Name }}
-                    Type: {{ .Type }}
-                    Value: {{ .Value }}
+                {{- if .parameters }}
+                parameters:
+                  {{- range .parameters }}
+                  - name: {{ .name }}
+                    type: {{ .type }}
+                    value: {{ .value }}
                   {{- end }}
                 {{- end }}
-                {{- if .Methods }}
-                Methods:
-                  {{- range .Methods }}
+                {{- if .methods }}
+                methods:
+                  {{- range .methods }}
                   - {{ . }}
                   {{- end }}
                 {{- end }}
-                {{- if .ServiceAccountName }}
-                ServiceAccountName: {{ .ServiceAccountName }}
+                {{- if .serviceAccountName }}
+                serviceAccountName: {{ .serviceAccountName }}
                 {{- end }}
-                {{- if .StorageInitializerImage }}
-                StorageInitializerImage: {{ .StorageInitializerImage }}
+                {{- if .storageInitializerImage }}
+                storageInitializerImage: {{ .storageInitializerImage }}
                 {{- end }}
-                {{- if .Children }}
-                Children:
-                  {{- range .Children }}
-                  - Name: {{ .Name }}
-                    Type: {{ .Type }}
-                    {{- if .Implementation }}
-                    Implementation: {{ .Implementation }}
+                {{- if .children }}
+                children:
+                  {{- range .children }}
+                  - name: {{ .name }}
+                    type: {{ .type }}
+                    {{- if .implementation }}
+                    implementation: {{ .implementation }}
                     {{- end }}
-                    {{- if .ModelUri }}
-                    ModelUri: {{ .ModelUri }}
+                    {{- if .modelUri }}
+                    modelUri: {{ .modelUri }}
                     {{- end }}
-                    {{- if .EnvSecretRefName }}
-                    EnvSecretRefName: {{ .EnvSecretRefName }}
+                    {{- if .envSecretRefName }}
+                    envSecretRefName: {{ .envSecretRefName }}
                     {{- end }}
-                    {{- if .Endpoint }}
-                    Endpoint:
-                      Type: {{ .Endpoint.Type }}
+                    {{- if .endpoint }}
+                    endpoint:
+                      type: {{ .endpoint.type }}
                     {{- end }}
-                    {{- if .Logger }}
-                    Logger:
-                      Mode: {{ .Logger.Mode }}
-                      {{- if .Logger.URL }}
-                      URL: {{ .Logger.URL }}
+                    {{- if .logger }}
+                    logger:
+                      mode: {{ .logger.mode }}
+                      {{- if .logger.url }}
+                      url: {{ .logger.url }}
                       {{- end }}
                     {{- end }}
-                    {{- if .Parameters }}
-                    Parameters:
-                      {{- range .Parameters }}
-                      - Name: {{ .Name }}
-                        Type: {{ .Type }}
-                        Value: {{ .Value }}
+                    {{- if .parameters }}
+                    parameters:
+                      {{- range .parameters }}
+                      - name: {{ .name }}
+                        type: {{ .type }}
+                        value: {{ .value }}
                       {{- end }}
                     {{- end }}
-                    {{- if .Methods }}
-                    Methods:
-                      {{- range .Methods }}
+                    {{- if .methods }}
+                    methods:
+                      {{- range .methods }}
                       - {{ . }}
                       {{- end }}
                     {{- end }}
-                    {{- if .ServiceAccountName }}
-                    ServiceAccountName: {{ .ServiceAccountName }}
+                    {{- if .serviceAccountName }}
+                    serviceAccountName: {{ .serviceAccountName }}
                     {{- end }}
-                    {{- if .StorageInitializerImage }}
-                    StorageInitializerImage: {{ .StorageInitializerImage }}
+                    {{- if .storageInitializerImage }}
+                    storageInitializerImage: {{ .storageInitializerImage }}
                     {{- end }}
-                    {{- if .Children }}
-                    Children:
-                      {{- range .Children }}
-                      - Name: {{ .Name }}
-                        Type: {{ .Type }}
-                        {{- if .Implementation }}
-                        Implementation: {{ .Implementation }}
+                    {{- if .children }}
+                    children:
+                      {{- range .children }}
+                      - name: {{ .name }}
+                        type: {{ .type }}
+                        {{- if .implementation }}
+                        implementation: {{ .implementation }}
                         {{- end }}
-                        {{- if .ModelUri }}
-                        ModelUri: {{ .ModelUri }}
+                        {{- if .modelUri }}
+                        modelUri: {{ .modelUri }}
                         {{- end }}
-                        {{- if .EnvSecretRefName }}
-                        EnvSecretRefName: {{ .EnvSecretRefName }}
+                        {{- if .envSecretRefName }}
+                        envSecretRefName: {{ .envSecretRefName }}
                         {{- end }}
-                        {{- if .Endpoint }}
-                        Endpoint:
-                          Type: {{ .Endpoint.Type }}
+                        {{- if .endpoint }}
+                        endpoint:
+                          type: {{ .endpoint.type }}
                         {{- end }}
-                        {{- if .Logger }}
-                        Logger:
-                          Mode: {{ .Logger.Mode }}
-                          {{- if .Logger.URL }}
-                          URL: {{ .Logger.URL }}
+                        {{- if .logger }}
+                        logger:
+                          mode: {{ .logger.mode }}
+                          {{- if .logger.url }}
+                          url: {{ .logger.url }}
                           {{- end }}
                         {{- end }}
-                        {{- if .Parameters }}
-                        Parameters:
-                          {{- range .Parameters }}
-                          - Name: {{ .Name }}
-                            Type: {{ .Type }}
-                            Value: {{ .Value }}
+                        {{- if .parameters }}
+                        parameters:
+                          {{- range .parameters }}
+                          - name: {{ .name }}
+                            type: {{ .type }}
+                            value: {{ .value }}
                           {{- end }}
                         {{- end }}
-                        {{- if .Methods }}
-                        Methods:
-                          {{- range .Methods }}
+                        {{- if .methods }}
+                        methods:
+                          {{- range .methods }}
                           - {{ . }}
                           {{- end }}
                         {{- end }}
-                        {{- if .ServiceAccountName }}
-                        ServiceAccountName: {{ .ServiceAccountName }}
+                        {{- if .serviceAccountName }}
+                        serviceAccountName: {{ .serviceAccountName }}
                         {{- end }}
-                        {{- if .StorageInitializerImage }}
-                        StorageInitializerImage: {{ .StorageInitializerImage }}
+                        {{- if .storageInitializerImage }}
+                        storageInitializerImage: {{ .storageInitializerImage }}
                         {{- end }}
-                        {{- if .Children }}
-                        Children:
-                          {{- range .Children }}
-                          - Name: {{ .Name }}
-                            Type: {{ .Type }}
-                            {{- if .Implementation }}
-                            Implementation: {{ .Implementation }}
+                        {{- if .children }}
+                        children:
+                          {{- range .children }}
+                          - name: {{ .name }}
+                            type: {{ .type }}
+                            {{- if .implementation }}
+                            implementation: {{ .implementation }}
                             {{- end }}
-                            {{- if .ModelUri }}
-                            ModelUri: {{ .ModelUri }}
+                            {{- if .modelUri }}
+                            modelUri: {{ .modelUri }}
                             {{- end }}
-                            {{- if .EnvSecretRefName }}
-                            EnvSecretRefName: {{ .EnvSecretRefName }}
+                            {{- if .envSecretRefName }}
+                            envSecretRefName: {{ .envSecretRefName }}
                             {{- end }}
-                            {{- if .Endpoint }}
-                            Endpoint:
-                              Type: {{ .Endpoint.Type }}
+                            {{- if .endpoint }}
+                            endpoint:
+                              type: {{ .endpoint.type }}
                             {{- end }}
-                            {{- if .Logger }}
-                            Logger:
-                              Mode: {{ .Logger.Mode }}
-                              {{- if .Logger.URL }}
-                              URL: {{ .Logger.URL }}
+                            {{- if .logger }}
+                            logger:
+                              mode: {{ .logger.mode }}
+                              {{- if .logger.url }}
+                              url: {{ .logger.url }}
                               {{- end }}
                             {{- end }}
-                            {{- if .Parameters }}
-                            Parameters:
-                              {{- range .Parameters }}
-                              - Name: {{ .Name }}
-                                Type: {{ .Type }}
-                                Value: {{ .Value }}
+                            {{- if .parameters }}
+                            parameters:
+                              {{- range .parameters }}
+                              - name: {{ .name }}
+                                type: {{ .type }}
+                                value: {{ .value }}
                               {{- end }}
                             {{- end }}
-                            {{- if .Methods }}
-                            Methods:
-                              {{- range .Methods }}
+                            {{- if .methods }}
+                            methods:
+                              {{- range .methods }}
                               - {{ . }}
                               {{- end }}
                             {{- end }}
-                            {{- if .ServiceAccountName }}
-                            ServiceAccountName: {{ .ServiceAccountName }}
+                            {{- if .serviceAccountName }}
+                            serviceAccountName: {{ .serviceAccountName }}
                             {{- end }}
-                            {{- if .StorageInitializerImage }}
-                            StorageInitializerImage: {{ .StorageInitializerImage }}
-                            {{- end }}                            
-                            Children: []
+                            {{- if .storageInitializerImage }}
+                            storageInitializerImage: {{ .storageInitializerImage }}
+                            {{- end }}
+                            children: []
                           {{- end }}
                         {{- else }}
-                        Children: []
+                        children: []
                         {{- end }}
                       {{- end }}
                     {{- else }}
-                    Children: []
+                    children: []
                     {{- end }}
                   {{- end }}
                 {{- else }}
-                Children: []
+                children: []
                 {{- end }}
               {{- end }}
             {{- else }}
-            Children: []
+            children: []
             {{- end }}
       {{- end }}
 
@@ -972,53 +972,53 @@ files:
     template: false
     content: |
       {{- define "seldon.graph.node" }}
-      name: {{ .Name }}
-      {{- if .Type }}
-      type: {{ .Type }}
+      name: {{ .name }}
+      {{- if .type }}
+      type: {{ .type }}
       {{- end }}
-      {{- if .Implementation }}
-      implementation: {{ .Implementation }}
+      {{- if .implementation }}
+      implementation: {{ .implementation }}
       {{- end }}
-      {{- if .ModelUri }}
-      modelUri: {{ .ModelUri }}
+      {{- if .modelUri }}
+      modelUri: {{ .modelUri }}
       {{- end }}
-      {{- if .EnvSecretRefName }}
-      envSecretRefName: {{ .EnvSecretRefName }}
+      {{- if .envSecretRefName }}
+      envSecretRefName: {{ .envSecretRefName }}
       {{- end }}
-      {{- if .Endpoint }}
+      {{- if .endpoint }}
       endpoint:
-        type: {{ .Endpoint.Type }}
+        type: {{ .endpoint.type }}
       {{- end }}
-      {{- if .Logger }}
+      {{- if .logger }}
       logger:
-        mode: {{ .Logger.Mode }}
-        {{- if .Logger.URL }}
-        url: {{ .Logger.URL }}
+        mode: {{ .logger.mode }}
+        {{- if .logger.url }}
+        url: {{ .logger.url }}
         {{- end }}
       {{- end }}
-      {{- if .Parameters }}
+      {{- if .parameters }}
       parameters:
-        {{- range .Parameters }}
-        - name: {{ .Name }}
-          type: {{ .Type }}
-          value: {{ .Value }}
+        {{- range .parameters }}
+        - name: {{ .name }}
+          type: {{ .type }}
+          value: {{ .value }}
         {{- end }}
       {{- end }}
-      {{- if .Methods }}
+      {{- if .methods }}
       methods:
-        {{- range .Methods }}
+        {{- range .methods }}
         - {{ . }}
         {{- end }}
       {{- end }}
-      {{- if .ServiceAccountName }}
-      serviceAccountName: {{ .ServiceAccountName }}
+      {{- if .serviceAccountName }}
+      serviceAccountName: {{ .serviceAccountName }}
       {{- end }}
-      {{- if .StorageInitializerImage }}
-      storageInitializerImage: {{ .StorageInitializerImage }}
+      {{- if .storageInitializerImage }}
+      storageInitializerImage: {{ .storageInitializerImage }}
       {{- end }}
-      {{- if .Children }}
+      {{- if .children }}
       children:
-        {{- range .Children }}
+        {{- range .children }}
         - {{ include "seldon.graph.node" . | indent 4 | trim }}
         {{- end }}
       {{- else }}
@@ -1026,409 +1026,552 @@ files:
       {{- end }}
       {{- end }}
       {{- define "seldon.container" }}
-      - name: {{ .Name }}
-        {{- if .Image }}
-        image: {{ .Image }}
+      - name: {{ .name }}
+        {{- if .image }}
+        image: {{ .image }}
         {{- end }}
-        {{- if .ImagePullPolicy }}
-        imagePullPolicy: {{ .ImagePullPolicy }}
+        {{- if .imagePullPolicy }}
+        imagePullPolicy: {{ .imagePullPolicy }}
         {{- end }}
-        {{- if .Args }}
+        {{- if .args }}
         args:
-          {{- range .Args }}
+          {{- range .args }}
           - {{ . }}
           {{- end }}
         {{- end }}
-        {{- if .Env }}
+        {{- if .env }}
         env:
-          {{- range .Env }}
-          - name: {{ .Name }}
-            {{- if .Value }}
-            value: {{ .Value }}
-            {{- else if .ValueFrom }}
+          {{- range .env }}
+          - name: {{ .name }}
+            {{- if .value }}
+            value: {{ .value }}
+            {{- else if .valueFrom }}
             valueFrom:
               secretKeyRef:
-                name: {{ .ValueFrom.SecretKeyRef.Name }}
-                key: {{ .ValueFrom.SecretKeyRef.Key }}
+                name: {{ .valueFrom.secretKeyRef.name }}
+                key: {{ .valueFrom.secretKeyRef.key }}
             {{- end }}
           {{- end }}
         {{- end }}
-        {{- if .EnvFrom }}
+        {{- if .envFrom }}
         envFrom:
-          {{- range .EnvFrom }}
-          {{- if .SecretRef }}
+          {{- range .envFrom }}
+          {{- if .secretRef }}
           - secretRef:
-              name: {{ .SecretRef.Name }}
+              name: {{ .secretRef.name }}
           {{- end }}
-          {{- if .ConfigMapRef }}
+          {{- if .configMapRef }}
           - configMapRef:
-              name: {{ .ConfigMapRef.Name }}
+              name: {{ .configMapRef.name }}
           {{- end }}
           {{- end }}
         {{- end }}
-        {{- if .VolumeMounts }}
+        {{- if .volumeMounts }}
         volumeMounts:
-          {{- range .VolumeMounts }}
-          - name: {{ .Name }}
-            mountPath: {{ .MountPath }}
-            {{- if .ReadOnly }}
-            readOnly: {{ .ReadOnly }}
+          {{- range .volumeMounts }}
+          - name: {{ .name }}
+            mountPath: {{ .mountPath }}
+            {{- if .readOnly }}
+            readOnly: {{ .readOnly }}
             {{- end }}
           {{- end }}
         {{- end }}
-        {{- if .Resources }}
+        {{- if .resources }}
         resources:
-          {{- if .Resources.Requests }}
+          {{- if .resources.requests }}
           requests:
-            {{- if .Resources.Requests.CPU }}
-            cpu: {{ .Resources.Requests.CPU }}
+            {{- if .resources.requests.cpu }}
+            cpu: {{ .resources.requests.cpu }}
             {{- end }}
-            {{- if .Resources.Requests.Memory }}
-            memory: {{ .Resources.Requests.Memory }}
+            {{- if .resources.requests.memory }}
+            memory: {{ .resources.requests.memory }}
             {{- end }}
           {{- end }}
-          {{- if .Resources.Limits }}
+          {{- if .resources.limits }}
           limits:
-            {{- if .Resources.Limits.CPU }}
-            cpu: {{ .Resources.Limits.CPU }}
+            {{- if .resources.limits.cpu }}
+            cpu: {{ .resources.limits.cpu }}
             {{- end }}
-            {{- if .Resources.Limits.Memory }}
-            memory: {{ .Resources.Limits.Memory }}
+            {{- if .resources.limits.memory }}
+            memory: {{ .resources.limits.memory }}
             {{- end }}
           {{- end }}
         {{- end }}
-        {{- if .Liveness }}
+        {{- if .liveness }}
         livenessProbe:
           httpGet:
-            path: {{ .Liveness.Path }}
-            port: {{ .Liveness.Port }}
-            {{- if .Liveness.Scheme }}
-            scheme: {{ .Liveness.Scheme }}
+            path: {{ .liveness.path }}
+            port: {{ .liveness.port }}
+            {{- if .liveness.scheme }}
+            scheme: {{ .liveness.scheme }}
             {{- end }}
-          initialDelaySeconds: {{ .Liveness.InitialDelaySeconds }}
-          periodSeconds: {{ .Liveness.PeriodSeconds }}
-          failureThreshold: {{ .Liveness.FailureThreshold }}
-          successThreshold: {{ .Liveness.SuccessThreshold }}
+          initialDelaySeconds: {{ .liveness.initialDelaySeconds }}
+          periodSeconds: {{ .liveness.periodSeconds }}
+          failureThreshold: {{ .liveness.failureThreshold }}
+          successThreshold: {{ .liveness.successThreshold }}
         {{- end }}
-        {{- if .Readiness }}
+        {{- if .readiness }}
         readinessProbe:
           httpGet:
-            path: {{ .Readiness.Path }}
-            port: {{ .Readiness.Port }}
-            {{- if .Readiness.Scheme }}
-            scheme: {{ .Readiness.Scheme }}
+            path: {{ .readiness.path }}
+            port: {{ .readiness.port }}
+            {{- if .readiness.scheme }}
+            scheme: {{ .readiness.scheme }}
             {{- end }}
-          initialDelaySeconds: {{ .Readiness.InitialDelaySeconds }}
-          periodSeconds: {{ .Readiness.PeriodSeconds }}
-          failureThreshold: {{ .Readiness.FailureThreshold }}
-          successThreshold: {{ .Readiness.SuccessThreshold }}
+          initialDelaySeconds: {{ .readiness.initialDelaySeconds }}
+          periodSeconds: {{ .readiness.periodSeconds }}
+          failureThreshold: {{ .readiness.failureThreshold }}
+          successThreshold: {{ .readiness.successThreshold }}
         {{- end }}
-        {{- if .Lifecycle }}
+        {{- if .lifecycle }}
         lifecycle:
-          {{- if .Lifecycle.PostStart }}
+          {{- if .lifecycle.postStart }}
           postStart:
-            {{- if .Lifecycle.PostStart.Exec }}
+            {{- if .lifecycle.postStart.exec }}
             exec:
               command:
-                {{- range .Lifecycle.PostStart.Exec.Command }}
+                {{- range .lifecycle.postStart.exec.command }}
                 - {{ . }}
                 {{- end }}
             {{- end }}
-            {{- if .Lifecycle.PostStart.HttpGet }}
+            {{- if .lifecycle.postStart.httpGet }}
             httpGet:
-              path: {{ .Lifecycle.PostStart.HttpGet.Path }}
-              port: {{ .Lifecycle.PostStart.HttpGet.Port }}
-              {{- if .Lifecycle.PostStart.HttpGet.Scheme }}
-              scheme: {{ .Lifecycle.PostStart.HttpGet.Scheme }}
+              path: {{ .lifecycle.postStart.httpGet.path }}
+              port: {{ .lifecycle.postStart.httpGet.port }}
+              {{- if .lifecycle.postStart.httpGet.scheme }}
+              scheme: {{ .lifecycle.postStart.httpGet.scheme }}
               {{- end }}
-              {{- if .Lifecycle.PostStart.HttpGet.Host }}
-              host: {{ .Lifecycle.PostStart.HttpGet.Host }}
+              {{- if .lifecycle.postStart.httpGet.host }}
+              host: {{ .lifecycle.postStart.httpGet.host }}
               {{- end }}
             {{- end }}
           {{- end }}
-          {{- if .Lifecycle.PreStop }}
+          {{- if .lifecycle.preStop }}
           preStop:
-            {{- if .Lifecycle.PreStop.Exec }}
+            {{- if .lifecycle.preStop.exec }}
             exec:
               command:
-                {{- range .Lifecycle.PreStop.Exec.Command }}
+                {{- range .lifecycle.preStop.exec.command }}
                 - {{ . }}
                 {{- end }}
             {{- end }}
-            {{- if .Lifecycle.PreStop.HttpGet }}
+            {{- if .lifecycle.preStop.httpGet }}
             httpGet:
-              path: {{ .Lifecycle.PreStop.HttpGet.Path }}
-              port: {{ .Lifecycle.PreStop.HttpGet.Port }}
-              {{- if .Lifecycle.PreStop.HttpGet.Scheme }}
-              scheme: {{ .Lifecycle.PreStop.HttpGet.Scheme }}
+              path: {{ .lifecycle.preStop.httpGet.path }}
+              port: {{ .lifecycle.preStop.httpGet.port }}
+              {{- if .lifecycle.preStop.httpGet.scheme }}
+              scheme: {{ .lifecycle.preStop.httpGet.scheme }}
               {{- end }}
-              {{- if .Lifecycle.PreStop.HttpGet.Host }}
-              host: {{.Lifecycle.PreStop.HttpGet.Host }}
+              {{- if .lifecycle.preStop.httpGet.host }}
+              host: {{ .lifecycle.preStop.httpGet.host }}
               {{- end }}
             {{- end }}
           {{- end }}
         {{- end }}
       {{- end }}
-
+      {{- define "seldon.container-s" }}
+        name: {{ .name }}
+        {{- if .image }}
+        image: {{ .image }}
+        {{- end }}
+        {{- if .imagePullPolicy }}
+        imagePullPolicy: {{ .imagePullPolicy }}
+        {{- end }}
+        {{- if .args }}
+        args:
+          {{- range .args }}
+          - {{ . }}
+          {{- end }}
+        {{- end }}
+        {{- if .env }}
+        env:
+          {{- range .env }}
+          - name: {{ .name }}
+            {{- if .value }}
+            value: {{ .value }}
+            {{- else if .valueFrom }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ .valueFrom.secretKeyRef.name }}
+                key: {{ .valueFrom.secretKeyRef.key }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- if .envFrom }}
+        envFrom:
+          {{- range .envFrom }}
+          {{- if .secretRef }}
+          - secretRef:
+              name: {{ .secretRef.name }}
+          {{- end }}
+          {{- if .configMapRef }}
+          - configMapRef:
+              name: {{ .configMapRef.name }}
+          {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- if .volumeMounts }}
+        volumeMounts:
+          {{- range .volumeMounts }}
+          - name: {{ .name }}
+            mountPath: {{ .mountPath }}
+            {{- if .readOnly }}
+            readOnly: {{ .readOnly }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- if .resources }}
+        resources:
+          {{- if .resources.requests }}
+          requests:
+            {{- if .resources.requests.cpu }}
+            cpu: {{ .resources.requests.cpu }}
+            {{- end }}
+            {{- if .resources.requests.memory }}
+            memory: {{ .resources.requests.memory }}
+            {{- end }}
+          {{- end }}
+          {{- if .resources.limits }}
+          limits:
+            {{- if .resources.limits.cpu }}
+            cpu: {{ .resources.limits.cpu }}
+            {{- end }}
+            {{- if .resources.limits.memory }}
+            memory: {{ .resources.limits.memory }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- if .liveness }}
+        livenessProbe:
+          httpGet:
+            path: {{ .liveness.path }}
+            port: {{ .liveness.port }}
+            {{- if .liveness.scheme }}
+            scheme: {{ .liveness.scheme }}
+            {{- end }}
+          initialDelaySeconds: {{ .liveness.initialDelaySeconds }}
+          periodSeconds: {{ .liveness.periodSeconds }}
+          failureThreshold: {{ .liveness.failureThreshold }}
+          successThreshold: {{ .liveness.successThreshold }}
+        {{- end }}
+        {{- if .readiness }}
+        readinessProbe:
+          httpGet:
+            path: {{ .readiness.path }}
+            port: {{ .readiness.port }}
+            {{- if .readiness.scheme }}
+            scheme: {{ .readiness.scheme }}
+            {{- end }}
+          initialDelaySeconds: {{ .readiness.initialDelaySeconds }}
+          periodSeconds: {{ .readiness.periodSeconds }}
+          failureThreshold: {{ .readiness.failureThreshold }}
+          successThreshold: {{ .readiness.successThreshold }}
+        {{- end }}
+        {{- if .lifecycle }}
+        lifecycle:
+          {{- if .lifecycle.postStart }}
+          postStart:
+            {{- if .lifecycle.postStart.exec }}
+            exec:
+              command:
+                {{- range .lifecycle.postStart.exec.command }}
+                - {{ . }}
+                {{- end }}
+            {{- end }}
+            {{- if .lifecycle.postStart.httpGet }}
+            httpGet:
+              path: {{ .lifecycle.postStart.httpGet.path }}
+              port: {{ .lifecycle.postStart.httpGet.port }}
+              {{- if .lifecycle.postStart.httpGet.scheme }}
+              scheme: {{ .lifecycle.postStart.httpGet.scheme }}
+              {{- end }}
+              {{- if .lifecycle.postStart.httpGet.host }}
+              host: {{ .lifecycle.postStart.httpGet.host }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- if .lifecycle.preStop }}
+          preStop:
+            {{- if .lifecycle.preStop.exec }}
+            exec:
+              command:
+                {{- range .lifecycle.preStop.exec.command }}
+                - {{ . }}
+                {{- end }}
+            {{- end }}
+            {{- if .lifecycle.preStop.httpGet }}
+            httpGet:
+              path: {{ .lifecycle.preStop.httpGet.path }}
+              port: {{ .lifecycle.preStop.httpGet.port }}
+              {{- if .lifecycle.preStop.httpGet.scheme }}
+              scheme: {{ .lifecycle.preStop.httpGet.scheme }}
+              {{- end }}
+              {{- if .lifecycle.preStop.httpGet.host }}
+              host: {{ .lifecycle.preStop.httpGet.host }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}      
 
   - path: templates/seldon-deployment.yaml
     template: false
     content: |
-      apiVersion: {{ .Values.ApiVersion }}
+      apiVersion: {{ .Values.apiVersion }}
       kind: SeldonDeployment
       metadata:
-        name: {{ .Values.DeploymentName }}
-        namespace: {{ .Values.Namespace }}
+        name: {{ .Values.deploymentName }}
+        namespace: {{ .Values.namespace }}
         labels:
-        {{- range $k, $v := .Values.Metadata.Labels }}
+        {{- range $k, $v := .Values.metadata.labels }}
           {{ $k }}: {{ $v }}
         {{- end }}
-        {{- if .Values.Metadata.Annotations }}
+        {{- if .Values.metadata.annotations }}
         annotations:
-        {{- range $k, $v := .Values.Metadata.Annotations }}
+        {{- range $k, $v := .Values.metadata.annotations }}
           {{ $k }}: {{ $v }}
         {{- end }}
         {{- end }}
       spec:
-        name: {{ .Values.DeploymentName }}
-        {{- if .Values.Protocol }}
-        protocol: {{ .Values.Protocol }}
+        name: {{ .Values.deploymentName }}
+        {{- if .Values.protocol }}
+        protocol: {{ .Values.protocol }}
         {{- end }}
-        {{- if .Values.Transport }}
-        transport: {{ .Values.Transport }}
+        {{- if .Values.transport }}
+        transport: {{ .Values.transport }}
         {{- end }}
-        {{- if .Values.SpecAnnotations }}
+        {{- if .Values.specAnnotations }}
         annotations:
-          {{- range $k, $v := .Values.SpecAnnotations }}
+          {{- range $k, $v := .Values.specAnnotations }}
           {{ $k }}: {{ $v }}
           {{- end }}
         {{- end }}
         predictors:
-        {{- range .Values.Predictors }}
-          - name: {{ .Name }}
-            {{- if .Replicas }}
-            replicas: {{ .Replicas }}
+        {{- range .Values.predictors }}
+          - name: {{ .name }}
+            {{- if .replicas }}
+            replicas: {{ .replicas }}
             {{- end }}
-            {{- if .Traffic }}
-            traffic: {{ .Traffic }}
+            {{- if .traffic }}
+            traffic: {{ .traffic }}
             {{- end }}
-            {{- if .Annotations }}
+            {{- if .annotations }}
             annotations:
-            {{- range $k, $v := .Annotations }}
+            {{- range $k, $v := .annotations }}
               {{ $k }}: {{ $v }}
             {{- end }}
             {{- end }}
-            {{- if .EngineResources }}
+            {{- if .engineResources }}
             engineResources:
-              {{- if .EngineResources.Requests }}
+              {{- if .engineResources.requests }}
               requests:
-                {{- if .EngineResources.Requests.CPU }}
-                cpu: {{ .EngineResources.Requests.CPU }}
+                {{- if .engineResources.requests.cpu }}
+                cpu: {{ .engineResources.requests.cpu }}
                 {{- end }}
-                {{- if .EngineResources.Requests.Memory }}
-                memory: {{ .EngineResources.Requests.Memory }}
+                {{- if .engineResources.requests.memory }}
+                memory: {{ .engineResources.requests.memory }}
                 {{- end }}
               {{- end }}
-              {{- if .EngineResources.Limits }}
+              {{- if .engineResources.limits }}
               limits:
-                {{- if .EngineResources.Limits.CPU }}
-                cpu: {{ .EngineResources.Limits.CPU }}
+                {{- if .engineResources.limits.cpu }}
+                cpu: {{ .engineResources.limits.cpu }}
                 {{- end }}
-                {{- if .EngineResources.Limits.Memory }}
-                memory: {{ .EngineResources.Limits.Memory }}
+                {{- if .engineResources.limits.memory }}
+                memory: {{ .engineResources.limits.memory }}
                 {{- end }}
               {{- end }}
             {{- end }}
-            {{- if .Labels }}
+            {{- if .labels }}
             labels:
-              {{- range $k, $v := .Labels }}
+              {{- range $k, $v := .labels }}
               {{ $k }}: {{ $v }}
               {{- end }}
             {{- end }}
-            {{- if .Shadow }}
-            shadow: {{ .Shadow }}
+            {{- if .shadow }}
+            shadow: {{ .shadow }}
             {{- end }}
-            {{- if .SSL }}
+            {{- if .ssl }}
             ssl:
-              certSecretName: {{ .SSL.CertSecretName }}
+              certSecretName: {{ .ssl.certSecretName }}
             {{- end }}
-            {{- if .ProgressDeadlineSeconds }}
-            progressDeadlineSeconds: {{ .ProgressDeadlineSeconds }}
+            {{- if .progressDeadlineSeconds }}
+            progressDeadlineSeconds: {{ .progressDeadlineSeconds }}
             {{- end }}
-            {{- if .Explainer }}
+            {{- if .explainer }}
             explainer:
-              {{- if .Explainer.Type }}
-              type: {{ .Explainer.Type }}
+              {{- if .explainer.type }}
+              type: {{ .explainer.type }}
               {{- end }}
-              {{- if .Explainer.ModelUri }}
-              modelUri: {{ .Explainer.ModelUri }}
+              {{- if .explainer.modelUri }}
+              modelUri: {{ .explainer.modelUri }}
               {{- end }}
-              {{- if .Explainer.ServiceAccountName }}
-              serviceAccountName: {{ .Explainer.ServiceAccountName }}
+              {{- if .explainer.serviceAccountName }}
+              serviceAccountName: {{ .explainer.serviceAccountName }}
               {{- end }}
-              {{- if .Explainer.StorageInitializerImage }}
-              storageInitializerImage: {{ .Explainer.StorageInitializerImage }}
+              {{- if .explainer.storageInitializerImage }}
+              storageInitializerImage: {{ .explainer.storageInitializerImage }}
               {{- end }}
-              {{- if .Explainer.EnvSecretRefName }}
-              envSecretRefName: {{ .Explainer.EnvSecretRefName }}
+              {{- if .explainer.envSecretRefName }}
+              envSecretRefName: {{ .explainer.envSecretRefName }}
               {{- end }}
-              {{- if .Explainer.InitParameters }}
-              initParameters: {{ .Explainer.InitParameters | quote }}
+              {{- if .explainer.initParameters }}
+              initParameters: {{ .explainer.initParameters | quote }}
               {{- end }}
-              {{- if .Explainer.Replicas }}
-              replicas: {{ .Explainer.Replicas }}
+              {{- if .explainer.replicas }}
+              replicas: {{ .explainer.replicas }}
               {{- end }}
-              {{- if .Explainer.Endpoint }}
+              {{- if .explainer.endpoint }}
               endpoint:
-                type: {{ .Explainer.Endpoint.Type }}
+                type: {{ .explainer.endpoint.type }}
               {{- end }}
-              {{- if .Explainer.Config }}
+              {{- if .explainer.config }}
               config:
-                {{- range $k, $v := .Explainer.Config }}
+                {{- range $k, $v := .explainer.config }}
                 {{ $k }}: {{ $v }}
                 {{- end }}
               {{- end }}
-              {{- if .Explainer.ContainerSpec }}
+              {{- if .explainer.containerSpec }}
               containerSpec:
-              {{- include "seldon.container" .Explainer.ContainerSpec | indent 10 }}
+              {{- include "seldon.container-s" .explainer.containerSpec | indent 8 }}
               {{- end }}
             {{- end }}
-            {{- if .SvcOrchSpec }}
+            {{- if .svcOrchSpec }}
             svcOrchSpec:
-              {{- if .SvcOrchSpec.Resources }}
+              {{- if .svcOrchSpec.resources }}
               resources:
-                {{- if .SvcOrchSpec.Resources.Requests }}
+                {{- if .svcOrchSpec.resources.requests }}
                 requests:
-                  {{- if .SvcOrchSpec.Resources.Requests.CPU }}
-                  cpu: {{ .SvcOrchSpec.Resources.Requests.CPU }}
+                  {{- if .svcOrchSpec.resources.requests.cpu }}
+                  cpu: {{ .svcOrchSpec.resources.requests.cpu }}
                   {{- end }}
-                  {{- if .SvcOrchSpec.Resources.Requests.Memory }}
-                  memory: {{ .SvcOrchSpec.Resources.Requests.Memory }}
+                  {{- if .svcOrchSpec.resources.requests.memory }}
+                  memory: {{ .svcOrchSpec.resources.requests.memory }}
                   {{- end }}
                 {{- end }}
-                {{- if .SvcOrchSpec.Resources.Limits }}
+                {{- if .svcOrchSpec.resources.limits }}
                 limits:
-                  {{- if .SvcOrchSpec.Resources.Limits.CPU }}
-                  cpu: {{ .SvcOrchSpec.Resources.Limits.CPU }}
+                  {{- if .svcOrchSpec.resources.limits.cpu }}
+                  cpu: {{ .svcOrchSpec.resources.limits.cpu }}
                   {{- end }}
-                  {{- if .SvcOrchSpec.Resources.Limits.Memory }}
-                  memory: {{ .SvcOrchSpec.Resources.Limits.Memory }}
+                  {{- if .svcOrchSpec.resources.limits.memory }}
+                  memory: {{ .svcOrchSpec.resources.limits.memory }}
                   {{- end }}
                 {{- end }}
               {{- end }}
-              {{- if .SvcOrchSpec.Env }}
+              {{- if .svcOrchSpec.env }}
               env:
-                {{- range .SvcOrchSpec.Env }}
-                - name: {{ .Name }}
-                  {{- if .Value }}
-                  value: {{ .Value }}
-                  {{- else if .ValueFrom }}
+                {{- range .svcOrchSpec.env }}
+                - name: {{ .name }}
+                  {{- if .value }}
+                  value: {{ .value }}
+                  {{- else if .valueFrom }}
                   valueFrom:
                     secretKeyRef:
-                      name: {{ .ValueFrom.SecretKeyRef.Name }}
-                      key: {{ .ValueFrom.SecretKeyRef.Key }}
+                      name: {{ .valueFrom.secretKeyRef.name }}
+                      key: {{ .valueFrom.secretKeyRef.key }}
                   {{- end }}
                 {{- end }}
               {{- end }}
             {{- end }}
             graph:
-              {{- include "seldon.graph.node" .Graph | indent 8 }}
+              {{- include "seldon.graph.node" .graph | indent 8 }}
             componentSpecs:
-              {{- if .HPASpec }}
+              {{- if .hpaSpec }}
               hpaSpec:
-                minReplicas: {{ .HPASpec.MinReplicas }}
-                maxReplicas: {{ .HPASpec.MaxReplicas }}
+                minReplicas: {{ .hpaSpec.minReplicas }}
+                maxReplicas: {{ .hpaSpec.maxReplicas }}
                 metricsv2:
-                  {{- range .HPASpec.MetricsV2 }}
-                  - type: {{ .Type }}
+                  {{- range .hpaSpec.metricsv2 }}
+                  - type: {{ .type }}
                     resource:
-                      name: {{ .Resource.Name }}
+                      name: {{ .resource.name }}
                       target:
-                        type: {{ .Resource.Target.Type }}
-                        averageUtilization: {{ .Resource.Target.AverageUtilization }}
+                        type: {{ .resource.target.type }}
+                        averageUtilization: {{ .resource.target.averageUtilization }}
                   {{- end }}
               {{- end }}
               - spec:
-                  {{- if .ComponentSpec.ServiceAccountName }}
-                  serviceAccountName: {{ .ComponentSpec.ServiceAccountName }}
+                  {{- if .componentSpec.serviceAccountName }}
+                  serviceAccountName: {{ .componentSpec.serviceAccountName }}
                   {{- end }}
-                  {{- if .ComponentSpec.TerminationGracePeriodSeconds }}
-                  terminationGracePeriodSeconds: {{ .ComponentSpec.TerminationGracePeriodSeconds }}
+                  {{- if .componentSpec.terminationGracePeriodSeconds }}
+                  terminationGracePeriodSeconds: {{ .componentSpec.terminationGracePeriodSeconds }}
                   {{- end }}
-                  {{- if .ComponentSpec.KedaSpec }}
+                  {{- if .componentSpec.kedaSpec }}
                   kedaSpec:
-                    {{- if .ComponentSpec.KedaSpec.MinReplicaCount }}
-                    minReplicaCount: {{ .ComponentSpec.KedaSpec.MinReplicaCount }}
+                    {{- if .componentSpec.kedaSpec.minReplicaCount }}
+                    minReplicaCount: {{ .componentSpec.kedaSpec.minReplicaCount }}
                     {{- end }}
-                    {{- if .ComponentSpec.KedaSpec.MaxReplicaCount }}
-                    maxReplicaCount: {{ .ComponentSpec.KedaSpec.MaxReplicaCount }}
+                    {{- if .componentSpec.kedaSpec.maxReplicaCount }}
+                    maxReplicaCount: {{ .componentSpec.kedaSpec.maxReplicaCount }}
                     {{- end }}
-                    {{- if .ComponentSpec.KedaSpec.CooldownPeriod }}
-                    cooldownPeriod: {{ .ComponentSpec.KedaSpec.CooldownPeriod }}
+                    {{- if .componentSpec.kedaSpec.cooldownPeriod }}
+                    cooldownPeriod: {{ .componentSpec.kedaSpec.cooldownPeriod }}
                     {{- end }}
-                    {{- if .ComponentSpec.KedaSpec.PollingInterval }}
-                    pollingInterval: {{ .ComponentSpec.KedaSpec.PollingInterval }}
+                    {{- if .componentSpec.kedaSpec.pollingInterval }}
+                    pollingInterval: {{ .componentSpec.kedaSpec.pollingInterval }}
                     {{- end }}
-                    {{- if .ComponentSpec.KedaSpec.Triggers }}
+                    {{- if .componentSpec.kedaSpec.triggers }}
                     triggers:
-                      {{- range .ComponentSpec.KedaSpec.Triggers }}
-                      - type: {{ .Type }}
-                        {{- if .Metadata }}
+                      {{- range .componentSpec.kedaSpec.triggers }}
+                      - type: {{ .type }}
+                        {{- if .metadata }}
                         metadata:
-                          {{- range $k, $v := .Metadata }}
+                          {{- range $k, $v := .metadata }}
                           {{ $k }}: {{ $v }}
                           {{- end }}
                         {{- end }}
-                        {{- if .AuthenticationRef }}
+                        {{- if .authenticationRef }}
                         authenticationRef:
-                          name: {{ .AuthenticationRef.Name }}
+                          name: {{ .authenticationRef.name }}
                         {{- end }}
                       {{- end }}
                     {{- end }}
-                    {{- if .ComponentSpec.KedaSpec.Advanced }}
+                    {{- if .componentSpec.kedaSpec.advanced }}
                     advanced:
-                      {{- if .ComponentSpec.KedaSpec.Advanced.RestoreToOriginalReplicaCount }}
-                      restoreToOriginalReplicaCount: {{ .ComponentSpec.KedaSpec.Advanced.RestoreToOriginalReplicaCount }}
+                      {{- if .componentSpec.kedaSpec.advanced.restoreToOriginalReplicaCount }}
+                      restoreToOriginalReplicaCount: {{ .componentSpec.kedaSpec.advanced.restoreToOriginalReplicaCount }}
                       {{- end }}
-                      {{- if .ComponentSpec.KedaSpec.Advanced.HorizontalPodAutoscalerConfig }}
+                      {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig }}
                       horizontalPodAutoscalerConfig:
-                        {{ .ComponentSpec.KedaSpec.Advanced.HorizontalPodAutoscalerConfig }}
+                        {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig }}
                       {{- end }}
                     {{- end }}
                   {{- end }}
-                  {{- if .ComponentSpec.PdbSpec }}
+                  {{- if .componentSpec.pdbSpec }}
                   pdbSpec:
-                    {{- if .ComponentSpec.PdbSpec.MinAvailable }}
-                    minAvailable: {{ .ComponentSpec.PdbSpec.MinAvailable }}
+                    {{- if .componentSpec.pdbSpec.minAvailable }}
+                    minAvailable: {{ .componentSpec.pdbSpec.minAvailable }}
                     {{- end }}
-                    {{- if .ComponentSpec.PdbSpec.MaxUnavailable }}
-                    maxUnavailable: {{ .ComponentSpec.PdbSpec.MaxUnavailable }}
+                    {{- if .componentSpec.pdbSpec.maxUnavailable }}
+                    maxUnavailable: {{ .componentSpec.pdbSpec.maxUnavailable }}
                     {{- end }}
                   {{- end }}
-                  {{- if .ComponentSpec.Containers }}      
+                  {{- if .componentSpec.containers }}      
                   containers:
-                    {{- range .ComponentSpec.Containers }}
+                    {{- range .componentSpec.containers }}
                     {{- include "seldon.container" . | indent 14 }}
                     {{- end }}
                   {{- end }}
-                  {{- if .ComponentSpec.InitContainers }}
+                  {{- if .componentSpec.initContainers }}
                   initContainers:
-                    {{- range .ComponentSpec.InitContainers }}
+                    {{- range .componentSpec.initContainers }}
                     {{- include "seldon.container" . | indent 14 }}
                     {{- end }}
                   {{- end }}
-                  {{- if .ComponentSpec.Volumes }}
+                  {{- if .componentSpec.volumes }}
                   volumes:
-                    {{- range .ComponentSpec.Volumes }}
-                    - name: {{ .Name }}
-                      {{- if .EmptyDir }}
+                    {{- range .componentSpec.volumes }}
+                    - name: {{ .name }}
+                      {{- if .emptyDir }}
                       emptyDir: {}
-                      {{- else if .Secret }}
+                      {{- else if .secret }}
                       secret:
-                        secretName: {{ .Secret.SecretName }}
+                        secretName: {{ .secret.secretName }}
                       {{- end }}
                     {{- end }}
-                  {{- end }}  
+                  {{- end }}
         {{- end }}
 
   - path: .helmignore
@@ -1442,715 +1585,719 @@ files:
       .ipynb_checkpoints/
 
 valuesSchema:
-  Environment:
+  environment:
     type: string
     description: Target environment (e.g., TEST, STAGING, PROD)
     required: true
-  ApiVersion:
+  apiVersion:
     type: string
     description: Kubernetes API version for the SeldonDeployment resource (e.g., machinelearning.seldon.io/v1)
     required: true
-  Chart.Name:
+  chart.name:
     type: string
     description: Name of the Helm chart
     required: true
-  Chart.Version:
+  chart.version:
     type: string
     description: Version of the Helm chart
     required: true
-  Chart.Description:
+  chart.description:
     type: string
     description: Short description of the chart's purpose
     required: true
-  DeploymentName:
+  deploymentName:
     type: string
     description: Name of the SeldonDeployment resource
     required: true
-  Namespace:
+  namespace:
     type: string
     description: Kubernetes namespace to deploy the resources in
     required: true
-  SubjectArea:
+  subjectArea:
     type: string
     description: A tag to classify a subject area of the target chart.
     required: true
     default: batch-model-inference
-  SourceMetafileName:
+  sourceMetafileName:
     type: string
     description: Source metafile name
     required: true
     default: no_data
-  SourceMetafileRepo:
+  sourceMetafileRepo:
     type: string
     description: Source metafile name
     required: true
     default: no_data
-  SourceMetafileBranch:
+  sourceMetafileBranch:
     type: string
     description: Source metafile name
     required: true
     default: no_data
-  Metadata.Labels:
+  metadata.labels:
     type: object
     description: Key-value pairs used to categorize and select Kubernetes objects
     required: false
-  Metadata.Annotations:
+  metadata.annotations:
     type: object
     description: Annotations applied to the SeldonDeployment additional metadata for tooling, policies, and configuration
     required: false
-  Protocol:
+  protocol:
     type: string
     description: Inference protocol to use. Allowed values- seldon, tensorflow, kafka, v2
     required: false
-  Transport:
+  transport:
     type: string
     description: Transport mechanism to use. Allowed values- rest, grpc
     required: false
-  Annotations:
+  annotations:
     type: object
     description: Annotations added to the SeldonDeployment spec
     required: false
-  SpecAnnotations:
+  specAnnotations:
     type: object
     description: Additional annotations applied under SeldonDeployment.spec
     required: false
-  Predictors:
+  predictors:
     type: array
     description: List of predictors defining traffic-split and graph configurations
     required: true
-  Predictors[].Name:
+  predictors[].name:
     type: string
     description: Unique name of the predictor
     required: true
-  Predictors[].Replicas:
+  predictors[].replicas:
     type: integer
     description: Number of model replicas to deploy
     required: false
-  Predictors[].Traffic:
+  predictors[].traffic:
     type: integer
     description: Percentage of traffic assigned to this predictor
     required: false
-  Predictors[].Annotations:
+  predictors[].annotations:
     type: object
     description: Annotations applied to this predictor instance
     required: false
-  Predictors[].SvcOrchSpec.Resources.Requests.CPU:
+  predictors[].svcOrchSpec.resources.requests.cpu:
     type: string
     description: CPU requested by the service orchestrator container
     required: false
-  Predictors[].SvcOrchSpec.Resources.Requests.Memory:
+  predictors[].svcOrchSpec.resources.requests.memory:
     type: string
     description: Memory requested by the service orchestrator container
     required: false
-  Predictors[].SvcOrchSpec.Resources.Limits.CPU:
+  predictors[].svcOrchSpec.resources.limits.cpu:
     type: string
     description: Maximum CPU allowed for the service orchestrator
     required: false
-  Predictors[].SvcOrchSpec.Resources.Limits.Memory:
+  predictors[].svcOrchSpec.resources.limits.memory:
     type: string
     description: Maximum memory allowed for the service orchestrator
     required: false
-  Predictors[].SvcOrchSpec.Env:
+  predictors[].svcOrchSpec.env:
     type: array
     description: Environment variables for the service orchestrator
     required: false
-  Predictors[].SvcOrchSpec.Env[].Name:
+  predictors[].svcOrchSpec.env[].name:
     type: string
     description: Name of environment variable for orchestrator
     required: true
-  Predictors[].SvcOrchSpec.Env[].Value:
+  predictors[].svcOrchSpec.env[].value:
     type: string
     description: Value of environment variable for orchestrator
     required: false
-  Predictors[].SvcOrchSpec.Env[].ValueFrom.SecretKeyRef.Name:
+  predictors[].svcOrchSpec.env[].valueFrom.secretKeyRef.name:
     type: string
     description: Name of the Kubernetes secret to reference
     required: false
-  Predictors[].SvcOrchSpec.Env[].ValueFrom.SecretKeyRef.Key:
+  predictors[].svcOrchSpec.env[].valueFrom.secretKeyRef.key:
     type: string
     description: Key inside the referenced secret
     required: false
-  Predictors[].Graph.Name:
+  predictors[].graph.name:
     type: string
     description: Name of the root node in the prediction graph
     required: true
-  Predictors[].Graph.Type:
+  predictors[].graph.type:
     type: string
-    description: Type. Allowed values- MODEL, TRANSFORMER, COMBINER, ROUTER, OUTPUT_TRANSFORMER, UNKNOWN_TYPE of the node (MODEL, ROUTER, TRANSFORMER, etc.)
+    description: Type of the node. Allowed values- MODEL, TRANSFORMER, COMBINER, ROUTER, OUTPUT_TRANSFORMER, UNKNOWN_TYPE
     required: true
-  Predictors[].Graph.Implementation:
+  predictors[].graph.implementation:
     type: string
     description: Predefined implementation for the model server. Allowed values- UNKNOWN_IMPLEMENTATION, SKLEARN_SERVER, XGBOOST_SERVER, TENSORFLOW_SERVER, PYTORCH_SERVER, LIGHTGBM_SERVER, CUSTOM, TRITON_SERVER, HUGGINGFACE_SERVER, MLFLOW_SERVER, ONNX_SERVER, R_SERVER
     required: false
-  Predictors[].Graph.ModelUri:
+  predictors[].graph.modelUri:
     type: string
     description: URI to the stored model (S3, GCS, local, etc.)
     required: false
-  Predictors[].Graph.Endpoint.Type:
+  predictors[].graph.endpoint.type:
     type: string
     description: Type of endpoint exposed by the graph. Allowed values- REST, GRPC
     required: false
-  Predictors[].Graph.EnvSecretRefName:
+  predictors[].graph.envSecretRefName:
     type: string
     description: Name of secret to pull environment credentials from
     required: false
-  Predictors[].Graph.Logger.Mode:
+  predictors[].graph.logger.mode:
     type: string
     description: Logging mode. Allowed values- all, request, response, none
     required: false
-  Predictors[].Graph.Logger.URL:
+  predictors[].graph.logger.url:
     type: string
     description: Optional URL to send logs to
     required: false
-  Predictors[].Graph.Parameters:
+  predictors[].graph.parameters:
     type: array
     description: List of parameters for this graph node
     required: false
-  Predictors[].Graph.Parameters[].Name:
+  predictors[].graph.parameters[].name:
     type: string
     description: Name of the parameter
     required: true
-  Predictors[].Graph.Parameters[].Type:
+  predictors[].graph.parameters[].type:
     type: string
     description: Data type of the parameter. Allowed values- STRING, BOOL, INT, FLOAT, DOUBLE
     required: true
-  Predictors[].Graph.Parameters[].Value:
+  predictors[].graph.parameters[].value:
     type: string
     description: Value of the parameter
     required: true
-  Predictors[].Graph.Children:
+  predictors[].graph.children:
     type: array
     description: Child nodes in the prediction graph
     required: false
-  Predictors[].Graph.Methods:
+  predictors[].graph.methods:
     type: array
     description: List of inference methods supported by this graph node. Common values- predict, transform, route, aggregate, send_feedback, custom
     required: false
-  Predictors[].Graph.ServiceAccountName:
+  predictors[].graph.serviceAccountName:
     type: string
     description: Kubernetes service account name to use for this graph node
     required: false
-  Predictors[].Graph.StorageInitializerImage:
+  predictors[].graph.storageInitializerImage:
     type: string
     description: Optional override image for storage initializer for this node
     required: false
-  Predictors[].ComponentSpec.ServiceAccountName:
+  predictors[].componentSpec.serviceAccountName:
     type: string
     description: Kubernetes service account used by pods for access control
     required: false
-  Predictors[].ComponentSpec.TerminationGracePeriodSeconds:
+  predictors[].componentSpec.terminationGracePeriodSeconds:
     type: integer
     description: Time (in seconds) for graceful shutdown
     required: false
-  Predictors[].ComponentSpec.Containers:
+  predictors[].componentSpec.containers:
     type: array
     description: Additional containers in the predictor pod
     required: false
-  Predictors[].ComponentSpec.Containers[].Name:
+  predictors[].componentSpec.containers[].name:
     type: string
     description: Name of the container in the pod
     required: true
-  Predictors[].ComponentSpec.Containers[].Image:
+  predictors[].componentSpec.containers[].image:
     type: string
     description: Docker image to use in the container
     required: true
-  Predictors[].ComponentSpec.Containers[].ImagePullPolicy:
+  predictors[].componentSpec.containers[].imagePullPolicy:
     type: string
     description: Kubernetes image pull policy (Always, IfNotPresent, Never)
     required: false
-  Predictors[].ComponentSpec.Containers[].Args:
+  predictors[].componentSpec.containers[].args:
     type: array
     description: Command-line arguments passed to the container entrypoint
     required: false
-  Predictors[].ComponentSpec.Containers[].Env:
+  predictors[].componentSpec.containers[].env:
     type: array
     description: Environment variables for the container
     required: false
-  Predictors[].ComponentSpec.Containers[].Env[].Name:
+  predictors[].componentSpec.containers[].env[].name:
     type: string
     description: Name of the environment variable
     required: true
-  Predictors[].ComponentSpec.Containers[].Env[].Value:
+  predictors[].componentSpec.containers[].env[].value:
     type: string
     description: Value of the environment variable
     required: false
-  Predictors[].ComponentSpec.Containers[].Env[].ValueFrom.SecretKeyRef.Name:
+  predictors[].componentSpec.containers[].env[].valueFrom.secretKeyRef.name:
     type: string
     description: Name of the Kubernetes secret to reference
     required: false
-  Predictors[].ComponentSpec.Containers[].Env[].ValueFrom.SecretKeyRef.Key:
+  predictors[].componentSpec.containers[].env[].valueFrom.secretKeyRef.key:
     type: string
     description: Key inside the referenced secret
     required: false
-  Predictors[].ComponentSpec.Containers[].EnvFrom:
+  predictors[].componentSpec.containers[].envFrom:
     type: array
     description: List of sources to populate environment variables from (ConfigMaps or Secrets)
     required: false
-  Predictors[].ComponentSpec.Containers[].EnvFrom[].SecretRef.Name:
+  predictors[].componentSpec.containers[].envFrom[].secretRef.name:
     type: string
     description: Name of the Secret for env import
     required: false
-  Predictors[].ComponentSpec.Containers[].EnvFrom[].ConfigMapRef.Name:
+  predictors[].componentSpec.containers[].envFrom[].configMapRef.name:
     type: string
     description: Name of the ConfigMap for env import
     required: false
-  Predictors[].ComponentSpec.Containers[].VolumeMounts:
+  predictors[].componentSpec.containers[].volumeMounts:
     type: array
     description: Volume mounts for container
     required: false
-  Predictors[].ComponentSpec.Containers[].VolumeMounts[].Name:
+  predictors[].componentSpec.containers[].volumeMounts[].name:
     type: string
     description: Name of the volume to mount
     required: true
-  Predictors[].ComponentSpec.Containers[].VolumeMounts[].MountPath:
+  predictors[].componentSpec.containers[].volumeMounts[].mountPath:
     type: string
     description: Path in container where volume will be mounted
     required: true
-  Predictors[].ComponentSpec.Containers[].VolumeMounts[].ReadOnly:
+  predictors[].componentSpec.containers[].volumeMounts[].readOnly:
     type: boolean
     description: Whether the volume mount should be read-only
     required: false
-  Predictors[].ComponentSpec.Containers[].Resources.Requests.CPU:
+  predictors[].componentSpec.containers[].resources.requests.cpu:
     type: string
     description: Amount of CPU requested by the container (e.g. "200m")
     required: false
-  Predictors[].ComponentSpec.Containers[].Resources.Requests.Memory:
+  predictors[].componentSpec.containers[].resources.requests.memory:
     type: string
     description: Amount of memory requested by the container (e.g. "256Mi")
     required: false
-  Predictors[].ComponentSpec.Containers[].Resources.Limits.CPU:
+  predictors[].componentSpec.containers[].resources.limits.cpu:
     type: string
     description: Maximum amount of CPU allowed for the container
     required: false
-  Predictors[].ComponentSpec.Containers[].Resources.Limits.Memory:
+  predictors[].componentSpec.containers[].resources.limits.memory:
     type: string
     description: Maximum amount of memory allowed for the container
     required: false
-  Predictors[].ComponentSpec.Containers[].Liveness.Path:
+  predictors[].componentSpec.containers[].liveness.path:
     type: string
     description: HTTP path to access on the container to perform liveness check
     required: false
-  Predictors[].ComponentSpec.Containers[].Liveness.Port:
+  predictors[].componentSpec.containers[].liveness.port:
     type: string
     description: Port to access for the liveness probe
     required: false
-  Predictors[].ComponentSpec.Containers[].Liveness.Scheme:
+  predictors[].componentSpec.containers[].liveness.scheme:
     type: string
     description: Scheme to use for connecting to the host (HTTP or HTTPS)
     required: false
-  Predictors[].ComponentSpec.Containers[].Liveness.InitialDelaySeconds:
+  predictors[].componentSpec.containers[].liveness.initialDelaySeconds:
     type: integer
     description: Number of seconds after the container has started before liveness probe is initiated
     required: false
-  Predictors[].ComponentSpec.Containers[].Liveness.PeriodSeconds:
+  predictors[].componentSpec.containers[].liveness.periodSeconds:
     type: integer
     description: How often (in seconds) to perform the liveness probe
     required: false
-  Predictors[].ComponentSpec.Containers[].Liveness.FailureThreshold:
+  predictors[].componentSpec.containers[].liveness.failureThreshold:
     type: integer
     description: Number of times the liveness probe can fail before the container is restarted
     required: false
-  Predictors[].ComponentSpec.Containers[].Liveness.SuccessThreshold:
+  predictors[].componentSpec.containers[].liveness.successThreshold:
     type: integer
     description: Minimum consecutive successes for the liveness probe to be considered successful
     required: false
-  Predictors[].ComponentSpec.Containers[].Readiness.Path:
+  predictors[].componentSpec.containers[].readiness.path:
     type: string
     description: HTTP path to access on the container to perform readiness check
     required: false
-  Predictors[].ComponentSpec.Containers[].Readiness.Port:
+  predictors[].componentSpec.containers[].readiness.port:
     type: string
     description: Port to access for the readiness probe
     required: false
-  Predictors[].ComponentSpec.Containers[].Readiness.Scheme:
+  predictors[].componentSpec.containers[].readiness.scheme:
     type: string
     description: Scheme to use for connecting to the host (HTTP or HTTPS)
     required: false
-  Predictors[].ComponentSpec.Containers[].Readiness.InitialDelaySeconds:
+  predictors[].componentSpec.containers[].readiness.initialDelaySeconds:
     type: integer
     description: Number of seconds after the container has started before readiness probe is initiated
     required: false
-  Predictors[].ComponentSpec.Containers[].Readiness.PeriodSeconds:
+  predictors[].componentSpec.containers[].readiness.periodSeconds:
     type: integer
     description: How often (in seconds) to perform the readiness probe
     required: false
-  Predictors[].ComponentSpec.Containers[].Readiness.FailureThreshold:
+  predictors[].componentSpec.containers[].readiness.failureThreshold:
     type: integer
     description: Number of times the readiness probe can fail before the container is marked unhealthy
     required: false
-  Predictors[].ComponentSpec.Containers[].Readiness.SuccessThreshold:
+  predictors[].componentSpec.containers[].readiness.successThreshold:
     type: integer
     description: Minimum consecutive successes for the readiness probe to be considered successful
     required: false
-  Predictors[].ComponentSpec.Containers[].Lifecycle:
+  predictors[].componentSpec.containers[].lifecycle:
     type: object
     description: Lifecycle hooks for the container (preStop and postStart)
     required: false
-  Predictors[].ComponentSpec.Containers[].Lifecycle.PreStop.Exec.Command:
+  predictors[].componentSpec.containers[].lifecycle.preStop.exec.command:
     type: array
     description: Command to run in preStop lifecycle hook (exec)
     required: false
-  Predictors[].ComponentSpec.Containers[].Lifecycle.PreStop.HttpGet.Path:
+  predictors[].componentSpec.containers[].lifecycle.preStop.httpGet.path:
     type: string
     description: HTTP path to access on the server for preStop hook
     required: false
-  Predictors[].ComponentSpec.Containers[].Lifecycle.PreStop.HttpGet.Port:
+  predictors[].componentSpec.containers[].lifecycle.preStop.httpGet.port:
     type: string
     description: Port to access on the server for preStop hook
     required: false
-  Predictors[].ComponentSpec.Containers[].Lifecycle.PostStart.Exec.Command:
+  predictors[].componentSpec.containers[].lifecycle.postStart.exec.command:
     type: array
     description: Command to run in postStart lifecycle hook (exec)
     required: false
-  Predictors[].ComponentSpec.Containers[].Lifecycle.PostStart.HttpGet.Path:
+  predictors[].componentSpec.containers[].lifecycle.postStart.httpGet.path:
     type: string
     description: HTTP path to access on the server for postStart hook
     required: false
-  Predictors[].ComponentSpec.Containers[].Lifecycle.PostStart.HttpGet.Port:
+  predictors[].componentSpec.containers[].lifecycle.postStart.httpGet.port:
     type: string
     description: Port to access on the server for postStart hook
     required: false
-  Predictors[].ComponentSpec.Volumes:
+  predictors[].componentSpec.volumes:
     type: array
     description: Volumes used by the predictor
     required: false
-  Predictors[].ComponentSpec.Volumes[].Name:
+  predictors[].componentSpec.volumes[].name:
     type: string
     description: Name of the volume
     required: true
-  Predictors[].ComponentSpec.Volumes[].Secret.SecretName:
+  predictors[].componentSpec.volumes[].secret.secretName:
     type: string
     description: Kubernetes secret name to mount as volume
     required: false
-  Predictors[].ComponentSpec.Volumes[].EmptyDir:
+  predictors[].componentSpec.volumes[].emptyDir:
     type: object
     description: EmptyDir volume source for ephemeral storage
     required: false
-  Predictors[].ComponentSpec.InitContainers:
+  predictors[].componentSpec.initContainers:
     type: array
     description: Init containers to run before main containers
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Name:
+  predictors[].componentSpec.initContainers[].name:
     type: string
     description: Name of the init container
     required: true
-  Predictors[].ComponentSpec.InitContainers[].Image:
+  predictors[].componentSpec.initContainers[].image:
     type: string
     description: Image of the init container
     required: true
-  Predictors[].ComponentSpec.InitContainers[].ImagePullPolicy:
+  predictors[].componentSpec.initContainers[].imagePullPolicy:
     type: string
     description: Policy for pulling init container image
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Args:
+  predictors[].componentSpec.initContainers[].args:
     type: array
     description: Arguments passed to init container on start
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Env:
+  predictors[].componentSpec.initContainers[].env:
     type: array
     description: Environment variables for the init container
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Env[].Name:
+  predictors[].componentSpec.initContainers[].env[].name:
     type: string
     description: Name of the environment variable
     required: true
-  Predictors[].ComponentSpec.InitContainers[].Env[].Value:
+  predictors[].componentSpec.initContainers[].env[].value:
     type: string
     description: Value of the environment variable
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Env[].ValueFrom.SecretKeyRef.Name:
+  predictors[].componentSpec.initContainers[].env[].valueFrom.secretKeyRef.name:
     type: string
     description: Name of the Kubernetes secret for env valueFrom
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Env[].ValueFrom.SecretKeyRef.Key:
+  predictors[].componentSpec.initContainers[].env[].valueFrom.secretKeyRef.key:
     type: string
     description: Key within the Kubernetes secret for env valueFrom
     required: false
-  Predictors[].ComponentSpec.InitContainers[].EnvFrom:
+  predictors[].componentSpec.initContainers[].envFrom:
     type: array
     description: List of sources to populate environment variables from (ConfigMaps or Secrets)
     required: false
-  Predictors[].ComponentSpec.InitContainers[].EnvFrom[].SecretRef.Name:
+  predictors[].componentSpec.initContainers[].envFrom[].secretRef.name:
     type: string
     description: Name of the Secret for env import
     required: false
-  Predictors[].ComponentSpec.InitContainers[].EnvFrom[].ConfigMapRef.Name:
+  predictors[].componentSpec.initContainers[].envFrom[].configMapRef.name:
     type: string
     description: Name of the ConfigMap for env import
     required: false
-  Predictors[].ComponentSpec.InitContainers[].VolumeMounts:
+  predictors[].componentSpec.initContainers[].volumeMounts:
     type: array
     description: Volume mounts for the init container
     required: false
-  Predictors[].ComponentSpec.InitContainers[].VolumeMounts[].Name:
+  predictors[].componentSpec.initContainers[].volumeMounts[].name:
     type: string
     description: Volume name to mount into init container
     required: true
-  Predictors[].ComponentSpec.InitContainers[].VolumeMounts[].MountPath:
+  predictors[].componentSpec.initContainers[].volumeMounts[].mountPath:
     type: string
     description: Path inside init container to mount the volume
     required: true
-  Predictors[].ComponentSpec.InitContainers[].VolumeMounts[].ReadOnly:
+  predictors[].componentSpec.initContainers[].volumeMounts[].readOnly:
     type: boolean
     description: Whether the mount is read-only
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Resources.Requests.CPU:
+  predictors[].componentSpec.initContainers[].resources.requests.cpu:
     type: string
     description: Amount of CPU requested by the init container
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Resources.Requests.Memory:
+  predictors[].componentSpec.initContainers[].resources.requests.memory:
     type: string
     description: Amount of memory requested by the init container
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Resources.Limits.CPU:
+  predictors[].componentSpec.initContainers[].resources.limits.cpu:
     type: string
     description: Maximum amount of CPU allowed for the init container
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Resources.Limits.Memory:
+  predictors[].componentSpec.initContainers[].resources.limits.memory:
     type: string
     description: Maximum amount of memory allowed for the init container
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Liveness.Path:
+  predictors[].componentSpec.initContainers[].liveness.path:
     type: string
     description: HTTP path to access on the container to perform liveness check
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Liveness.Port:
+  predictors[].componentSpec.initContainers[].liveness.port:
     type: string
     description: Port to access for the liveness probe
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Liveness.Scheme:
+  predictors[].componentSpec.initContainers[].liveness.scheme:
     type: string
     description: Scheme to use for connecting to the host (HTTP or HTTPS)
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Liveness.InitialDelaySeconds:
+  predictors[].componentSpec.initContainers[].liveness.initialDelaySeconds:
     type: integer
     description: Number of seconds after the container has started before liveness probe is initiated
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Liveness.PeriodSeconds:
+  predictors[].componentSpec.initContainers[].liveness.periodSeconds:
     type: integer
     description: How often (in seconds) to perform the liveness probe
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Liveness.FailureThreshold:
+  predictors[].componentSpec.initContainers[].liveness.failureThreshold:
     type: integer
     description: Number of times the liveness probe can fail before the container is restarted
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Liveness.SuccessThreshold:
+  predictors[].componentSpec.initContainers[].liveness.successThreshold:
     type: integer
     description: Minimum consecutive successes for the liveness probe to be considered successful
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Readiness.Path:
+  predictors[].componentSpec.initContainers[].readiness.path:
     type: string
     description: HTTP path to access on the container to perform readiness check
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Readiness.Port:
+  predictors[].componentSpec.initContainers[].readiness.port:
     type: string
     description: Port to access for the readiness probe
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Readiness.Scheme:
+  predictors[].componentSpec.initContainers[].readiness.scheme:
     type: string
     description: Scheme to use for connecting to the host (HTTP or HTTPS)
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Readiness.InitialDelaySeconds:
+  predictors[].componentSpec.initContainers[].readiness.initialDelaySeconds:
     type: integer
     description: Number of seconds after the container has started before readiness probe is initiated
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Readiness.PeriodSeconds:
+  predictors[].componentSpec.initContainers[].readiness.periodSeconds:
     type: integer
     description: How often (in seconds) to perform the readiness probe
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Readiness.FailureThreshold:
+  predictors[].componentSpec.initContainers[].readiness.failureThreshold:
     type: integer
     description: Number of times the readiness probe can fail before the container is marked unhealthy
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Readiness.SuccessThreshold:
+  predictors[].componentSpec.initContainers[].readiness.successThreshold:
     type: integer
     description: Minimum consecutive successes for the readiness probe to be considered successful
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Lifecycle:
+  predictors[].componentSpec.initContainers[].lifecycle:
     type: object
     description: Lifecycle hooks for the init container
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Lifecycle.PreStop.Exec.Command:
+  predictors[].componentSpec.initContainers[].lifecycle.preStop.exec.command:
     type: array
     description: Command to run in preStop lifecycle hook (exec)
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Lifecycle.PostStart.Exec.Command:
+  predictors[].componentSpec.initContainers[].lifecycle.postStart.exec.command:
     type: array
     description: Command to run in postStart lifecycle hook (exec)
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Lifecycle.PreStop.HttpGet.Path:
+  predictors[].componentSpec.initContainers[].lifecycle.preStop.httpGet.path:
     type: string
     description: HTTP path to access on the server for preStop hook
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Lifecycle.PreStop.HttpGet.Port:
+  predictors[].componentSpec.initContainers[].lifecycle.preStop.httpGet.port:
     type: string
     description: Port to access on the server for preStop hook
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Lifecycle.PostStart.HttpGet.Path:
+  predictors[].componentSpec.initContainers[].lifecycle.postStart.httpGet.path:
     type: string
     description: HTTP path to access on the server for postStart hook
     required: false
-  Predictors[].ComponentSpec.InitContainers[].Lifecycle.PostStart.HttpGet.Port:
+  predictors[].componentSpec.initContainers[].lifecycle.postStart.httpGet.port:
     type: string
     description: Port to access on the server for postStart hook
     required: false
-  Predictors[].ComponentSpec.HPASpec:
+  predictors[].componentSpec.hpaSpec:
     type: object
     description: Horizontal Pod Autoscaler configuration for the predictor
     required: false
-  Predictors[].ComponentSpec.HPASpec.MinReplicas:
+  predictors[].componentSpec.hpaSpec.minReplicas:
     type: integer
     description: Minimum number of replicas allowed
     required: true
-  Predictors[].ComponentSpec.HPASpec.MaxReplicas:
+  predictors[].componentSpec.hpaSpec.maxReplicas:
     type: integer
     description: Maximum number of replicas allowed
     required: true
-  Predictors[].ComponentSpec.HPASpec.MetricsV2:
+  predictors[].componentSpec.hpaSpec.metricsV2:
     type: array
     description: List of custom metrics for autoscaling
     required: false
-  Predictors[].ComponentSpec.HPASpec.MetricsV2[].Type:
+  predictors[].componentSpec.hpaSpec.metricsV2[].type:
     type: string
     description: Type of metric (e.g., Resource)
     required: true
-  Predictors[].ComponentSpec.HPASpec.MetricsV2[].Resource.Name:
+  predictors[].componentSpec.hpaSpec.metricsV2[].resource.name:
     type: string
     description: Resource name for autoscaling (e.g., cpu)
     required: true
-  Predictors[].ComponentSpec.HPASpec.MetricsV2[].Resource.Target.Type:
+  predictors[].componentSpec.hpaSpec.metricsV2[].resource.target.type:
     type: string
     description: Type of target (e.g., Utilization)
     required: true
-  Predictors[].ComponentSpec.HPASpec.MetricsV2[].Resource.Target.AverageUtilization:
+  predictors[].componentSpec.hpaSpec.metricsV2[].resource.target.averageUtilization:
     type: integer
     description: Target average utilization percentage
     required: false
-  Predictors[].ComponentSpec.KedaSpec.MinReplicaCount:
+  predictors[].componentSpec.kedaSpec.minReplicaCount:
     type: integer
     description: Minimum number of replicas to scale down to with KEDA
     required: false
-  Predictors[].ComponentSpec.KedaSpec.MaxReplicaCount:
+  predictors[].componentSpec.kedaSpec.maxReplicaCount:
     type: integer
     description: Maximum number of replicas to scale up to with KEDA
     required: false
-  Predictors[].ComponentSpec.KedaSpec.CooldownPeriod:
+  predictors[].componentSpec.kedaSpec.cooldownPeriod:
     type: integer
     description: Number of seconds to wait before scaling down
     required: false
-  Predictors[].ComponentSpec.KedaSpec.PollingInterval:
+  predictors[].componentSpec.kedaSpec.pollingInterval:
     type: integer
     description: Interval in seconds to check for scaling metrics
     required: false
-  Predictors[].ComponentSpec.KedaSpec.Triggers:
+  predictors[].componentSpec.kedaSpec.triggers:
     type: array
     description: List of KEDA triggers to define scaling behavior
     required: false
-  Predictors[].ComponentSpec.KedaSpec.Triggers[].Type:
+  predictors[].componentSpec.kedaSpec.triggers[].type:
     type: string
     description: Type of KEDA trigger (e.g. cpu, kafka, prometheus)
     required: true
-  Predictors[].ComponentSpec.KedaSpec.Triggers[].Metadata:
+  predictors[].componentSpec.kedaSpec.triggers[].metadata:
     type: object
     description: Key-value map with trigger-specific metadata
     required: false
-  Predictors[].ComponentSpec.KedaSpec.Triggers[].AuthenticationRef.Name:
+  predictors[].componentSpec.kedaSpec.triggers[].authenticationRef.name:
     type: string
     description: Name of the KEDA authentication reference to use
     required: false
-  Predictors[].ComponentSpec.KedaSpec.Advanced.RestoreToOriginalReplicaCount:
+  predictors[].componentSpec.kedaSpec.advanced.restoreToOriginalReplicaCount:
     type: boolean
     description: Restore to the original replica count after scaling is no longer needed
     required: false
-  Predictors[].ComponentSpec.KedaSpec.Advanced.HorizontalPodAutoscalerConfig:
+  predictors[].componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig:
     type: object
     description: HPA behavior configuration as a key-value map
     required: false
-  Predictors[].ComponentSpec.PdbSpec.MinAvailable:
+  predictors[].componentSpec.pdbSpec.minAvailable:
     type: string
     description: Minimum number or percentage of pods that must be available during disruptions
     required: false
-  Predictors[].ComponentSpec.PdbSpec.MaxUnavailable:
+  predictors[].componentSpec.pdbSpec.maxUnavailable:
     type: string
     description: Maximum number or percentage of pods that may be unavailable during disruptions
     required: false
-  Predictors[].EngineResources.Requests.CPU:
+  predictors[].engineResources.requests.cpu:
     type: string
     description: CPU requested for the Seldon engine sidecar
     required: false
-  Predictors[].EngineResources.Requests.Memory:
+  predictors[].engineResources.requests.memory:
     type: string
     description: Memory requested for the Seldon engine sidecar
     required: false
-  Predictors[].EngineResources.Limits.CPU:
+  predictors[].engineResources.limits.cpu:
     type: string
     description: Maximum CPU allowed for the Seldon engine sidecar
     required: false
-  Predictors[].EngineResources.Limits.Memory:
+  predictors[].engineResources.limits.memory:
     type: string
     description: Maximum memory allowed for the Seldon engine sidecar
     required: false
-  Predictors[].Labels:
+  predictors[].labels:
     type: object
     description: Custom labels applied to the predictor deployment
     required: false
-  Predictors[].Shadow:
+  predictors[].shadow:
     type: boolean
     description: If true, all traffic is shadowed to this predictor without impacting the response
     required: false
-  Predictors[].SSL.CertSecretName:
+  predictors[].ssl.certSecretName:
     type: string
-    description: SSL sertificate secrete name for this predictor
+    description: SSL certificate secret name for this predictor
     required: false
-  Predictors[].ProgressDeadlineSeconds:
+  predictors[].progressDeadlineSeconds:
     type: integer
     description: Time in seconds the deployment controller should wait before marking the predictor as failed
     required: false
-  Predictors[].Explainer.Type:
+  predictors[].explainer.type:
     type: string
     description: The type of explainer used to interpret model predictions. Allowed values- anchor_tabular, anchor_text, anchor_image, kernel_shap, tree_shap, integrated_gradients, contrastive, cfproto, counterfactual, alibi, custom
     required: false
-  Predictors[].Explainer.ModelUri:
+  predictors[].explainer.modelUri:
     type: string
     description: URI pointing to the explainer model location
     required: false
-  Predictors[].Explainer.Config:
+  predictors[].explainer.config:
     type: object
     description: Key-value configuration settings passed to the explainer
     required: false
-  Predictors[].Explainer.Endpoint.Type:
+  predictors[].explainer.endpoint.type:
     type: string
     description: Type of the endpoint protocol. Allowed values- REST, GRPC
     required: false
-  Predictors[].Explainer.EnvSecretRefName:
+  predictors[].explainer.envSecretRefName:
     type: string
     description: Name of the secret containing environment variables for the explainer
     required: false
-  Predictors[].Explainer.StorageInitializerImage:
+  predictors[].explainer.storageInitializerImage:
     type: string
     description: Custom image to use for the explainer's storage initializer
     required: false
-  Predictors[].Explainer.Replicas:
+  predictors[].explainer.replicas:
     type: integer
     description: Number of replicas to run for the explainer deployment
     required: false
-  Predictors[].Explainer.InitParameters:
+  predictors[].explainer.initParameters:
     type: string
     description: JSON-formatted string with initialization parameters for the explainer
     required: false
-  Predictors[].Explainer.ContainerSpec.Name:
+  predictors[].explainer.serviceAccountName:
+    type: string
+    description: Service account name to run the explainer under
+    required: false
+  predictors[].explainer.containerSpec.name:
     type: string
     description: Name of the explainer container
     required: false
-  Predictors[].Explainer.ContainerSpec.Image:
+  predictors[].explainer.containerSpec.image:
     type: string
     description: Container image for the explainer
     required: false
-  Predictors[].Explainer.ContainerSpec.Args:
+  predictors[].explainer.containerSpec.args:
     type: array
     description: Command-line arguments passed to the explainer container
     required: false
-  Predictors[].Explainer.ContainerSpec.ImagePullPolicy:
+  predictors[].explainer.containerSpec.imagePullPolicy:
     type: string
-    description: Policy for pulling init container image
-    required: false  
+    description: Policy for pulling explainer container image
+    required: false

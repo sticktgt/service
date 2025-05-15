@@ -11,303 +11,311 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+/*
+yaml:"app.dognauts/platform-generated" json:"platformGenerated"
+*/
 type Values struct {
-	Environment          string            `json:"Environment"`
-	ApiVersion           string            `json:"ApiVersion"`
-	Chart                Chart             `json:"Chart"`
-	DeploymentName       string            `json:"DeploymentName"`
-	Namespace            string            `json:"Namespace"`
-	Metadata             Metadata          `json:"Metadata"`
-	Predictors           []Predictor       `json:"Predictors"`
-	Annotations          map[string]string `json:"annotations,omitempty"`
-	Protocol             string            `json:"protocol,omitempty"`
-	Transport            string            `json:"transport,omitempty"`
-	SubjectArea          string            `json:"subjectArea,omitempty"`
-	SourceMetafileName   string            `json:"sourceMetafileName,omitempty"`
-	SourceMetafileRepo   string            `json:"sourceMetafileRepo,omitempty"`
-	SourceMetafileBranch string            `json:"sourceMetafileBranch,omitempty"`
+	Environment          string            `json:"environment" yaml:"environment"`
+	ApiVersion           string            `json:"apiVersion" yaml:"apiVersion"`
+	Chart                Chart             `json:"chart" yaml:"chart"`
+	DeploymentName       string            `json:"deploymentName" yaml:"deploymentName"`
+	Namespace            string            `json:"namespace" yaml:"namespace"`
+	Metadata             Metadata          `json:"metadata" yaml:"metadata"`
+	Predictors           []Predictor       `json:"predictors" yaml:"predictors"`
+	Annotations          map[string]string `json:"annotations,omitempty" yaml:"annotations,omitempty"`
+	Protocol             string            `json:"protocol,omitempty" yaml:"protocol,omitempty"`
+	Transport            string            `json:"transport,omitempty" yaml:"transport,omitempty"`
+	SubjectArea          string            `json:"subjectArea,omitempty" yaml:"subjectArea,omitempty"`
+	SourceMetafileName   string            `json:"sourceMetafileName,omitempty" yaml:"sourceMetafileName,omitempty"`
+	SourceMetafileRepo   string            `json:"sourceMetafileRepo,omitempty" yaml:"sourceMetafileRepo,omitempty"`
+	SourceMetafileBranch string            `json:"sourceMetafileBranch,omitempty" yaml:"sourceMetafileBranch,omitempty"`
 }
 
 type Chart struct {
-	Name        string `json:"Name"`
-	Version     string `json:"Version"`
-	Description string `json:"Description"`
+	Name        string `json:"name" yaml:"name"`
+	Version     string `json:"version" yaml:"version"`
+	Description string `json:"description" yaml:"description"`
 }
 
 type Metadata struct {
-	Labels      map[string]string `json:"Labels,omitempty"`
-	Annotations map[string]string `json:"Annotations,omitempty"`
+	Labels      map[string]string `json:"labels,omitempty" yaml:"labels,omitempty"`
+	Annotations map[string]string `json:"annotations,omitempty" yaml:"annotations,omitempty"`
 }
 
 type Predictor struct {
-	Name                    string            `json:"Name"`
-	Replicas                int               `json:"Replicas"`
-	Traffic                 int               `json:"Traffic"`
-	SvcOrchSpec             *SvcOrchSpec      `json:"svcOrchSpec,omitempty"`
-	Graph                   GraphNode         `json:"Graph"`
-	ComponentSpec           ComponentSpec     `json:"ComponentSpec"`
-	EngineResources         *Resources        `json:"EngineResources,omitempty"`
-	Labels                  map[string]string `json:"Labels,omitempty"`
-	Explainer               *Explainer        `json:"Explainer,omitempty"`
-	Shadow                  bool              `json:"Shadow,omitempty"`
-	SSL                     *SSL              `json:"SSL,omitempty"`
-	ProgressDeadlineSeconds int               `json:"ProgressDeadlineSeconds,omitempty"`
+	Name                    string            `json:"name" yaml:"name"`
+	Replicas                int               `json:"replicas" yaml:"replicas"`
+	Traffic                 int               `json:"traffic" yaml:"traffic"`
+	SvcOrchSpec             *SvcOrchSpec      `json:"svcOrchSpec,omitempty" yaml:"svcOrchSpec,omitempty"`
+	Graph                   GraphNode         `json:"graph" yaml:"graph"`
+	ComponentSpec           ComponentSpec     `json:"componentSpec" yaml:"componentSpec"`
+	EngineResources         *Resources        `json:"engineResources,omitempty" yaml:"engineResources,omitempty"`
+	Labels                  map[string]string `json:"labels,omitempty" yaml:"labels,omitempty"`
+	Explainer               *Explainer        `json:"explainer,omitempty" yaml:"explainer,omitempty"`
+	Shadow                  bool              `json:"shadow,omitempty" yaml:"shadow,omitempty"`
+	SSL                     *SSL              `json:"ssl,omitempty" yaml:"ssl,omitempty"`
+	ProgressDeadlineSeconds int               `json:"progressDeadlineSeconds,omitempty" yaml:"progressDeadlineSeconds,omitempty"`
 }
 
 type SSL struct {
-	CertSecretName string `json:"certSecretName,omitempty" protobuf:"string,2,opt,name=certSecretName"`
+	CertSecretName string `json:"certSecretName,omitempty" yaml:"certSecretName,omitempty" protobuf:"string,2,opt,name=certSecretName"`
 }
 
 type Explainer struct {
-	Type                    string            `json:"Type,omitempty"`
-	ModelUri                string            `json:"ModelUri,omitempty"`
-	ServiceAccountName      string            `json:"ServiceAccountName,omitempty"`
-	Config                  map[string]string `json:"Config,omitempty"`
-	ContainerSpec           *Container        `json:"ContainerSpec,omitempty"` // or InitContainer if you use init-style explainers
-	Endpoint                *Endpoint         `json:"Endpoint,omitempty"`
-	EnvSecretRefName        string            `json:"EnvSecretRefName,omitempty"`
-	StorageInitializerImage string            `json:"StorageInitializerImage,omitempty"`
-	Replicas                int               `json:"Replicas,omitempty"`
-	InitParameters          string            `json:"InitParameters,omitempty"`
+	Type                    string            `json:"type,omitempty" yaml:"type,omitempty"`
+	ModelUri                string            `json:"modelUri,omitempty" yaml:"modelUri,omitempty"`
+	ServiceAccountName      string            `json:"serviceAccountName,omitempty" yaml:"serviceAccountName,omitempty"`
+	Config                  map[string]string `json:"config,omitempty" yaml:"config,omitempty"`
+	ContainerSpec           *Container        `json:"containerSpec,omitempty" yaml:"containerSpec,omitempty"`
+	Endpoint                *Endpoint         `json:"endpoint,omitempty" yaml:"endpoint,omitempty"`
+	EnvSecretRefName        string            `json:"envSecretRefName,omitempty" yaml:"envSecretRefName,omitempty"`
+	StorageInitializerImage string            `json:"storageInitializerImage,omitempty" yaml:"storageInitializerImage,omitempty"`
+	Replicas                int               `json:"replicas,omitempty" yaml:"replicas,omitempty"`
+	InitParameters          string            `json:"initParameters,omitempty" yaml:"initParameters,omitempty"`
 }
 
 type EnvVar struct {
-	Name      string     `json:"Name"`
-	Value     string     `json:"Value,omitempty"`
-	ValueFrom *ValueFrom `json:"ValueFrom,omitempty"`
+	Name      string     `json:"name" yaml:"name"`
+	Value     string     `json:"value,omitempty" yaml:"value,omitempty"`
+	ValueFrom *ValueFrom `json:"valueFrom,omitempty" yaml:"valueFrom,omitempty"`
 }
 
 type ValueFrom struct {
-	SecretKeyRef SecretKeyRef `json:"SecretKeyRef"`
+	SecretKeyRef SecretKeyRef `json:"secretKeyRef" yaml:"secretKeyRef"`
 }
 
 type SecretKeyRef struct {
-	Name string `json:"Name"`
-	Key  string `json:"Key"`
+	Name string `json:"name" yaml:"name"`
+	Key  string `json:"key" yaml:"key"`
 }
 
 type GraphNode struct {
-	Name                    string      `json:"Name"`
-	Type                    string      `json:"Type"`
-	Implementation          string      `json:"Implementation,omitempty"`
-	ModelUri                string      `json:"ModelUri,omitempty"`
-	EnvSecretRefName        string      `json:"EnvSecretRefName,omitempty"`
-	Logger                  *Logger     `json:"Logger,omitempty"`
-	Endpoint                *Endpoint   `json:"Endpoint,omitempty"`
-	Parameters              []Parameter `json:"Parameters,omitempty"`
-	Children                []GraphNode `json:"Children,omitempty"`
-	Methods                 []string    `json:"Methods,omitempty"`
-	ServiceAccountName      string      `json:"ServiceAccountName,omitempty"`
-	StorageInitializerImage string      `json:"StorageInitializerImage,omitempty"`
+	Name                    string      `json:"name" yaml:"name"`
+	Type                    string      `json:"type" yaml:"type"`
+	Implementation          string      `json:"implementation,omitempty" yaml:"implementation,omitempty"`
+	ModelUri                string      `json:"modelUri,omitempty" yaml:"modelUri,omitempty"`
+	EnvSecretRefName        string      `json:"envSecretRefName,omitempty" yaml:"envSecretRefName,omitempty"`
+	Logger                  *Logger     `json:"logger,omitempty" yaml:"logger,omitempty"`
+	Endpoint                *Endpoint   `json:"endpoint,omitempty" yaml:"endpoint,omitempty"`
+	Parameters              []Parameter `json:"parameters,omitempty" yaml:"parameters,omitempty"`
+	Children                []GraphNode `json:"children,omitempty" yaml:"children,omitempty"`
+	Methods                 []string    `json:"methods,omitempty" yaml:"methods,omitempty"`
+	ServiceAccountName      string      `json:"serviceAccountName,omitempty" yaml:"serviceAccountName,omitempty"`
+	StorageInitializerImage string      `json:"storageInitializerImage,omitempty" yaml:"storageInitializerImage,omitempty"`
 }
 
 type Logger struct {
-	Mode string `json:"Mode,omitempty"`
-	URL  string `json:"URL,omitempty"`
+	Mode string `json:"mode,omitempty" yaml:"mode,omitempty"`
+	URL  string `json:"url,omitempty" yaml:"url,omitempty"`
 }
 
 type Parameter struct {
-	Name  string `json:"Name"`
-	Type  string `json:"Type"`
-	Value string `json:"Value"`
+	Name  string `json:"name" yaml:"name"`
+	Type  string `json:"type" yaml:"type"`
+	Value string `json:"value" yaml:"value"`
 }
 
 type ComponentSpec struct {
-	ServiceAccountName            string      `json:"ServiceAccountName,omitempty"`
-	TerminationGracePeriodSeconds int         `json:"TerminationGracePeriodSeconds,omitempty"`
-	Containers                    []Container `json:"Containers,omitempty"`
-	Volumes                       []Volume    `json:"Volumes,omitempty"`
-	InitContainers                []Container `json:"InitContainers,omitempty"`
-	HPASpec                       *HPASpec    `json:"hpaSpec,omitempty"`
-	KedaSpec                      *KedaSpec   `json:"KedaSpec,omitempty"`
-	PdbSpec                       *PdbSpec    `json:"PdbSpec,omitempty"`
+	ServiceAccountName            string      `json:"serviceAccountName,omitempty" yaml:"serviceAccountName,omitempty"`
+	TerminationGracePeriodSeconds int         `json:"terminationGracePeriodSeconds,omitempty" yaml:"terminationGracePeriodSeconds,omitempty"`
+	Containers                    []Container `json:"containers,omitempty" yaml:"containers,omitempty"`
+	Volumes                       []Volume    `json:"volumes,omitempty" yaml:"volumes,omitempty"`
+	InitContainers                []Container `json:"initContainers,omitempty" yaml:"initContainers,omitempty"`
+	HPASpec                       *HPASpec    `json:"hpaSpec,omitempty" yaml:"hpaSpec,omitempty"`
+	KedaSpec                      *KedaSpec   `json:"kedaSpec,omitempty" yaml:"kedaSpec,omitempty"`
+	PdbSpec                       *PdbSpec    `json:"pdbSpec,omitempty" yaml:"pdbSpec,omitempty"`
 }
 
 type KedaSpec struct {
-	MinReplicaCount *int32            `json:"minReplicaCount,omitempty"`
-	MaxReplicaCount *int32            `json:"maxReplicaCount,omitempty"`
-	CooldownPeriod  *int32            `json:"cooldownPeriod,omitempty"`
-	PollingInterval *int32            `json:"pollingInterval,omitempty"`
-	Triggers        []KedaTrigger     `json:"triggers,omitempty"`
-	Advanced        *KedaAdvancedSpec `json:"advanced,omitempty"`
+	MinReplicaCount *int32            `json:"minReplicaCount,omitempty" yaml:"minReplicaCount,omitempty"`
+	MaxReplicaCount *int32            `json:"maxReplicaCount,omitempty" yaml:"maxReplicaCount,omitempty"`
+	CooldownPeriod  *int32            `json:"cooldownPeriod,omitempty" yaml:"cooldownPeriod,omitempty"`
+	PollingInterval *int32            `json:"pollingInterval,omitempty" yaml:"pollingInterval,omitempty"`
+	Triggers        []KedaTrigger     `json:"triggers,omitempty" yaml:"triggers,omitempty"`
+	Advanced        *KedaAdvancedSpec `json:"advanced,omitempty" yaml:"advanced,omitempty"`
 }
 
 type KedaTrigger struct {
-	Type              string            `json:"type"`
-	Metadata          map[string]string `json:"metadata,omitempty"`
+	Type              string            `json:"type" yaml:"type"`
+	Metadata          map[string]string `json:"metadata,omitempty" yaml:"metadata,omitempty"`
 	AuthenticationRef *struct {
-		Name string `json:"name"`
-	} `json:"authenticationRef,omitempty"`
+		Name string `json:"name" yaml:"name"`
+	} `json:"authenticationRef,omitempty" yaml:"authenticationRef,omitempty"`
 }
 
 type KedaAdvancedSpec struct {
-	RestoreToOriginalReplicaCount *bool `json:"restoreToOriginalReplicaCount,omitempty"`
+	RestoreToOriginalReplicaCount *bool `json:"restoreToOriginalReplicaCount,omitempty" yaml:"restoreToOriginalReplicaCount,omitempty"`
 	HorizontalPodAutoscalerConfig *struct {
-		Behavior map[string]interface{} `json:"behavior,omitempty"`
-	} `json:"horizontalPodAutoscalerConfig,omitempty"`
+		Behavior map[string]interface{} `json:"behavior,omitempty" yaml:"behavior,omitempty"`
+	} `json:"horizontalPodAutoscalerConfig,omitempty" yaml:"horizontalPodAutoscalerConfig,omitempty"`
 }
 
 type PdbSpec struct {
-	MinAvailable   string `json:"minAvailable,omitempty"`
-	MaxUnavailable string `json:"maxUnavailable,omitempty"`
+	MinAvailable   string `json:"minAvailable,omitempty" yaml:"minAvailable,omitempty"`
+	MaxUnavailable string `json:"maxUnavailable,omitempty" yaml:"maxUnavailable,omitempty"`
 }
 
 type Container struct {
-	Name            string        `json:"Name"`
-	Image           string        `json:"Image,omitempty"`
-	ImagePullPolicy string        `json:"ImagePullPolicy,omitempty"`
-	Args            []string      `json:"Args,omitempty"`
-	Env             []EnvVar      `json:"Env,omitempty"`
-	EnvFrom         []EnvFromItem `json:"EnvFrom,omitempty"`
-	VolumeMounts    []VolumeMount `json:"VolumeMounts,omitempty"`
-	Resources       *Resources    `json:"Resources,omitempty"`
-	Liveness        *Probe        `json:"Liveness,omitempty"`
-	Readiness       *Probe        `json:"Readiness,omitempty"`
-	Lifecycle       *Lifecycle    `json:"Lifecycle,omitempty"`
+	Name            string        `json:"name" yaml:"name"`
+	Image           string        `json:"image,omitempty" yaml:"image,omitempty"`
+	ImagePullPolicy string        `json:"imagePullPolicy,omitempty" yaml:"imagePullPolicy,omitempty"`
+	Args            []string      `json:"args,omitempty" yaml:"args,omitempty"`
+	Env             []EnvVar      `json:"env,omitempty" yaml:"env,omitempty"`
+	EnvFrom         []EnvFromItem `json:"envFrom,omitempty" yaml:"envFrom,omitempty"`
+	VolumeMounts    []VolumeMount `json:"volumeMounts,omitempty" yaml:"volumeMounts,omitempty"`
+	Resources       *Resources    `json:"resources,omitempty" yaml:"resources,omitempty"`
+	Liveness        *Probe        `json:"liveness,omitempty" yaml:"liveness,omitempty"`
+	Readiness       *Probe        `json:"readiness,omitempty" yaml:"readiness,omitempty"`
+	Lifecycle       *Lifecycle    `json:"lifecycle,omitempty" yaml:"lifecycle,omitempty"`
 }
 
 type ResourceQuantities struct {
-	CPU    string `json:"cpu,omitempty"`
-	Memory string `json:"memory,omitempty"`
+	CPU    string `json:"cpu,omitempty" yaml:"cpu,omitempty"`
+	Memory string `json:"memory,omitempty" yaml:"memory,omitempty"`
 }
 
 type Resources struct {
-	Requests *ResourceQuantities `json:"Requests,omitempty"`
-	Limits   *ResourceQuantities `json:"Limits,omitempty"`
+	Requests *ResourceQuantities `json:"requests,omitempty" yaml:"requests,omitempty"`
+	Limits   *ResourceQuantities `json:"limits,omitempty" yaml:"limits,omitempty"`
 }
 
 type VolumeMount struct {
-	Name      string `json:"Name"`
-	MountPath string `json:"MountPath"`
-	ReadOnly  bool   `json:"ReadOnly,omitempty"`
+	Name      string `json:"name" yaml:"name"`
+	MountPath string `json:"mountPath" yaml:"mountPath"`
+	ReadOnly  bool   `json:"readOnly,omitempty" yaml:"readOnly,omitempty"`
 }
 
 type Volume struct {
-	Name     string              `json:"Name"`
-	EmptyDir *struct{}           `json:"EmptyDir,omitempty"`
-	Secret   *SecretVolumeSource `json:"Secret,omitempty"`
+	Name     string              `json:"name" yaml:"name"`
+	EmptyDir *struct{}           `json:"emptyDir,omitempty" yaml:"emptyDir,omitempty"`
+	Secret   *SecretVolumeSource `json:"secret,omitempty" yaml:"secret,omitempty"`
 }
 
 type SecretVolumeSource struct {
-	SecretName string `json:"SecretName"`
+	SecretName string `json:"secretName" yaml:"secretName"`
 }
 
 type Probe struct {
-	Path                string `json:"Path"`
-	Port                string `json:"Port"`
-	InitialDelaySeconds int    `json:"InitialDelaySeconds"`
-	PeriodSeconds       int    `json:"PeriodSeconds"`
-	FailureThreshold    int    `json:"FailureThreshold"`
-	SuccessThreshold    int    `json:"SuccessThreshold"`
-	Scheme              string `json:"Scheme,omitempty"`
+	Path                string `json:"path" yaml:"path"`
+	Port                string `json:"port" yaml:"port"`
+	InitialDelaySeconds int    `json:"initialDelaySeconds" yaml:"initialDelaySeconds"`
+	PeriodSeconds       int    `json:"periodSeconds" yaml:"periodSeconds"`
+	FailureThreshold    int    `json:"failureThreshold" yaml:"failureThreshold"`
+	SuccessThreshold    int    `json:"successThreshold" yaml:"successThreshold"`
+	Scheme              string `json:"scheme,omitempty" yaml:"scheme,omitempty"`
 }
 
 type InitContainer struct {
-	Name            string        `json:"Name"`
-	Image           string        `json:"Image"`
-	ImagePullPolicy string        `json:"ImagePullPolicy"`
-	Args            []string      `json:"Args,omitempty"`
-	Env             []EnvVar      `json:"Env,omitempty"`
-	EnvFrom         []EnvFromItem `json:"EnvFrom,omitempty"`
-	VolumeMounts    []VolumeMount `json:"VolumeMounts,omitempty"`
-	Resources       *Resources    `json:"Resources,omitempty"`
-	Liveness        *Probe        `json:"Liveness,omitempty"`
-	Readiness       *Probe        `json:"Readiness,omitempty"`
-	Lifecycle       *Lifecycle    `json:"Lifecycle,omitempty"`
+	Name            string        `json:"name" yaml:"name"`
+	Image           string        `json:"image" yaml:"image"`
+	ImagePullPolicy string        `json:"imagePullPolicy" yaml:"imagePullPolicy"`
+	Args            []string      `json:"args,omitempty" yaml:"args,omitempty"`
+	Env             []EnvVar      `json:"env,omitempty" yaml:"env,omitempty"`
+	EnvFrom         []EnvFromItem `json:"envFrom,omitempty" yaml:"envFrom,omitempty"`
+	VolumeMounts    []VolumeMount `json:"volumeMounts,omitempty" yaml:"volumeMounts,omitempty"`
+	Resources       *Resources    `json:"resources,omitempty" yaml:"resources,omitempty"`
+	Liveness        *Probe        `json:"liveness,omitempty" yaml:"liveness,omitempty"`
+	Readiness       *Probe        `json:"readiness,omitempty" yaml:"readiness,omitempty"`
+	Lifecycle       *Lifecycle    `json:"lifecycle,omitempty" yaml:"lifecycle,omitempty"`
 }
 
 type EnvFromItem struct {
-	SecretRef    *SecretRef    `json:"SecretRef,omitempty"`
-	ConfigMapRef *ConfigMapRef `json:"ConfigMapRef,omitempty"`
+	SecretRef    *SecretRef    `json:"secretRef,omitempty" yaml:"secretRef,omitempty"`
+	ConfigMapRef *ConfigMapRef `json:"configMapRef,omitempty" yaml:"configMapRef,omitempty"`
 }
 
 type SecretRef struct {
-	Name string `json:"Name"`
+	Name string `json:"name" yaml:"name"`
 }
 
 type ConfigMapRef struct {
-	Name string `json:"Name"`
+	Name string `json:"name" yaml:"name"`
 }
 
 type Endpoint struct {
-	Type string `json:"Type,omitempty"`
+	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 }
 
 type HPATarget struct {
-	Type               string `json:"type"`               // e.g., "Utilization"
-	AverageUtilization int    `json:"averageUtilization"` // e.g., 70
+	Type               string `json:"type" yaml:"type"`
+	AverageUtilization int    `json:"averageUtilization" yaml:"averageUtilization"`
 }
 
 type HPAResourceMetric struct {
-	Name   string    `json:"name"`   // e.g., "cpu"
-	Target HPATarget `json:"target"` // Target threshold
+	Name   string    `json:"name" yaml:"name"`
+	Target HPATarget `json:"target" yaml:"target"`
 }
 
 type HPAMetric struct {
-	Type     string            `json:"type"`     // e.g., "Resource"
-	Resource HPAResourceMetric `json:"resource"` // Resource-based metric
+	Type     string            `json:"type" yaml:"type"`
+	Resource HPAResourceMetric `json:"resource" yaml:"resource"`
 }
 
 type HPASpec struct {
-	MinReplicas int         `json:"minReplicas"`
-	MaxReplicas int         `json:"maxReplicas"`
-	MetricsV2   []HPAMetric `json:"metricsv2,omitempty"`
+	MinReplicas int         `json:"minReplicas" yaml:"minReplicas"`
+	MaxReplicas int         `json:"maxReplicas" yaml:"maxReplicas"`
+	MetricsV2   []HPAMetric `json:"metricsv2,omitempty" yaml:"metricsv2,omitempty"`
 }
 
 type SvcOrchSpec struct {
-	Resources *Resources `json:"resources,omitempty"`
-	Env       []EnvVar   `json:"env,omitempty"`
+	Resources *Resources `json:"resources,omitempty" yaml:"resources,omitempty"`
+	Env       []EnvVar   `json:"env,omitempty" yaml:"env,omitempty"`
 }
 
 type Lifecycle struct {
-	PostStart *LifecycleHandler `json:"PostStart,omitempty"`
-	PreStop   *LifecycleHandler `json:"PreStop,omitempty"`
+	PostStart *LifecycleHandler `json:"postStart,omitempty" yaml:"postStart,omitempty"`
+	PreStop   *LifecycleHandler `json:"preStop,omitempty" yaml:"preStop,omitempty"`
 }
 
 type LifecycleHandler struct {
-	Exec      *ExecAction      `json:"Exec,omitempty"`
-	HTTPGet   *HTTPGetAction   `json:"HttpGet,omitempty"`
-	TCPSocket *TCPSocketAction `json:"TcpSocket,omitempty"`
+	Exec      *ExecAction      `json:"exec,omitempty" yaml:"exec,omitempty"`
+	HTTPGet   *HTTPGetAction   `json:"httpGet,omitempty" yaml:"httpGet,omitempty"`
+	TCPSocket *TCPSocketAction `json:"tcpSocket,omitempty" yaml:"tcpSocket,omitempty"`
 }
 
 type ExecAction struct {
-	Command []string `json:"Command"`
+	Command []string `json:"command" yaml:"command"`
 }
 
 type HTTPGetAction struct {
-	Path        string            `json:"Path,omitempty"`
-	Port        string            `json:"Port"`
-	Host        string            `json:"Host,omitempty"`
-	Scheme      string            `json:"Scheme,omitempty"`
-	HTTPHeaders map[string]string `json:"HttpHeaders,omitempty"`
+	Path        string            `json:"path,omitempty" yaml:"path,omitempty"`
+	Port        string            `json:"port" yaml:"port"`
+	Host        string            `json:"host,omitempty" yaml:"host,omitempty"`
+	Scheme      string            `json:"scheme,omitempty" yaml:"scheme,omitempty"`
+	HTTPHeaders map[string]string `json:"httpHeaders,omitempty" yaml:"httpHeaders,omitempty"`
 }
 
 type TCPSocketAction struct {
-	Port string `json:"Port"`
-	Host string `json:"Host,omitempty"`
+	Port string `json:"port" yaml:"port"`
+	Host string `json:"host,omitempty" yaml:"host,omitempty"`
 }
 
 type ChartTemplate struct {
 	Files []struct {
-		Path     string `yaml:"path"`
-		Template bool   `yaml:"template"`
-		Content  string `yaml:"content"`
+		Path     string `jsonl:"path" yaml:"path"`
+		Template bool   `json:"path" yaml:"template"`
+		Content  string `json:"path" yaml:"content"`
 	} `yaml:"files"`
 }
 
 var log = logrus.New()
 
 func main() {
-	var values Values
+	var valuesCheck Values
 	log.Printf("Reading values file")
 	valData, err := os.ReadFile("../config/values.json")
 	check(err)
+
+	check(json.Unmarshal(valData, &valuesCheck))
+
+	var values = make(map[string]interface{})
 	check(json.Unmarshal(valData, &values))
 
-	//valuesStr, err := json.Marshal(values)
-	//check(err)
-	//log.Printf("Generated: %s", valuesStr)
-
+	/*
+		valuesStr, err := json.Marshal(values)
+		check(err)
+		log.Printf("Generated: %s", valuesStr)
+	*/
 	var meta ChartTemplate
 	log.Printf("Reading template file")
 	tmplData, err := os.ReadFile("../config/seldon.meta.yaml")
@@ -316,8 +324,8 @@ func main() {
 
 	for _, file := range meta.Files {
 		newfilepath := file.Path
-		if file.Path == "values-ENV.yaml" && values.Environment != "" {
-			newfilepath = "values-" + values.Environment + ".yaml"
+		if file.Path == "values-ENV.yaml" && valuesCheck.Environment != "" {
+			newfilepath = "values-" + valuesCheck.Environment + ".yaml"
 		}
 
 		outputPath := filepath.Join("output", newfilepath)
@@ -329,6 +337,7 @@ func main() {
 			tmpl, err := template.New(file.Path).Parse(file.Content)
 			check(err)
 			var buf bytes.Buffer
+			log.Printf("Execute: %s", file.Path)
 			check(tmpl.Execute(&buf, values))
 			content = buf.String()
 		}

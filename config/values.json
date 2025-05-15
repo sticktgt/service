@@ -1,119 +1,119 @@
 {
-  "Environment": "TEST",
-  "ApiVersion": "machinelearning.seldon.io/v1",
-  "Chart": {
-    "Name": "test-model",
-    "Version": "0.1.0",
-    "Description": "Test Seldon deployment chart"
+  "environment": "TEST",
+  "apiVersion": "machinelearning.seldon.io/v1",
+  "chart": {
+    "name": "test-model",
+    "version": "0.1.0",
+    "description": "Test Seldon deployment chart"
   },
-  "DeploymentName": "test-explainer-model",
-  "Namespace": "default",
-  "SubjectArea": "seldon-test-project",
-  "SourceMetafileName": "seldon.meta.yaml",
-  "SourceMetafileRepo": "https://neogit.neoflex.ru/vsemenov/tservice/",
-  "SourceMetafileBranch": "main",  
-  "Predictors": [
+  "deploymentName": "test-explainer-model",
+  "namespace": "default",
+  "subjectArea": "seldon-test-project",
+  "sourceMetafileName": "seldon.meta.yaml",
+  "sourceMetafileRepo": "https://neogit.neoflex.ru/vsemenov/tservice/",
+  "sourceMetafileBranch": "main",
+  "predictors": [
     {
-      "Name": "default",
-      "Replicas": 2,
-      "Traffic": 100,
-      "Shadow": true,
-      "Labels": {
+      "name": "default",
+      "replicas": 2,
+      "traffic": 100,
+      "shadow": true,
+      "labels": {
         "team": "ml",
         "env": "test"
       },
-      "SSL": {
-        "CertSecretName": "tls-cert-secret"
+      "ssl": {
+        "certSecretName": "tls-cert-secret"
       },
-      "ProgressDeadlineSeconds": 600,
-      "EngineResources": {
-        "Requests": {
+      "progressDeadlineSeconds": 600,
+      "engineResources": {
+        "requests": {
           "cpu": "200m",
           "memory": "256Mi"
         },
-        "Limits": {
+        "limits": {
           "cpu": "500m",
           "memory": "512Mi"
         }
       },
-      "ComponentSpec": {
-        "ServiceAccountName": "explainer-sa",
-        "TerminationGracePeriodSeconds": 20,
-        "Containers": [
+      "componentSpec": {
+        "serviceAccountName": "explainer-sa",
+        "terminationGracePeriodSeconds": 20,
+        "containers": [
           {
-            "Name": "classifier",
-            "Image": "seldonio/sklearn-iris:0.1",
-            "ImagePullPolicy": "IfNotPresent",
-            "Args": [
+            "name": "classifier",
+            "image": "seldonio/sklearn-iris:0.1",
+            "imagePullPolicy": "IfNotPresent",
+            "args": [
               "--model",
               "serve"
             ],
-            "Env": [
+            "env": [
               {
-                "Name": "MODEL_ENV",
-                "Value": "prod"
+                "name": "MODEL_ENV",
+                "value": "prod"
               }
             ],
-            "Resources": {
-              "Requests": {
+            "resources": {
+              "requests": {
                 "cpu": "100m",
                 "memory": "128Mi"
               },
-              "Limits": {
+              "limits": {
                 "cpu": "200m",
                 "memory": "256Mi"
               }
             },
-            "Liveness": {
-              "Path": "/health",
-              "Port": "8080",
-              "InitialDelaySeconds": 5,
-              "PeriodSeconds": 10,
-              "FailureThreshold": 3,
-              "SuccessThreshold": 1,
-              "Scheme": "HTTP"
+            "liveness": {
+              "path": "/health",
+              "port": "8080",
+              "initialDelaySeconds": 5,
+              "periodSeconds": 10,
+              "failureThreshold": 3,
+              "successThreshold": 1,
+              "scheme": "HTTP"
             },
-            "Readiness": {
-              "Path": "/ready",
-              "Port": "8080",
-              "InitialDelaySeconds": 5,
-              "PeriodSeconds": 10,
-              "FailureThreshold": 3,
-              "SuccessThreshold": 1,
-              "Scheme": "HTTP"
+            "readiness": {
+              "path": "/ready",
+              "port": "8080",
+              "initialDelaySeconds": 5,
+              "periodSeconds": 10,
+              "failureThreshold": 3,
+              "successThreshold": 1,
+              "scheme": "HTTP"
             }
           }
         ]
       },
-      "Explainer": {
-        "Type": "anchor_tabular",
-        "ModelUri": "gs://seldon-models/explainer",
-        "ServiceAccountName": "explainer-sa",
-        "StorageInitializerImage": "seldonio/storage-init:1.18.0-dev",
-        "EnvSecretRefName": "explainer-secret",
-        "Replicas": 1,
-        "InitParameters": "{ \"threshold\": 0.95, \"top_n\": 3 }",
-        "Endpoint": {
-          "Type": "REST"
+      "explainer": {
+        "type": "anchor_tabular",
+        "modelUri": "gs://seldon-models/explainer",
+        "serviceAccountName": "explainer-sa",
+        "storageInitializerImage": "seldonio/storage-init:1.18.0-dev",
+        "envSecretRefName": "explainer-secret",
+        "replicas": 1,
+        "initParameters": "{ \"threshold\": 0.95, \"top_n\": 3 }",
+        "endpoint": {
+          "type": "REST"
         },
-        "Config": {
+        "config": {
           "explainer_runtime": "python",
           "logging": "debug"
         },
-        "ContainerSpec": {
-          "Name": "custom-explainer",
-          "Image": "seldonio/explainer-anchor:0.1",
-          "Args": [
+        "containerSpec": {
+          "name": "custom-explainer",
+          "image": "seldonio/explainer-anchor:0.1",
+          "args": [
             "--explain"
           ]
         }
       },
-      "Graph": {
-        "Name": "classifier",
-        "Type": "MODEL",
-        "Implementation": "SKLEARN_SERVER",
-        "ModelUri": "gs://seldon-models/sklearn/iris",
-        "Children": []
+      "graph": {
+        "name": "classifier",
+        "type": "MODEL",
+        "implementation": "SKLEARN_SERVER",
+        "modelUri": "gs://seldon-models/sklearn/iris",
+        "children": []
       }
     }
   ]
