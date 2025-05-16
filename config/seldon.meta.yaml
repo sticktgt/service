@@ -3,55 +3,55 @@ files:
     template: true
     content: |
       apiVersion: v2
-      name: {{ .chart.name }}
-      version: {{ .chart.version }}
-      description: {{ .chart.description }}
+      name: {{ .Values.chart.name }}
+      version: {{ .Values.chart.version }}
+      description: {{ .Values.chart.description }}
       type: application
       app.dognauts:
-        subjectArea: {{ .subjectArea }}
-        sourceMetafileRepo: {{ .sourceMetafileRepo }}
-        sourceMetafileBranch: {{ .sourceMetafileBranch }}
-        sourceMetafileName: {{ .sourceMetafileName }}
+        subjectArea: {{ .Values.subjectArea }}
+        sourceMetafileRepo: {{ .Values.sourceMetafileRepo }}
+        sourceMetafileBranch: {{ .Values.sourceMetafileBranch }}
+        sourceMetafileName: {{ .Values.sourceMetafileName }}
       annotations:
         app.dognauts/platform-generated: true
-        app.dognauts/subjectArea: {{ .subjectArea }}
+        app.dognauts/subjectArea: {{ .Values.subjectArea }}
 
   - path: values.yaml
     template: true
     content: |
-      apiVersion: {{ .apiVersion }}
-      {{- if .environment }}
-      environment: {{ .environment }}
+      apiVersion: {{ .Values.apiVersion }}
+      {{- if .Values.environment }}
+      environment: {{ .Values.environment }}
       {{- end }}
-      {{- if .protocol }}
-      protocol: {{ .protocol }}
+      {{- if .Values.protocol }}
+      protocol: {{ .Values.protocol }}
       {{- end }}
-      {{- if .transport }}
-      transport: {{ .transport }}
+      {{- if .Values.transport }}
+      transport: {{ .Values.transport }}
       {{- end }}
-      {{- if .annotations }}
+      {{- if .Values.annotations }}
       specAnnotations:
-        {{- range $k, $v := .annotations }}
+        {{- range $k, $v := .Values.annotations }}
         {{ $k }}: {{ $v }}
         {{- end }}
       {{- end }}
       chart:
-        name: {{ .chart.name }}
-        version: {{ .chart.version }}
-        description: {{ .chart.description }}
-      deploymentName: {{ .deploymentName }}
-      namespace: {{ .namespace }}
+        name: {{ .Values.chart.name }}
+        version: {{ .Values.chart.version }}
+        description: {{ .Values.chart.description }}
+      deploymentName: {{ .Values.deploymentName }}
+      namespace: {{ .Values.namespace }}
       metadata:
         labels:
-          {{- range $k, $v := .metadata.labels }}
+          {{- range $k, $v := .Values.metadata.labels }}
           {{ $k }}: {{ $v }}
           {{- end }}
         annotations:
-          {{- range $k, $v := .metadata.annotations }}
+          {{- range $k, $v := .Values.metadata.annotations }}
           {{ $k }}: {{ $v }}
           {{- end }}
       predictors:
-      {{- range .predictors }}
+      {{- range .Values.predictors }}
         {{ .name }}:
           name: {{ .name }}
           replicas: {{ .replicas }}        
@@ -242,10 +242,11 @@ files:
       {{- end }}
 
   - path: values-ENV.yaml
+    outputFilename: values-{{ .Values.environment }}.yaml
     template: true
     content: |
       predictors:
-      {{- range .predictors }}
+      {{- range .Values.predictors }}
         {{ .name }}:
           name: {{ .name }}
           replicas: {{ .replicas }}
@@ -1704,647 +1705,647 @@ valuesSchema:
     type: array
     description: List of predictors defining traffic-split and graph configurations
     required: true
-  predictors[].name:
+  predictors.name:
     type: string
     description: Unique name of the predictor
     required: true
-  predictors[].replicas:
+  predictors.replicas:
     type: integer
     description: Number of model replicas to deploy
     required: false
-  predictors[].traffic:
+  predictors.traffic:
     type: integer
     description: Percentage of traffic assigned to this predictor
     required: false
-  predictors[].annotations:
+  predictors.annotations:
     type: object
     description: Annotations applied to this predictor instance
     required: false
-  predictors[].svcOrchSpec.resources.requests.cpu:
+  predictors.svcOrchSpec.resources.requests.cpu:
     type: string
     description: CPU requested by the service orchestrator container
     required: false
-  predictors[].svcOrchSpec.resources.requests.memory:
+  predictors.svcOrchSpec.resources.requests.memory:
     type: string
     description: Memory requested by the service orchestrator container
     required: false
-  predictors[].svcOrchSpec.resources.limits.cpu:
+  predictors.svcOrchSpec.resources.limits.cpu:
     type: string
     description: Maximum CPU allowed for the service orchestrator
     required: false
-  predictors[].svcOrchSpec.resources.limits.memory:
+  predictors.svcOrchSpec.resources.limits.memory:
     type: string
     description: Maximum memory allowed for the service orchestrator
     required: false
-  predictors[].svcOrchSpec.env:
+  predictors.svcOrchSpec.env:
     type: array
     description: Environment variables for the service orchestrator
     required: false
-  predictors[].svcOrchSpec.env[].name:
+  predictors.svcOrchSpec.env.name:
     type: string
     description: Name of environment variable for orchestrator
     required: true
-  predictors[].svcOrchSpec.env[].value:
+  predictors.svcOrchSpec.env.value:
     type: string
     description: Value of environment variable for orchestrator
     required: false
-  predictors[].svcOrchSpec.env[].valueFrom.secretKeyRef.name:
+  predictors.svcOrchSpec.env.valueFrom.secretKeyRef.name:
     type: string
     description: Name of the Kubernetes secret to reference
     required: false
-  predictors[].svcOrchSpec.env[].valueFrom.secretKeyRef.key:
+  predictors.svcOrchSpec.env.valueFrom.secretKeyRef.key:
     type: string
     description: Key inside the referenced secret
     required: false
-  predictors[].graph.name:
+  predictors.graph.name:
     type: string
     description: Name of the root node in the prediction graph
     required: true
-  predictors[].graph.type:
+  predictors.graph.type:
     type: string
     description: Type of the node. Allowed values- MODEL, TRANSFORMER, COMBINER, ROUTER, OUTPUT_TRANSFORMER, UNKNOWN_TYPE
     required: true
-  predictors[].graph.implementation:
+  predictors.graph.implementation:
     type: string
     description: Predefined implementation for the model server. Allowed values- UNKNOWN_IMPLEMENTATION, SKLEARN_SERVER, XGBOOST_SERVER, TENSORFLOW_SERVER, PYTORCH_SERVER, LIGHTGBM_SERVER, CUSTOM, TRITON_SERVER, HUGGINGFACE_SERVER, MLFLOW_SERVER, ONNX_SERVER, R_SERVER
     required: false
-  predictors[].graph.modelUri:
+  predictors.graph.modelUri:
     type: string
     description: URI to the stored model (S3, GCS, local, etc.)
     required: false
-  predictors[].graph.endpoint.type:
+  predictors.graph.endpoint.type:
     type: string
     description: Type of endpoint exposed by the graph. Allowed values- REST, GRPC
     required: false
-  predictors[].graph.envSecretRefName:
+  predictors.graph.envSecretRefName:
     type: string
     description: Name of secret to pull environment credentials from
     required: false
-  predictors[].graph.logger.mode:
+  predictors.graph.logger.mode:
     type: string
     description: Logging mode. Allowed values- all, request, response, none
     required: false
-  predictors[].graph.logger.url:
+  predictors.graph.logger.url:
     type: string
     description: Optional URL to send logs to
     required: false
-  predictors[].graph.parameters:
+  predictors.graph.parameters:
     type: array
     description: List of parameters for this graph node
     required: false
-  predictors[].graph.parameters[].name:
+  predictors.graph.parameters.name:
     type: string
     description: Name of the parameter
     required: true
-  predictors[].graph.parameters[].type:
+  predictors.graph.parameters.type:
     type: string
     description: Data type of the parameter. Allowed values- STRING, BOOL, INT, FLOAT, DOUBLE
     required: true
-  predictors[].graph.parameters[].value:
+  predictors.graph.parameters.value:
     type: string
     description: Value of the parameter
     required: true
-  predictors[].graph.children:
+  predictors.graph.children:
     type: array
     description: Child nodes in the prediction graph
     required: false
-  predictors[].graph.methods:
+  predictors.graph.methods:
     type: array
     description: List of inference methods supported by this graph node. Common values- predict, transform, route, aggregate, send_feedback, custom
     required: false
-  predictors[].graph.serviceAccountName:
+  predictors.graph.serviceAccountName:
     type: string
     description: Kubernetes service account name to use for this graph node
     required: false
-  predictors[].graph.storageInitializerImage:
+  predictors.graph.storageInitializerImage:
     type: string
     description: Optional override image for storage initializer for this node
     required: false
-  predictors[].componentSpec.serviceAccountName:
+  predictors.componentSpec.serviceAccountName:
     type: string
     description: Kubernetes service account used by pods for access control
     required: false
-  predictors[].componentSpec.terminationGracePeriodSeconds:
+  predictors.componentSpec.terminationGracePeriodSeconds:
     type: integer
     description: Time (in seconds) for graceful shutdown
     required: false
-  predictors[].componentSpec.containers:
+  predictors.componentSpec.containers:
     type: array
     description: Additional containers in the predictor pod
     required: false
-  predictors[].componentSpec.containers[].name:
+  predictors.componentSpec.containers.name:
     type: string
     description: Name of the container in the pod
     required: true
-  predictors[].componentSpec.containers[].image:
+  predictors.componentSpec.containers.image:
     type: string
     description: Docker image to use in the container
     required: true
-  predictors[].componentSpec.containers[].imagePullPolicy:
+  predictors.componentSpec.containers.imagePullPolicy:
     type: string
     description: Kubernetes image pull policy (Always, IfNotPresent, Never)
     required: false
-  predictors[].componentSpec.containers[].args:
+  predictors.componentSpec.containers.args:
     type: array
     description: Command-line arguments passed to the container entrypoint
     required: false
-  predictors[].componentSpec.containers[].env:
+  predictors.componentSpec.containers.env:
     type: array
     description: Environment variables for the container
     required: false
-  predictors[].componentSpec.containers[].env[].name:
+  predictors.componentSpec.containers.env.name:
     type: string
     description: Name of the environment variable
     required: true
-  predictors[].componentSpec.containers[].env[].value:
+  predictors.componentSpec.containers.env.value:
     type: string
     description: Value of the environment variable
     required: false
-  predictors[].componentSpec.containers[].env[].valueFrom.secretKeyRef.name:
+  predictors.componentSpec.containers.env.valueFrom.secretKeyRef.name:
     type: string
     description: Name of the Kubernetes secret to reference
     required: false
-  predictors[].componentSpec.containers[].env[].valueFrom.secretKeyRef.key:
+  predictors.componentSpec.containers.env.valueFrom.secretKeyRef.key:
     type: string
     description: Key inside the referenced secret
     required: false
-  predictors[].componentSpec.containers[].envFrom:
+  predictors.componentSpec.containers.envFrom:
     type: array
     description: List of sources to populate environment variables from (ConfigMaps or Secrets)
     required: false
-  predictors[].componentSpec.containers[].envFrom[].secretRef.name:
+  predictors.componentSpec.containers.envFrom.secretRef.name:
     type: string
     description: Name of the Secret for env import
     required: false
-  predictors[].componentSpec.containers[].envFrom[].configMapRef.name:
+  predictors.componentSpec.containers.envFrom.configMapRef.name:
     type: string
     description: Name of the ConfigMap for env import
     required: false
-  predictors[].componentSpec.containers[].volumeMounts:
+  predictors.componentSpec.containers.volumeMounts:
     type: array
     description: Volume mounts for container
     required: false
-  predictors[].componentSpec.containers[].volumeMounts[].name:
+  predictors.componentSpec.containers.volumeMounts.name:
     type: string
     description: Name of the volume to mount
     required: true
-  predictors[].componentSpec.containers[].volumeMounts[].mountPath:
+  predictors.componentSpec.containers.volumeMounts.mountPath:
     type: string
     description: Path in container where volume will be mounted
     required: true
-  predictors[].componentSpec.containers[].volumeMounts[].readOnly:
+  predictors.componentSpec.containers.volumeMounts.readOnly:
     type: boolean
     description: Whether the volume mount should be read-only
     required: false
-  predictors[].componentSpec.containers[].resources.requests.cpu:
+  predictors.componentSpec.containers.resources.requests.cpu:
     type: string
     description: Amount of CPU requested by the container (e.g. "200m")
     required: false
-  predictors[].componentSpec.containers[].resources.requests.memory:
+  predictors.componentSpec.containers.resources.requests.memory:
     type: string
     description: Amount of memory requested by the container (e.g. "256Mi")
     required: false
-  predictors[].componentSpec.containers[].resources.limits.cpu:
+  predictors.componentSpec.containers.resources.limits.cpu:
     type: string
     description: Maximum amount of CPU allowed for the container
     required: false
-  predictors[].componentSpec.containers[].resources.limits.memory:
+  predictors.componentSpec.containers.resources.limits.memory:
     type: string
     description: Maximum amount of memory allowed for the container
     required: false
-  predictors[].componentSpec.containers[].liveness.path:
+  predictors.componentSpec.containers.liveness.path:
     type: string
     description: HTTP path to access on the container to perform liveness check
     required: false
-  predictors[].componentSpec.containers[].liveness.port:
+  predictors.componentSpec.containers.liveness.port:
     type: string
     description: Port to access for the liveness probe
     required: false
-  predictors[].componentSpec.containers[].liveness.scheme:
+  predictors.componentSpec.containers.liveness.scheme:
     type: string
     description: Scheme to use for connecting to the host (HTTP or HTTPS)
     required: false
-  predictors[].componentSpec.containers[].liveness.initialDelaySeconds:
+  predictors.componentSpec.containers.liveness.initialDelaySeconds:
     type: integer
     description: Number of seconds after the container has started before liveness probe is initiated
     required: false
-  predictors[].componentSpec.containers[].liveness.periodSeconds:
+  predictors.componentSpec.containers.liveness.periodSeconds:
     type: integer
     description: How often (in seconds) to perform the liveness probe
     required: false
-  predictors[].componentSpec.containers[].liveness.failureThreshold:
+  predictors.componentSpec.containers.liveness.failureThreshold:
     type: integer
     description: Number of times the liveness probe can fail before the container is restarted
     required: false
-  predictors[].componentSpec.containers[].liveness.successThreshold:
+  predictors.componentSpec.containers.liveness.successThreshold:
     type: integer
     description: Minimum consecutive successes for the liveness probe to be considered successful
     required: false
-  predictors[].componentSpec.containers[].readiness.path:
+  predictors.componentSpec.containers.readiness.path:
     type: string
     description: HTTP path to access on the container to perform readiness check
     required: false
-  predictors[].componentSpec.containers[].readiness.port:
+  predictors.componentSpec.containers.readiness.port:
     type: string
     description: Port to access for the readiness probe
     required: false
-  predictors[].componentSpec.containers[].readiness.scheme:
+  predictors.componentSpec.containers.readiness.scheme:
     type: string
     description: Scheme to use for connecting to the host (HTTP or HTTPS)
     required: false
-  predictors[].componentSpec.containers[].readiness.initialDelaySeconds:
+  predictors.componentSpec.containers.readiness.initialDelaySeconds:
     type: integer
     description: Number of seconds after the container has started before readiness probe is initiated
     required: false
-  predictors[].componentSpec.containers[].readiness.periodSeconds:
+  predictors.componentSpec.containers.readiness.periodSeconds:
     type: integer
     description: How often (in seconds) to perform the readiness probe
     required: false
-  predictors[].componentSpec.containers[].readiness.failureThreshold:
+  predictors.componentSpec.containers.readiness.failureThreshold:
     type: integer
     description: Number of times the readiness probe can fail before the container is marked unhealthy
     required: false
-  predictors[].componentSpec.containers[].readiness.successThreshold:
+  predictors.componentSpec.containers.readiness.successThreshold:
     type: integer
     description: Minimum consecutive successes for the readiness probe to be considered successful
     required: false
-  predictors[].componentSpec.containers[].lifecycle:
+  predictors.componentSpec.containers.lifecycle:
     type: object
     description: Lifecycle hooks for the container (preStop and postStart)
     required: false
-  predictors[].componentSpec.containers[].lifecycle.preStop.exec.command:
+  predictors.componentSpec.containers.lifecycle.preStop.exec.command:
     type: array
     description: Command to run in preStop lifecycle hook (exec)
     required: false
-  predictors[].componentSpec.containers[].lifecycle.preStop.httpGet.path:
+  predictors.componentSpec.containers.lifecycle.preStop.httpGet.path:
     type: string
     description: HTTP path to access on the server for preStop hook
     required: false
-  predictors[].componentSpec.containers[].lifecycle.preStop.httpGet.port:
+  predictors.componentSpec.containers.lifecycle.preStop.httpGet.port:
     type: string
     description: Port to access on the server for preStop hook
     required: false
-  predictors[].componentSpec.containers[].lifecycle.postStart.exec.command:
+  predictors.componentSpec.containers.lifecycle.postStart.exec.command:
     type: array
     description: Command to run in postStart lifecycle hook (exec)
     required: false
-  predictors[].componentSpec.containers[].lifecycle.postStart.httpGet.path:
+  predictors.componentSpec.containers.lifecycle.postStart.httpGet.path:
     type: string
     description: HTTP path to access on the server for postStart hook
     required: false
-  predictors[].componentSpec.containers[].lifecycle.postStart.httpGet.port:
+  predictors.componentSpec.containers.lifecycle.postStart.httpGet.port:
     type: string
     description: Port to access on the server for postStart hook
     required: false
-  predictors[].componentSpec.volumes:
+  predictors.componentSpec.volumes:
     type: array
     description: Volumes used by the predictor
     required: false
-  predictors[].componentSpec.volumes[].name:
+  predictors.componentSpec.volumes.name:
     type: string
     description: Name of the volume
     required: true
-  predictors[].componentSpec.volumes[].secret.secretName:
+  predictors.componentSpec.volumes.secret.secretName:
     type: string
     description: Kubernetes secret name to mount as volume
     required: false
-  predictors[].componentSpec.volumes[].emptyDir.medium:
+  predictors.componentSpec.volumes.emptyDir.medium:
     type: string
     description: Storage medium type for the EmptyDir volume. Allowed values- "" (default), "Memory"
     required: false
-  predictors[].componentSpec.volumes[].emptyDir.sizeLimit:
+  predictors.componentSpec.volumes.emptyDir.sizeLimit:
     type: string
     description: Total storage size limit for the EmptyDir volume (e.g., "2Gi")
     required: false
-  predictors[].componentSpec.initContainers:
+  predictors.componentSpec.initContainers:
     type: array
     description: Init containers to run before main containers
     required: false
-  predictors[].componentSpec.initContainers[].name:
+  predictors.componentSpec.initContainers.name:
     type: string
     description: Name of the init container
     required: true
-  predictors[].componentSpec.initContainers[].image:
+  predictors.componentSpec.initContainers.image:
     type: string
     description: Image of the init container
     required: true
-  predictors[].componentSpec.initContainers[].imagePullPolicy:
+  predictors.componentSpec.initContainers.imagePullPolicy:
     type: string
     description: Policy for pulling init container image
     required: false
-  predictors[].componentSpec.initContainers[].args:
+  predictors.componentSpec.initContainers.args:
     type: array
     description: Arguments passed to init container on start
     required: false
-  predictors[].componentSpec.initContainers[].env:
+  predictors.componentSpec.initContainers.env:
     type: array
     description: Environment variables for the init container
     required: false
-  predictors[].componentSpec.initContainers[].env[].name:
+  predictors.componentSpec.initContainers.env.name:
     type: string
     description: Name of the environment variable
     required: true
-  predictors[].componentSpec.initContainers[].env[].value:
+  predictors.componentSpec.initContainers.env.value:
     type: string
     description: Value of the environment variable
     required: false
-  predictors[].componentSpec.initContainers[].env[].valueFrom.secretKeyRef.name:
+  predictors.componentSpec.initContainers.env.valueFrom.secretKeyRef.name:
     type: string
     description: Name of the Kubernetes secret for env valueFrom
     required: false
-  predictors[].componentSpec.initContainers[].env[].valueFrom.secretKeyRef.key:
+  predictors.componentSpec.initContainers.env.valueFrom.secretKeyRef.key:
     type: string
     description: Key within the Kubernetes secret for env valueFrom
     required: false
-  predictors[].componentSpec.initContainers[].envFrom:
+  predictors.componentSpec.initContainers.envFrom:
     type: array
     description: List of sources to populate environment variables from (ConfigMaps or Secrets)
     required: false
-  predictors[].componentSpec.initContainers[].envFrom[].secretRef.name:
+  predictors.componentSpec.initContainers.envFrom.secretRef.name:
     type: string
     description: Name of the Secret for env import
     required: false
-  predictors[].componentSpec.initContainers[].envFrom[].configMapRef.name:
+  predictors.componentSpec.initContainers.envFrom.configMapRef.name:
     type: string
     description: Name of the ConfigMap for env import
     required: false
-  predictors[].componentSpec.initContainers[].volumeMounts:
+  predictors.componentSpec.initContainers.volumeMounts:
     type: array
     description: Volume mounts for the init container
     required: false
-  predictors[].componentSpec.initContainers[].volumeMounts[].name:
+  predictors.componentSpec.initContainers.volumeMounts.name:
     type: string
     description: Volume name to mount into init container
     required: true
-  predictors[].componentSpec.initContainers[].volumeMounts[].mountPath:
+  predictors.componentSpec.initContainers.volumeMounts.mountPath:
     type: string
     description: Path inside init container to mount the volume
     required: true
-  predictors[].componentSpec.initContainers[].volumeMounts[].readOnly:
+  predictors.componentSpec.initContainers.volumeMounts.readOnly:
     type: boolean
     description: Whether the mount is read-only
     required: false
-  predictors[].componentSpec.initContainers[].resources.requests.cpu:
+  predictors.componentSpec.initContainers.resources.requests.cpu:
     type: string
     description: Amount of CPU requested by the init container
     required: false
-  predictors[].componentSpec.initContainers[].resources.requests.memory:
+  predictors.componentSpec.initContainers.resources.requests.memory:
     type: string
     description: Amount of memory requested by the init container
     required: false
-  predictors[].componentSpec.initContainers[].resources.limits.cpu:
+  predictors.componentSpec.initContainers.resources.limits.cpu:
     type: string
     description: Maximum amount of CPU allowed for the init container
     required: false
-  predictors[].componentSpec.initContainers[].resources.limits.memory:
+  predictors.componentSpec.initContainers.resources.limits.memory:
     type: string
     description: Maximum amount of memory allowed for the init container
     required: false
-  predictors[].componentSpec.initContainers[].liveness.path:
+  predictors.componentSpec.initContainers.liveness.path:
     type: string
     description: HTTP path to access on the container to perform liveness check
     required: false
-  predictors[].componentSpec.initContainers[].liveness.port:
+  predictors.componentSpec.initContainers.liveness.port:
     type: string
     description: Port to access for the liveness probe
     required: false
-  predictors[].componentSpec.initContainers[].liveness.scheme:
+  predictors.componentSpec.initContainers.liveness.scheme:
     type: string
     description: Scheme to use for connecting to the host (HTTP or HTTPS)
     required: false
-  predictors[].componentSpec.initContainers[].liveness.initialDelaySeconds:
+  predictors.componentSpec.initContainers.liveness.initialDelaySeconds:
     type: integer
     description: Number of seconds after the container has started before liveness probe is initiated
     required: false
-  predictors[].componentSpec.initContainers[].liveness.periodSeconds:
+  predictors.componentSpec.initContainers.liveness.periodSeconds:
     type: integer
     description: How often (in seconds) to perform the liveness probe
     required: false
-  predictors[].componentSpec.initContainers[].liveness.failureThreshold:
+  predictors.componentSpec.initContainers.liveness.failureThreshold:
     type: integer
     description: Number of times the liveness probe can fail before the container is restarted
     required: false
-  predictors[].componentSpec.initContainers[].liveness.successThreshold:
+  predictors.componentSpec.initContainers.liveness.successThreshold:
     type: integer
     description: Minimum consecutive successes for the liveness probe to be considered successful
     required: false
-  predictors[].componentSpec.initContainers[].readiness.path:
+  predictors.componentSpec.initContainers.readiness.path:
     type: string
     description: HTTP path to access on the container to perform readiness check
     required: false
-  predictors[].componentSpec.initContainers[].readiness.port:
+  predictors.componentSpec.initContainers.readiness.port:
     type: string
     description: Port to access for the readiness probe
     required: false
-  predictors[].componentSpec.initContainers[].readiness.scheme:
+  predictors.componentSpec.initContainers.readiness.scheme:
     type: string
     description: Scheme to use for connecting to the host (HTTP or HTTPS)
     required: false
-  predictors[].componentSpec.initContainers[].readiness.initialDelaySeconds:
+  predictors.componentSpec.initContainers.readiness.initialDelaySeconds:
     type: integer
     description: Number of seconds after the container has started before readiness probe is initiated
     required: false
-  predictors[].componentSpec.initContainers[].readiness.periodSeconds:
+  predictors.componentSpec.initContainers.readiness.periodSeconds:
     type: integer
     description: How often (in seconds) to perform the readiness probe
     required: false
-  predictors[].componentSpec.initContainers[].readiness.failureThreshold:
+  predictors.componentSpec.initContainers.readiness.failureThreshold:
     type: integer
     description: Number of times the readiness probe can fail before the container is marked unhealthy
     required: false
-  predictors[].componentSpec.initContainers[].readiness.successThreshold:
+  predictors.componentSpec.initContainers.readiness.successThreshold:
     type: integer
     description: Minimum consecutive successes for the readiness probe to be considered successful
     required: false
-  predictors[].componentSpec.initContainers[].lifecycle:
+  predictors.componentSpec.initContainers.lifecycle:
     type: object
     description: Lifecycle hooks for the init container
     required: false
-  predictors[].componentSpec.initContainers[].lifecycle.preStop.exec.command:
+  predictors.componentSpec.initContainers.lifecycle.preStop.exec.command:
     type: array
     description: Command to run in preStop lifecycle hook (exec)
     required: false
-  predictors[].componentSpec.initContainers[].lifecycle.postStart.exec.command:
+  predictors.componentSpec.initContainers.lifecycle.postStart.exec.command:
     type: array
     description: Command to run in postStart lifecycle hook (exec)
     required: false
-  predictors[].componentSpec.initContainers[].lifecycle.preStop.httpGet.path:
+  predictors.componentSpec.initContainers.lifecycle.preStop.httpGet.path:
     type: string
     description: HTTP path to access on the server for preStop hook
     required: false
-  predictors[].componentSpec.initContainers[].lifecycle.preStop.httpGet.port:
+  predictors.componentSpec.initContainers.lifecycle.preStop.httpGet.port:
     type: string
     description: Port to access on the server for preStop hook
     required: false
-  predictors[].componentSpec.initContainers[].lifecycle.postStart.httpGet.path:
+  predictors.componentSpec.initContainers.lifecycle.postStart.httpGet.path:
     type: string
     description: HTTP path to access on the server for postStart hook
     required: false
-  predictors[].componentSpec.initContainers[].lifecycle.postStart.httpGet.port:
+  predictors.componentSpec.initContainers.lifecycle.postStart.httpGet.port:
     type: string
     description: Port to access on the server for postStart hook
     required: false
-  predictors[].componentSpec.hpaSpec:
+  predictors.componentSpec.hpaSpec:
     type: object
     description: Horizontal Pod Autoscaler configuration for the predictor
     required: false
-  predictors[].componentSpec.hpaSpec.minReplicas:
+  predictors.componentSpec.hpaSpec.minReplicas:
     type: integer
     description: Minimum number of replicas allowed
     required: true
-  predictors[].componentSpec.hpaSpec.maxReplicas:
+  predictors.componentSpec.hpaSpec.maxReplicas:
     type: integer
     description: Maximum number of replicas allowed
     required: true
-  predictors[].componentSpec.hpaSpec.metricsV2:
+  predictors.componentSpec.hpaSpec.metricsV2:
     type: array
     description: List of custom metrics for autoscaling
     required: false
-  predictors[].componentSpec.hpaSpec.metricsV2[].type:
+  predictors.componentSpec.hpaSpec.metricsV2.type:
     type: string
     description: Type of metric (e.g., Resource)
     required: true
-  predictors[].componentSpec.hpaSpec.metricsV2[].resource.name:
+  predictors.componentSpec.hpaSpec.metricsV2.resource.name:
     type: string
     description: Resource name for autoscaling (e.g., cpu)
     required: true
-  predictors[].componentSpec.hpaSpec.metricsV2[].resource.target.type:
+  predictors.componentSpec.hpaSpec.metricsV2.resource.target.type:
     type: string
     description: Type of target (e.g., Utilization)
     required: true
-  predictors[].componentSpec.hpaSpec.metricsV2[].resource.target.averageUtilization:
+  predictors.componentSpec.hpaSpec.metricsV2.resource.target.averageUtilization:
     type: integer
     description: Target average utilization percentage
     required: false
-  predictors[].componentSpec.kedaSpec.minReplicaCount:
+  predictors.componentSpec.kedaSpec.minReplicaCount:
     type: integer
     description: Minimum number of replicas to scale down to with KEDA
     required: false
-  predictors[].componentSpec.kedaSpec.maxReplicaCount:
+  predictors.componentSpec.kedaSpec.maxReplicaCount:
     type: integer
     description: Maximum number of replicas to scale up to with KEDA
     required: false
-  predictors[].componentSpec.kedaSpec.cooldownPeriod:
+  predictors.componentSpec.kedaSpec.cooldownPeriod:
     type: integer
     description: Number of seconds to wait before scaling down
     required: false
-  predictors[].componentSpec.kedaSpec.pollingInterval:
+  predictors.componentSpec.kedaSpec.pollingInterval:
     type: integer
     description: Interval in seconds to check for scaling metrics
     required: false
-  predictors[].componentSpec.kedaSpec.triggers:
+  predictors.componentSpec.kedaSpec.triggers:
     type: array
     description: List of KEDA triggers to define scaling behavior
     required: false
-  predictors[].componentSpec.kedaSpec.triggers[].type:
+  predictors.componentSpec.kedaSpec.triggers.type:
     type: string
     description: Type of KEDA trigger (e.g. cpu, kafka, prometheus)
     required: true
-  predictors[].componentSpec.kedaSpec.triggers[].metadata:
+  predictors.componentSpec.kedaSpec.triggers.metadata:
     type: object
     description: Key-value map with trigger-specific metadata
     required: false
-  predictors[].componentSpec.kedaSpec.triggers[].authenticationRef.name:
+  predictors.componentSpec.kedaSpec.triggers.authenticationRef.name:
     type: string
     description: Name of the KEDA authentication reference to use
     required: false
-  predictors[].componentSpec.kedaSpec.advanced.restoreToOriginalReplicaCount:
+  predictors.componentSpec.kedaSpec.advanced.restoreToOriginalReplicaCount:
     type: boolean
     description: Restore to the original replica count after scaling is no longer needed
     required: false
-  predictors[].componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig:
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig:
     type: object
     description: HPA behavior configuration as a key-value map
     required: false
-  predictors[].componentSpec.pdbSpec.minAvailable:
+  predictors.componentSpec.pdbSpec.minAvailable:
     type: string
     description: Minimum number or percentage of pods that must be available during disruptions
     required: false
-  predictors[].componentSpec.pdbSpec.maxUnavailable:
+  predictors.componentSpec.pdbSpec.maxUnavailable:
     type: string
     description: Maximum number or percentage of pods that may be unavailable during disruptions
     required: false
-  predictors[].engineResources.requests.cpu:
+  predictors.engineResources.requests.cpu:
     type: string
     description: CPU requested for the Seldon engine sidecar
     required: false
-  predictors[].engineResources.requests.memory:
+  predictors.engineResources.requests.memory:
     type: string
     description: Memory requested for the Seldon engine sidecar
     required: false
-  predictors[].engineResources.limits.cpu:
+  predictors.engineResources.limits.cpu:
     type: string
     description: Maximum CPU allowed for the Seldon engine sidecar
     required: false
-  predictors[].engineResources.limits.memory:
+  predictors.engineResources.limits.memory:
     type: string
     description: Maximum memory allowed for the Seldon engine sidecar
     required: false
-  predictors[].labels:
+  predictors.labels:
     type: object
     description: Custom labels applied to the predictor deployment
     required: false
-  predictors[].shadow:
+  predictors.shadow:
     type: boolean
     description: If true, all traffic is shadowed to this predictor without impacting the response
     required: false
-  predictors[].ssl.certSecretName:
+  predictors.ssl.certSecretName:
     type: string
     description: SSL certificate secret name for this predictor
     required: false
-  predictors[].progressDeadlineSeconds:
+  predictors.progressDeadlineSeconds:
     type: integer
     description: Time in seconds the deployment controller should wait before marking the predictor as failed
     required: false
-  predictors[].explainer.type:
+  predictors.explainer.type:
     type: string
     description: The type of explainer used to interpret model predictions. Allowed values- anchor_tabular, anchor_text, anchor_image, kernel_shap, tree_shap, integrated_gradients, contrastive, cfproto, counterfactual, alibi, custom
     required: false
-  predictors[].explainer.modelUri:
+  predictors.explainer.modelUri:
     type: string
     description: URI pointing to the explainer model location
     required: false
-  predictors[].explainer.config:
+  predictors.explainer.config:
     type: object
     description: Key-value configuration settings passed to the explainer
     required: false
-  predictors[].explainer.endpoint.type:
+  predictors.explainer.endpoint.type:
     type: string
     description: Type of the endpoint protocol. Allowed values- REST, GRPC
     required: false
-  predictors[].explainer.envSecretRefName:
+  predictors.explainer.envSecretRefName:
     type: string
     description: Name of the secret containing environment variables for the explainer
     required: false
-  predictors[].explainer.storageInitializerImage:
+  predictors.explainer.storageInitializerImage:
     type: string
     description: Custom image to use for the explainer's storage initializer
     required: false
-  predictors[].explainer.replicas:
+  predictors.explainer.replicas:
     type: integer
     description: Number of replicas to run for the explainer deployment
     required: false
-  predictors[].explainer.initParameters:
+  predictors.explainer.initParameters:
     type: string
     description: JSON-formatted string with initialization parameters for the explainer
     required: false
-  predictors[].explainer.serviceAccountName:
+  predictors.explainer.serviceAccountName:
     type: string
     description: Service account name to run the explainer under
     required: false
-  predictors[].explainer.containerSpec.name:
+  predictors.explainer.containerSpec.name:
     type: string
     description: Name of the explainer container
     required: false
-  predictors[].explainer.containerSpec.image:
+  predictors.explainer.containerSpec.image:
     type: string
     description: Container image for the explainer
     required: false
-  predictors[].explainer.containerSpec.args:
+  predictors.explainer.containerSpec.args:
     type: array
     description: Command-line arguments passed to the explainer container
     required: false
-  predictors[].explainer.containerSpec.imagePullPolicy:
+  predictors.explainer.containerSpec.imagePullPolicy:
     type: string
     description: Policy for pulling explainer container image
     required: false

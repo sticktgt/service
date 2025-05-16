@@ -342,8 +342,13 @@ func main() {
 			tmpl, err := template.New(file.Path).Parse(file.Content)
 			check(err)
 			var buf bytes.Buffer
+
+			tplData := map[string]interface{}{
+				"Values": values,
+			}
+
 			log.Printf("Execute: %s", file.Path)
-			check(tmpl.Execute(&buf, values))
+			check(tmpl.Execute(&buf, tplData))
 			content = buf.String()
 		}
 		check(os.WriteFile(outputPath, []byte(content), 0644))
