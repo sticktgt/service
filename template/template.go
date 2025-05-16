@@ -187,8 +187,13 @@ type VolumeMount struct {
 
 type Volume struct {
 	Name     string              `json:"name" yaml:"name"`
-	EmptyDir *struct{}           `json:"emptyDir,omitempty" yaml:"emptyDir,omitempty"`
+	EmptyDir *EmptyDirVolume     `json:"emptyDir,omitempty" yaml:"emptyDir,omitempty"`
 	Secret   *SecretVolumeSource `json:"secret,omitempty" yaml:"secret,omitempty"`
+}
+
+type EmptyDirVolume struct {
+	Medium    string `json:"medium,omitempty" yaml:"medium,omitempty"`
+	SizeLimit string `json:"sizeLimit,omitempty" yaml:"sizeLimit,omitempty"`
 }
 
 type SecretVolumeSource struct {

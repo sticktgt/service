@@ -52,7 +52,8 @@ files:
           {{- end }}
       predictors:
       {{- range .predictors }}
-        - name: {{ .name }}
+        {{ .name }}:
+          name: {{ .name }}
           replicas: {{ .replicas }}        
           graph:
             name: {{ .graph.name }}
@@ -88,7 +89,8 @@ files:
             {{- if .graph.children }}
             children:
               {{- range .graph.children }}
-              - name: {{ .name }}
+              {{ .name }}:
+                name: {{ .name }}
                 type: {{ .type }}
                 {{- if .implementation }}
                 implementation: {{ .implementation }}
@@ -121,7 +123,8 @@ files:
                 {{- if .children }}
                 children:
                   {{- range .children }}
-                  - name: {{ .name }}
+                  {{ .name }}:
+                    name: {{ .name }}
                     type: {{ .type }}
                     {{- if .implementation }}
                     implementation: {{ .implementation }}
@@ -154,7 +157,8 @@ files:
                     {{- if .children }}
                     children:
                       {{- range .children }}
-                      - name: {{ .name }}
+                      {{ .name }}:
+                        name: {{ .name }}
                         type: {{ .type }}
                         {{- if .implementation }}
                         implementation: {{ .implementation }}
@@ -187,7 +191,8 @@ files:
                         {{- if .children }}
                         children:
                           {{- range .children }}
-                          - name: {{ .name }}
+                          {{ .name }}:
+                            name: {{ .name }}
                             type: {{ .type }}
                             {{- if .implementation }}
                             implementation: {{ .implementation }}
@@ -241,7 +246,8 @@ files:
     content: |
       predictors:
       {{- range .predictors }}
-        - name: {{ .name }}
+        {{ .name }}:
+          name: {{ .name }}
           replicas: {{ .replicas }}
           traffic: {{ .traffic }}
           {{- if .engineResources }}
@@ -437,9 +443,16 @@ files:
             {{- if .componentSpec.volumes }}
             volumes:
             {{- range .componentSpec.volumes }}
-              - name: {{ .name }}
+              {{ .name }}:
+                name: {{ .name }}
                 {{- if .emptyDir }}
-                emptyDir: {}
+                emptyDir:
+                  {{- if .emptyDir.medium }}
+                  medium: {{ .emptyDir.medium }}
+                  {{- end }}
+                  {{- if .emptyDir.sizeLimit }}
+                  sizeLimit: {{ .emptyDir.sizeLimit }}
+                  {{- end }}
                 {{- else if .secret }}
                 secret:
                   secretName: {{ .secret.secretName }}
@@ -449,7 +462,8 @@ files:
             {{- if .componentSpec.containers }}
             containers:
             {{- range .componentSpec.containers }}
-              - name: {{ .name }}
+              {{ .name }}:
+                name: {{ .name }}
                 image: {{ .image }}
                 {{- if .imagePullPolicy }}
                 imagePullPolicy: {{ .imagePullPolicy }}
@@ -488,7 +502,8 @@ files:
                 {{- if .volumeMounts }}
                 volumeMounts:
                   {{- range .volumeMounts }}
-                  - name: {{ .name }}
+                  {{ .name }}:
+                    name: {{ .name }}
                     mountPath: {{ .mountPath }}
                     {{- if .readOnly }}
                     readOnly: {{ .readOnly }}
@@ -590,7 +605,8 @@ files:
             {{- if .componentSpec.initContainers }}
             initContainers:
             {{- range .componentSpec.initContainers }}
-              - name: {{ .name }}
+              {{ .name }}:
+                name: {{ .name }}
                 image: {{ .image }}
                 {{- if .imagePullPolicy }}
                 imagePullPolicy: {{ .imagePullPolicy }}
@@ -628,7 +644,8 @@ files:
                 {{- end }}
                 volumeMounts:
                   {{- range .volumeMounts }}
-                  - name: {{ .name }}
+                  {{ .name }}:
+                    name: {{ .name }}
                     mountPath: {{ .mountPath }}
                     {{- if .readOnly }}
                     readOnly: {{ .readOnly }}
@@ -772,7 +789,8 @@ files:
             {{- if .graph.children }}
             children:
               {{- range .graph.children }}
-              - name: {{ .name }}
+              {{ .name }}:
+                name: {{ .name }}
                 type: {{ .type }}
                 {{- if .implementation }}
                 implementation: {{ .implementation }}
@@ -817,7 +835,8 @@ files:
                 {{- if .children }}
                 children:
                   {{- range .children }}
-                  - name: {{ .name }}
+                  {{ .name }}:
+                    name: {{ .name }}
                     type: {{ .type }}
                     {{- if .implementation }}
                     implementation: {{ .implementation }}
@@ -862,7 +881,8 @@ files:
                     {{- if .children }}
                     children:
                       {{- range .children }}
-                      - name: {{ .name }}
+                      {{ .name }}:
+                        name: {{ .name }}
                         type: {{ .type }}
                         {{- if .implementation }}
                         implementation: {{ .implementation }}
@@ -907,7 +927,8 @@ files:
                         {{- if .children }}
                         children:
                           {{- range .children }}
-                          - name: {{ .name }}
+                          {{ .name }}:
+                            name: {{ .name }}
                             type: {{ .type }}
                             {{- if .implementation }}
                             implementation: {{ .implementation }}
@@ -1018,8 +1039,10 @@ files:
       {{- end }}
       {{- if .children }}
       children:
-        {{- range .children }}
+        {{- range $name, $ch := .children }}
+        {{- with $ch }}
         - {{ include "seldon.graph.node" . | indent 4 | trim }}
+        {{- end }}
         {{- end }}
       {{- else }}
       children: []
@@ -1068,12 +1091,14 @@ files:
         {{- end }}
         {{- if .volumeMounts }}
         volumeMounts:
-          {{- range .volumeMounts }}
+          {{- range $name, $vm := .volumeMounts }}
+          {{- with $vm }}                  
           - name: {{ .name }}
             mountPath: {{ .mountPath }}
             {{- if .readOnly }}
             readOnly: {{ .readOnly }}
             {{- end }}
+          {{- end }}
           {{- end }}
         {{- end }}
         {{- if .resources }}
@@ -1212,12 +1237,14 @@ files:
         {{- end }}
         {{- if .volumeMounts }}
         volumeMounts:
-          {{- range .volumeMounts }}
+          {{- range $name, $vm := .volumeMounts }}
+          {{- with $vm }}         
           - name: {{ .name }}
             mountPath: {{ .mountPath }}
             {{- if .readOnly }}
             readOnly: {{ .readOnly }}
             {{- end }}
+          {{- end }}
           {{- end }}
         {{- end }}
         {{- if .resources }}
@@ -1347,7 +1374,8 @@ files:
           {{- end }}
         {{- end }}
         predictors:
-        {{- range .Values.predictors }}
+        {{- range $name, $pred := .Values.predictors }}
+          {{- with $pred }}
           - name: {{ .name }}
             {{- if .replicas }}
             replicas: {{ .replicas }}
@@ -1476,6 +1504,7 @@ files:
             {{- end }}
             graph:
               {{- include "seldon.graph.node" .graph | indent 8 }}
+            {{- if .componentSpec }}
             componentSpecs:
               {{- if .hpaSpec }}
               hpaSpec:
@@ -1550,28 +1579,42 @@ files:
                   {{- end }}
                   {{- if .componentSpec.containers }}      
                   containers:
-                    {{- range .componentSpec.containers }}
+                    {{- range $name, $cn := .componentSpec.containers }}
+                    {{- with $cn }}
                     {{- include "seldon.container" . | indent 14 }}
+                    {{- end }}
                     {{- end }}
                   {{- end }}
                   {{- if .componentSpec.initContainers }}
                   initContainers:
-                    {{- range .componentSpec.initContainers }}
+                    {{- range $name, $icn := .componentSpec.initContainers }}
+                    {{- with $icn }}
                     {{- include "seldon.container" . | indent 14 }}
+                    {{- end }}
                     {{- end }}
                   {{- end }}
                   {{- if .componentSpec.volumes }}
                   volumes:
-                    {{- range .componentSpec.volumes }}
+                    {{- range $name, $vm := .componentSpec.volumes }}
+                    {{- with $vm }}                    
                     - name: {{ .name }}
                       {{- if .emptyDir }}
-                      emptyDir: {}
+                      emptyDir:
+                        {{- if .emptyDir.medium }}
+                        medium: {{ .emptyDir.medium }}
+                        {{- end }}
+                        {{- if .emptyDir.sizeLimit }}
+                        sizeLimit: {{ .emptyDir.sizeLimit }}
+                        {{- end }}
                       {{- else if .secret }}
                       secret:
                         secretName: {{ .secret.secretName }}
                       {{- end }}
                     {{- end }}
+                    {{- end }}
                   {{- end }}
+            {{- end }}
+          {{- end }}    
         {{- end }}
 
   - path: .helmignore
@@ -1965,9 +2008,13 @@ valuesSchema:
     type: string
     description: Kubernetes secret name to mount as volume
     required: false
-  predictors[].componentSpec.volumes[].emptyDir:
-    type: object
-    description: EmptyDir volume source for ephemeral storage
+  predictors[].componentSpec.volumes[].emptyDir.medium:
+    type: string
+    description: Storage medium type for the EmptyDir volume. Allowed values- "" (default), "Memory"
+    required: false
+  predictors[].componentSpec.volumes[].emptyDir.sizeLimit:
+    type: string
+    description: Total storage size limit for the EmptyDir volume (e.g., "2Gi")
     required: false
   predictors[].componentSpec.initContainers:
     type: array
