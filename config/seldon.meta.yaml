@@ -484,7 +484,7 @@ files:
                   {{- range .env }}
                   - name: {{ .name }}
                     {{- if .value }}
-                    value: {{ .value }}
+                    value: '{{ .value -}}'
                     {{- else if .valueFrom }}
                     valueFrom:
                       secretKeyRef:
@@ -627,7 +627,7 @@ files:
                   {{- range .env }}
                   - name: {{ .name }}
                     {{- if .value }}
-                    value: {{ .value }}
+                    value: '{{ .value -}}
                     {{- else if .valueFrom }}
                     valueFrom:
                       secretKeyRef:
@@ -1073,7 +1073,7 @@ files:
           {{- range .env }}
           - name: {{ .name }}
             {{- if .value }}
-            value: {{ .value }}
+            value: '{{ .value -}}'
             {{- else if .valueFrom }}
             valueFrom:
               secretKeyRef:
@@ -1219,7 +1219,7 @@ files:
           {{- range .env }}
           - name: {{ .name }}
             {{- if .value }}
-            value: {{ .value }}
+            value: '{{ .value -}}'
             {{- else if .valueFrom }}
             valueFrom:
               secretKeyRef:

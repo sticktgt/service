@@ -50,8 +50,8 @@
             ],
             "env": [
               {
-                "name": "MODEL_ENV",
-                "value": "prod"
+                "name": "MODEL_METADATA",
+                "value": "---\\nname: single-node\\nversions: [ generic-node/v0.4 ]\\nplatform: seldon"
               }
             ],
             "resources": {
