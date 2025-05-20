@@ -7,6 +7,10 @@ import (
 	"path/filepath"
 	"text/template"
 
+	"gservice/generator"
+	"gservice/utils"
+	"gservice/validation"
+
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
@@ -299,7 +303,7 @@ type ChartTemplate struct {
 	Files []struct {
 		Path     string `jsonl:"path" yaml:"path"`
 		Template bool   `json:"path" yaml:"template"`
-		Content  string `json:"path" yaml:"content"`
+		Content  string `json:"content" yaml:"content"`
 	} `yaml:"files"`
 }
 
@@ -316,16 +320,47 @@ func main() {
 	var values = make(map[string]interface{})
 	check(json.Unmarshal(valData, &values))
 
-	/*
-		valuesStr, err := json.Marshal(values)
-		check(err)
-		log.Printf("Generated: %s", valuesStr)
-	*/
 	var meta ChartTemplate
 	log.Printf("Reading template file")
 	tmplData, err := os.ReadFile("../config/seldon.meta.yaml")
 	check(err)
 	check(yaml.Unmarshal(tmplData, &meta))
+
+	/*
+		valuesStr, err := json.Marshal(values)
+		check(err)
+		log.Printf("Generated: %s", valuesStr)
+	*/
+	i := 1
+	if i == 1 {
+
+		params := struct {
+			MergedSetupValues  map[string]interface{}
+			Environment        string
+			ProcessID          string
+			CreateNewEnvValues bool
+		}{
+			MergedSetupValues:  values,
+			Environment:        valuesCheck.Environment,
+			ProcessID:          "12345", // Example process ID
+			CreateNewEnvValues: false,   // Example value
+		}
+		//func GenerateChart(meta utils.MetaStructure, setupValues map[string]interface{}, outputDir string, cliEnv string, processID string, createEnvValues bool) error {
+		log.Printf("ValidateMetafile")
+		err = validation.ValidateMetafile(tmplData, params.ProcessID)
+		check(err)
+
+		repoProjectSubfolder := "output" // Example subfolder path
+		log.Printf("LoadMeta")
+		meta, err := utils.LoadMeta(tmplData, params.ProcessID)
+		check(err)
+		log.Printf("GenerateChart")
+		if err := generator.GenerateChart(meta, params.MergedSetupValues, repoProjectSubfolder, params.Environment, params.ProcessID, params.CreateNewEnvValues); err != nil {
+			check(err)
+		}
+		log.WithField("processID", params.ProcessID).Info("✅ Chart files generated")
+		return
+	}
 
 	for _, file := range meta.Files {
 		newfilepath := file.Path

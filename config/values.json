@@ -92,7 +92,7 @@
         "storageInitializerImage": "seldonio/storage-init:1.18.0-dev",
         "envSecretRefName": "explainer-secret",
         "replicas": 1,
-        "initParameters": "{ \"threshold\": 0.95, \"top_n\": 3 }",
+        "initParameters": "threshold: 0.95, top_n: 3",
         "endpoint": {
           "type": "REST"
         },

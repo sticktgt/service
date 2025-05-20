@@ -1,3 +1,8 @@
+chart:
+  name: seldon-core-v1
+  version: 1.0.0
+  description: Seldon Core V1 Chart
+
 files:
   - path: Chart.yaml
     template: true
@@ -306,7 +311,7 @@ files:
             envSecretRefName: {{ .explainer.envSecretRefName }}
             {{- end }}
             {{- if .explainer.initParameters }}
-            initParameters: {{ .explainer.initParameters }}
+            initParameters: '{{ .explainer.initParameters }}'
             {{- end }}
             {{- if .explainer.replicas }}
             replicas: {{ .explainer.replicas }}
@@ -1350,9 +1355,11 @@ files:
       metadata:
         name: {{ .Values.deploymentName }}
         namespace: {{ .Values.namespace }}
+        {{- if .Values.metadata.labels }}
         labels:
         {{- range $k, $v := .Values.metadata.labels }}
           {{ $k }}: {{ $v }}
+        {{- end }}
         {{- end }}
         {{- if .Values.metadata.annotations }}
         annotations:
@@ -1445,7 +1452,7 @@ files:
               envSecretRefName: {{ .explainer.envSecretRefName }}
               {{- end }}
               {{- if .explainer.initParameters }}
-              initParameters: {{ .explainer.initParameters | quote }}
+              initParameters: '{{ .explainer.initParameters }}'
               {{- end }}
               {{- if .explainer.replicas }}
               replicas: {{ .explainer.replicas }}
@@ -1678,11 +1685,11 @@ valuesSchema:
     required: true
     default: no_data
   metadata.labels:
-    type: object
+    type: map
     description: Key-value pairs used to categorize and select Kubernetes objects
     required: false
   metadata.annotations:
-    type: object
+    type: list
     description: Annotations applied to the SeldonDeployment additional metadata for tooling, policies, and configuration
     required: false
   protocol:
@@ -1694,15 +1701,15 @@ valuesSchema:
     description: Transport mechanism to use. Allowed values- rest, grpc
     required: false
   annotations:
-    type: object
+    type: list
     description: Annotations added to the SeldonDeployment spec
     required: false
   specAnnotations:
-    type: object
+    type: list
     description: Additional annotations applied under SeldonDeployment.spec
     required: false
   predictors:
-    type: array
+    type: list
     description: List of predictors defining traffic-split and graph configurations
     required: true
   predictors.name:
@@ -1718,7 +1725,7 @@ valuesSchema:
     description: Percentage of traffic assigned to this predictor
     required: false
   predictors.annotations:
-    type: object
+    type: list
     description: Annotations applied to this predictor instance
     required: false
   predictors.svcOrchSpec.resources.requests.cpu:
@@ -1738,7 +1745,7 @@ valuesSchema:
     description: Maximum memory allowed for the service orchestrator
     required: false
   predictors.svcOrchSpec.env:
-    type: array
+    type: list
     description: Environment variables for the service orchestrator
     required: false
   predictors.svcOrchSpec.env.name:
@@ -1790,7 +1797,7 @@ valuesSchema:
     description: Optional URL to send logs to
     required: false
   predictors.graph.parameters:
-    type: array
+    type: list
     description: List of parameters for this graph node
     required: false
   predictors.graph.parameters.name:
@@ -1806,11 +1813,11 @@ valuesSchema:
     description: Value of the parameter
     required: true
   predictors.graph.children:
-    type: array
+    type: list
     description: Child nodes in the prediction graph
     required: false
   predictors.graph.methods:
-    type: array
+    type: list
     description: List of inference methods supported by this graph node. Common values- predict, transform, route, aggregate, send_feedback, custom
     required: false
   predictors.graph.serviceAccountName:
@@ -1830,7 +1837,7 @@ valuesSchema:
     description: Time (in seconds) for graceful shutdown
     required: false
   predictors.componentSpec.containers:
-    type: array
+    type: list
     description: Additional containers in the predictor pod
     required: false
   predictors.componentSpec.containers.name:
@@ -1846,11 +1853,11 @@ valuesSchema:
     description: Kubernetes image pull policy (Always, IfNotPresent, Never)
     required: false
   predictors.componentSpec.containers.args:
-    type: array
+    type: list
     description: Command-line arguments passed to the container entrypoint
     required: false
   predictors.componentSpec.containers.env:
-    type: array
+    type: list
     description: Environment variables for the container
     required: false
   predictors.componentSpec.containers.env.name:
@@ -1870,7 +1877,7 @@ valuesSchema:
     description: Key inside the referenced secret
     required: false
   predictors.componentSpec.containers.envFrom:
-    type: array
+    type: list
     description: List of sources to populate environment variables from (ConfigMaps or Secrets)
     required: false
   predictors.componentSpec.containers.envFrom.secretRef.name:
@@ -1882,7 +1889,7 @@ valuesSchema:
     description: Name of the ConfigMap for env import
     required: false
   predictors.componentSpec.containers.volumeMounts:
-    type: array
+    type: list
     description: Volume mounts for container
     required: false
   predictors.componentSpec.containers.volumeMounts.name:
@@ -1969,12 +1976,8 @@ valuesSchema:
     type: integer
     description: Minimum consecutive successes for the readiness probe to be considered successful
     required: false
-  predictors.componentSpec.containers.lifecycle:
-    type: object
-    description: Lifecycle hooks for the container (preStop and postStart)
-    required: false
   predictors.componentSpec.containers.lifecycle.preStop.exec.command:
-    type: array
+    type: list
     description: Command to run in preStop lifecycle hook (exec)
     required: false
   predictors.componentSpec.containers.lifecycle.preStop.httpGet.path:
@@ -1986,7 +1989,7 @@ valuesSchema:
     description: Port to access on the server for preStop hook
     required: false
   predictors.componentSpec.containers.lifecycle.postStart.exec.command:
-    type: array
+    type: list
     description: Command to run in postStart lifecycle hook (exec)
     required: false
   predictors.componentSpec.containers.lifecycle.postStart.httpGet.path:
@@ -1998,7 +2001,7 @@ valuesSchema:
     description: Port to access on the server for postStart hook
     required: false
   predictors.componentSpec.volumes:
-    type: array
+    type: list
     description: Volumes used by the predictor
     required: false
   predictors.componentSpec.volumes.name:
@@ -2018,7 +2021,7 @@ valuesSchema:
     description: Total storage size limit for the EmptyDir volume (e.g., "2Gi")
     required: false
   predictors.componentSpec.initContainers:
-    type: array
+    type: list
     description: Init containers to run before main containers
     required: false
   predictors.componentSpec.initContainers.name:
@@ -2034,11 +2037,11 @@ valuesSchema:
     description: Policy for pulling init container image
     required: false
   predictors.componentSpec.initContainers.args:
-    type: array
+    type: list
     description: Arguments passed to init container on start
     required: false
   predictors.componentSpec.initContainers.env:
-    type: array
+    type: list
     description: Environment variables for the init container
     required: false
   predictors.componentSpec.initContainers.env.name:
@@ -2058,7 +2061,7 @@ valuesSchema:
     description: Key within the Kubernetes secret for env valueFrom
     required: false
   predictors.componentSpec.initContainers.envFrom:
-    type: array
+    type: list
     description: List of sources to populate environment variables from (ConfigMaps or Secrets)
     required: false
   predictors.componentSpec.initContainers.envFrom.secretRef.name:
@@ -2070,7 +2073,7 @@ valuesSchema:
     description: Name of the ConfigMap for env import
     required: false
   predictors.componentSpec.initContainers.volumeMounts:
-    type: array
+    type: list
     description: Volume mounts for the init container
     required: false
   predictors.componentSpec.initContainers.volumeMounts.name:
@@ -2157,16 +2160,12 @@ valuesSchema:
     type: integer
     description: Minimum consecutive successes for the readiness probe to be considered successful
     required: false
-  predictors.componentSpec.initContainers.lifecycle:
-    type: object
-    description: Lifecycle hooks for the init container
-    required: false
   predictors.componentSpec.initContainers.lifecycle.preStop.exec.command:
-    type: array
+    type: list
     description: Command to run in preStop lifecycle hook (exec)
     required: false
   predictors.componentSpec.initContainers.lifecycle.postStart.exec.command:
-    type: array
+    type: list
     description: Command to run in postStart lifecycle hook (exec)
     required: false
   predictors.componentSpec.initContainers.lifecycle.preStop.httpGet.path:
@@ -2185,10 +2184,6 @@ valuesSchema:
     type: string
     description: Port to access on the server for postStart hook
     required: false
-  predictors.componentSpec.hpaSpec:
-    type: object
-    description: Horizontal Pod Autoscaler configuration for the predictor
-    required: false
   predictors.componentSpec.hpaSpec.minReplicas:
     type: integer
     description: Minimum number of replicas allowed
@@ -2198,7 +2193,7 @@ valuesSchema:
     description: Maximum number of replicas allowed
     required: true
   predictors.componentSpec.hpaSpec.metricsV2:
-    type: array
+    type: list
     description: List of custom metrics for autoscaling
     required: false
   predictors.componentSpec.hpaSpec.metricsV2.type:
@@ -2234,7 +2229,7 @@ valuesSchema:
     description: Interval in seconds to check for scaling metrics
     required: false
   predictors.componentSpec.kedaSpec.triggers:
-    type: array
+    type: list
     description: List of KEDA triggers to define scaling behavior
     required: false
   predictors.componentSpec.kedaSpec.triggers.type:
@@ -2242,7 +2237,7 @@ valuesSchema:
     description: Type of KEDA trigger (e.g. cpu, kafka, prometheus)
     required: true
   predictors.componentSpec.kedaSpec.triggers.metadata:
-    type: object
+    type: map
     description: Key-value map with trigger-specific metadata
     required: false
   predictors.componentSpec.kedaSpec.triggers.authenticationRef.name:
@@ -2254,7 +2249,7 @@ valuesSchema:
     description: Restore to the original replica count after scaling is no longer needed
     required: false
   predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig:
-    type: object
+    type: map
     description: HPA behavior configuration as a key-value map
     required: false
   predictors.componentSpec.pdbSpec.minAvailable:
@@ -2282,7 +2277,7 @@ valuesSchema:
     description: Maximum memory allowed for the Seldon engine sidecar
     required: false
   predictors.labels:
-    type: object
+    type: list
     description: Custom labels applied to the predictor deployment
     required: false
   predictors.shadow:
@@ -2306,7 +2301,7 @@ valuesSchema:
     description: URI pointing to the explainer model location
     required: false
   predictors.explainer.config:
-    type: object
+    type: map
     description: Key-value configuration settings passed to the explainer
     required: false
   predictors.explainer.endpoint.type:
@@ -2342,7 +2337,7 @@ valuesSchema:
     description: Container image for the explainer
     required: false
   predictors.explainer.containerSpec.args:
-    type: array
+    type: list
     description: Command-line arguments passed to the explainer container
     required: false
   predictors.explainer.containerSpec.imagePullPolicy:
