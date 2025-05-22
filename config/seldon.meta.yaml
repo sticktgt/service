@@ -24,9 +24,8 @@ files:
   - path: values.yaml
     template: true
     content: |
+      {{- if .Values.apiVersio }}
       apiVersion: {{ .Values.apiVersion }}
-      {{- if .Values.environment }}
-      environment: {{ .Values.environment }}
       {{- end }}
       {{- if .Values.protocol }}
       protocol: {{ .Values.protocol }}
@@ -40,29 +39,42 @@ files:
         {{ $k }}: {{ $v }}
         {{- end }}
       {{- end }}
-      chart:
-        name: {{ .Values.chart.name }}
-        version: {{ .Values.chart.version }}
-        description: {{ .Values.chart.description }}
+      {{- if .Values.deploymentName }}
       deploymentName: {{ .Values.deploymentName }}
+      {{- end }}
+      {{- if .Values.namespace }}
       namespace: {{ .Values.namespace }}
+      {{- end }}
+      {{- if .Values.metadata }}
       metadata:
+        {{- if .Values.metadata.labels }}
         labels:
           {{- range $k, $v := .Values.metadata.labels }}
           {{ $k }}: {{ $v }}
           {{- end }}
+        {{- end }}
+        {{- if .Values.metadata.annotations }}
         annotations:
           {{- range $k, $v := .Values.metadata.annotations }}
           {{ $k }}: {{ $v }}
           {{- end }}
+        {{- end }}
+      {{- end }}
       predictors:
       {{- range .Values.predictors }}
         {{ .name }}:
           name: {{ .name }}
-          replicas: {{ .replicas }}        
+          {{- if .replicas }}
+          replicas: {{ .replicas }}
+          {{- end }}
+          {{- if .traffic }}
+          traffic: {{ .traffic }}
+          {{- end }}
           graph:
             name: {{ .graph.name }}
+            {{- if .graph.type }}
             type: {{ .graph.type }}
+            {{- end }}
             {{- if .graph.implementation }}
             implementation: {{ .graph.implementation }}
             {{- end }}
@@ -96,7 +108,9 @@ files:
               {{- range .graph.children }}
               {{ .name }}:
                 name: {{ .name }}
+                {{- if .type }}
                 type: {{ .type }}
+                {{- end }}
                 {{- if .implementation }}
                 implementation: {{ .implementation }}
                 {{- end }}
@@ -130,7 +144,9 @@ files:
                   {{- range .children }}
                   {{ .name }}:
                     name: {{ .name }}
+                    {{- if .type }}
                     type: {{ .type }}
+                    {{- end }}
                     {{- if .implementation }}
                     implementation: {{ .implementation }}
                     {{- end }}
@@ -164,7 +180,9 @@ files:
                       {{- range .children }}
                       {{ .name }}:
                         name: {{ .name }}
+                        {{- if .type }}
                         type: {{ .type }}
+                        {{- end }}
                         {{- if .implementation }}
                         implementation: {{ .implementation }}
                         {{- end }}
@@ -198,7 +216,9 @@ files:
                           {{- range .children }}
                           {{ .name }}:
                             name: {{ .name }}
+                            {{- if .type }}
                             type: {{ .type }}
+                            {{- end }}
                             {{- if .implementation }}
                             implementation: {{ .implementation }}
                             {{- end }}
@@ -254,8 +274,12 @@ files:
       {{- range .Values.predictors }}
         {{ .name }}:
           name: {{ .name }}
+          {{- if .replicas }}
           replicas: {{ .replicas }}
+          {{- end }}
+          {{- if .traffic }}
           traffic: {{ .traffic }}
+          {{- end }}
           {{- if .engineResources }}
           engineResources:
             {{- if .engineResources.requests }}
@@ -751,7 +775,9 @@ files:
             {{- end }}
           graph:
             name: {{ .graph.name }}
+            {{- if .graph.type }}
             type: {{ .graph.type }}
+            {{- end }}
             {{- if .graph.implementation }}
             implementation: {{ .graph.implementation }}
             {{- end }}
@@ -797,7 +823,9 @@ files:
               {{- range .graph.children }}
               {{ .name }}:
                 name: {{ .name }}
+                {{- if .type }}
                 type: {{ .type }}
+                {{- end }}
                 {{- if .implementation }}
                 implementation: {{ .implementation }}
                 {{- end }}
@@ -843,7 +871,9 @@ files:
                   {{- range .children }}
                   {{ .name }}:
                     name: {{ .name }}
+                    {{- if .type }}
                     type: {{ .type }}
+                    {{- end }}
                     {{- if .implementation }}
                     implementation: {{ .implementation }}
                     {{- end }}
@@ -889,7 +919,9 @@ files:
                       {{- range .children }}
                       {{ .name }}:
                         name: {{ .name }}
+                        {{- if .type }}
                         type: {{ .type }}
+                        {{- end }}
                         {{- if .implementation }}
                         implementation: {{ .implementation }}
                         {{- end }}
@@ -935,7 +967,9 @@ files:
                           {{- range .children }}
                           {{ .name }}:
                             name: {{ .name }}
+                            {{- if .type }}
                             type: {{ .type }}
+                            {{- end }}
                             {{- if .implementation }}
                             implementation: {{ .implementation }}
                             {{- end }}
