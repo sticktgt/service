@@ -1,118 +1,76 @@
 {
-  "environment": "TEST",
-  "apiVersion": "machinelearning.seldon.io/v1",
+  "apiVersion": "machinelearning.seldon.io/v1alpha2",
   "chart": {
     "name": "test-model",
     "version": "0.1.0",
     "description": "Test Seldon deployment chart"
   },
-  "deploymentName": "test-explainer-model",
-  "namespace": "default",
-  "subjectArea": "seldon-test-project",
-  "sourceMetafileName": "seldon.meta.yaml",
-  "sourceMetafileRepo": "https://neogit.neoflex.ru/vsemenov/tservice/",
-  "sourceMetafileBranch": "main",
+  "deploymentName": "jokes-openinference",
+  "namespace": "app-llm",
+  "protocol": "v2",
+  "metadata": {
+    "labels": {
+      "components": "seldon-core",
+      "entity": "online-model"
+    },
+    "annotations": {}
+  },
   "predictors": [
     {
-      "name": "default",
-      "replicas": 2,
-      "traffic": 100,
-      "shadow": true,
-      "labels": {
-        "team": "ml",
-        "env": "test"
-      },
-      "ssl": {
-        "certSecretName": "tls-cert-secret"
-      },
-      "progressDeadlineSeconds": 600,
-      "engineResources": {
-        "requests": {
-          "cpu": "200m",
-          "memory": "256Mi"
-        },
-        "limits": {
-          "cpu": "500m",
-          "memory": "512Mi"
-        }
-      },
+      "name": "jokes1test",
+      "replicas": 1,
       "componentSpec": {
-        "serviceAccountName": "explainer-sa",
-        "terminationGracePeriodSeconds": 20,
+        "serviceAccountName": "default-editor",
+        "terminationGracePeriodSeconds": 0,
         "containers": [
           {
-            "name": "classifier",
-            "image": "seldonio/sklearn-iris:0.1",
-            "imagePullPolicy": "IfNotPresent",
-            "args": [
-              "--model",
-              "serve"
-            ],
+            "name": "jokes-openinference",
             "env": [
               {
-                "name": "MODEL_METADATA",
-                "value": "---\\nname: single-node\\nversions: [ generic-node/v0.4 ]\\nplatform: seldon"
+                "name": "GUNICORN_WORKERS",
+                "value": "2"
+              },
+              {
+                "name": "GUNICORN_THREADS",
+                "value": "2"
               }
             ],
-            "resources": {
-              "requests": {
-                "cpu": "100m",
-                "memory": "128Mi"
-              },
-              "limits": {
-                "cpu": "200m",
-                "memory": "256Mi"
-              }
-            },
             "liveness": {
-              "path": "/health",
-              "port": "8080",
-              "initialDelaySeconds": 5,
-              "periodSeconds": 10,
-              "failureThreshold": 3,
-              "successThreshold": 1,
-              "scheme": "HTTP"
+              "path": "/health/ping",
+              "port": "http",
+              "scheme": "HTTP",
+              "initialDelaySeconds": 80,
+              "periodSeconds": 5,
+              "failureThreshold": 200,
+              "successThreshold": 1
             },
             "readiness": {
-              "path": "/ready",
-              "port": "8080",
-              "initialDelaySeconds": 5,
-              "periodSeconds": 10,
-              "failureThreshold": 3,
-              "successThreshold": 1,
-              "scheme": "HTTP"
+              "path": "/health/ping",
+              "port": "http",
+              "scheme": "HTTP",
+              "initialDelaySeconds": 80,
+              "periodSeconds": 5,
+              "failureThreshold": 200,
+              "successThreshold": 1
+            },
+            "resources": {
+              "limits": {
+                "cpu": "2.0",
+                "memory": "2.0Gi"
+              },
+              "requests": {
+                "cpu": "2.0",
+                "memory": "2.0Gi"
+              }
             }
           }
         ]
       },
-      "explainer": {
-        "type": "anchor_tabular",
-        "modelUri": "gs://seldon-models/explainer",
-        "serviceAccountName": "explainer-sa",
-        "storageInitializerImage": "seldonio/storage-init:1.18.0-dev",
-        "envSecretRefName": "explainer-secret",
-        "replicas": 1,
-        "initParameters": "threshold: 0.95, top_n: 3",
-        "endpoint": {
-          "type": "REST"
-        },
-        "config": {
-          "explainer_runtime": "python",
-          "logging": "debug"
-        },
-        "containerSpec": {
-          "name": "custom-explainer",
-          "image": "seldonio/explainer-anchor:0.1",
-          "args": [
-            "--explain"
-          ]
-        }
-      },
       "graph": {
-        "name": "classifier",
-        "type": "MODEL",
-        "implementation": "SKLEARN_SERVER",
-        "modelUri": "gs://seldon-models/sklearn/iris",
+        "name": "jokes-openinference",
+        "implementation": "MLFLOW_SERVER",
+        "modelUri": "s3://app-llm/4/18e6254104ab476eb019bebd0ff2b65d/artifacts/model",
+        "envSecretRefName": "seldon-secret",
         "children": []
       }
     }

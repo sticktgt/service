@@ -1670,14 +1670,11 @@ files:
       .ipynb_checkpoints/
 
 valuesSchema:
-  environment:
-    type: string
-    description: Target environment (e.g., TEST, STAGING, PROD)
-    required: true
   apiVersion:
     type: string
     description: Kubernetes API version for the SeldonDeployment resource (e.g., machinelearning.seldon.io/v1)
     required: true
+    default: machinelearning.seldon.io/v1
   chart.name:
     type: string
     description: Name of the Helm chart

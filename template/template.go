@@ -12,6 +12,7 @@ import (
 	"gservice/validation"
 
 	"github.com/sirupsen/logrus"
+	"github.com/xeipuuv/gojsonschema"
 	"gopkg.in/yaml.v3"
 )
 
@@ -140,18 +141,53 @@ type KedaSpec struct {
 }
 
 type KedaTrigger struct {
-	Type              string            `json:"type" yaml:"type"`
-	Metadata          map[string]string `json:"metadata,omitempty" yaml:"metadata,omitempty"`
-	AuthenticationRef *struct {
-		Name string `json:"name" yaml:"name"`
-	} `json:"authenticationRef,omitempty" yaml:"authenticationRef,omitempty"`
+	Type              string             `json:"type" yaml:"type"`
+	Name              string             `json:"name,omitempty" yaml:"name,omitempty"`
+	UseCachedMetrics  bool               `json:"useCachedMetrics,omitempty" yaml:"useCachedMetrics,omitempty"`
+	Metadata          map[string]string  `json:"metadata,omitempty" yaml:"metadata,omitempty"`
+	AuthenticationRef *AuthenticationRef `json:"authenticationRef,omitempty" yaml:"authenticationRef,omitempty"`
+	MetricType        string             `json:"metricType,omitempty" yaml:"metricType,omitempty"`
+}
+
+type AuthenticationRef struct {
+	Name string `json:"name" yaml:"name"`
+	Kind string `json:"kind,omitempty" yaml:"kind,omitempty"`
 }
 
 type KedaAdvancedSpec struct {
-	RestoreToOriginalReplicaCount *bool `json:"restoreToOriginalReplicaCount,omitempty" yaml:"restoreToOriginalReplicaCount,omitempty"`
-	HorizontalPodAutoscalerConfig *struct {
-		Behavior map[string]interface{} `json:"behavior,omitempty" yaml:"behavior,omitempty"`
-	} `json:"horizontalPodAutoscalerConfig,omitempty" yaml:"horizontalPodAutoscalerConfig,omitempty"`
+	RestoreToOriginalReplicaCount *bool                          `json:"restoreToOriginalReplicaCount,omitempty" yaml:"restoreToOriginalReplicaCount,omitempty"`
+	HorizontalPodAutoscalerConfig *HorizontalPodAutoscalerConfig `json:"horizontalPodAutoscalerConfig,omitempty" yaml:"horizontalPodAutoscalerConfig,omitempty"`
+	ScalingModifiers              ScalingModifiers               `json:"scalingModifiers,omitempty" yaml:"scalingModifiers,omitempty"`
+}
+
+type HorizontalPodAutoscalerConfig struct {
+	Behavior *HorizontalPodAutoscalerBehavior `json:"behavior,omitempty" yaml:"behavior,omitempty"`
+	Name     string                           `json:"name,omitempty" yaml:"name,omitempty"`
+}
+
+type HorizontalPodAutoscalerBehavior struct {
+	ScaleUp   *HPAScalingRules `json:"scaleUp,omitempty" yaml:"scaleUp,omitempty"`
+	ScaleDown *HPAScalingRules `json:"scaleDown,omitempty" yaml:"scaleDown,omitempty"`
+}
+
+type HPAScalingRules struct {
+	StabilizationWindowSeconds int                `json:"stabilizationWindowSeconds,omitempty" yaml:"stabilizationWindowSeconds,omitempty"`
+	SelectPolicy               string             `json:"selectPolicy,omitempty" yaml:"selectPolicy,omitempty"`
+	Policies                   []HPAScalingPolicy `json:"policies,omitempty" yaml:"policies,omitempty"`
+	Tolerance                  string             `json:"tolerance,omitempty" yaml:"tolerance,omitempty"`
+}
+
+type HPAScalingPolicy struct {
+	Type          string `json:"type" yaml:"type"`
+	Value         int    `json:"value" yaml:"value"`
+	PeriodSeconds int    `json:"periodSeconds" yaml:"periodSeconds"`
+}
+
+type ScalingModifiers struct {
+	Formula          string `json:"formula,omitempty" yaml:"formula,omitempty"`
+	Target           string `json:"target,omitempty" yaml:"target,omitempty"`
+	ActivationTarget string `json:"activationTarget,omitempty" yaml:"activationTarget,omitempty"`
+	MetricType       string `json:"metricType,omitempty" yaml:"metricType,omitempty"`
 }
 
 type PdbSpec struct {
@@ -315,6 +351,19 @@ func main() {
 	valData, err := os.ReadFile("../config/values.json")
 	check(err)
 
+	log.Printf("Loading schema file")
+	schemaLoader := gojsonschema.NewReferenceLoader("file://../config/schema.json")
+	documentLoader := gojsonschema.NewReferenceLoader("file://../config/values.json")
+	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
+	check(err)
+	if result.Valid() {
+		log.Printf("The input JSON is valid.")
+	} else {
+		log.Printf("The input JSON is not valid. See errors:")
+		for _, desc := range result.Errors() {
+			log.Printf("- %s\n", desc)
+		}
+	}
 	check(json.Unmarshal(valData, &valuesCheck))
 
 	var values = make(map[string]interface{})
