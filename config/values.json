@@ -6,50 +6,113 @@
     "version": "0.1.0",
     "description": "Test Seldon deployment chart"
   },
-  "deploymentName": "seldon-model",
+  "deploymentName": "test-explainer-model",
   "namespace": "default",
+  "subjectArea": "seldon-test-project",
+  "sourceMetafileName": "seldon.meta.yaml",
+  "sourceMetafileRepo": "https://neogit.neoflex.ru/vsemenov/tservice/",
+  "sourceMetafileBranch": "main",
   "predictors": [
     {
-      "name": "example",
+      "name": "default",
+      "replicas": 2,
+      "traffic": 100,
+      "shadow": true,
+      "labels": {
+        "team": "ml",
+        "env": "test"
+      },
+      "ssl": {
+        "certSecretName": "tls-cert-secret"
+      },
+      "progressDeadlineSeconds": 600,
+      "engineResources": {
+        "requests": {
+          "cpu": "200m",
+          "memory": "256Mi"
+        },
+        "limits": {
+          "cpu": "500m",
+          "memory": "512Mi"
+        }
+      },
       "componentSpec": {
+        "serviceAccountName": "explainer-sa",
+        "terminationGracePeriodSeconds": 20,
         "containers": [
           {
             "name": "classifier",
-            "image": "seldonio/mock_classifier:1.16.0-dev",
+            "image": "seldonio/sklearn-iris:0.1",
             "imagePullPolicy": "IfNotPresent",
+            "args": [
+              "--model",
+              "serve"
+            ],
+            "env": [
+              {
+                "name": "MODEL_METADATA",
+                "value": "---\\nname: single-node\\nversions: [ generic-node/v0.4 ]\\nplatform: seldon"
+              }
+            ],
             "resources": {
               "requests": {
-                "cpu": "0.5"
+                "cpu": "100m",
+                "memory": "128Mi"
+              },
+              "limits": {
+                "cpu": "200m",
+                "memory": "256Mi"
               }
+            },
+            "liveness": {
+              "path": "/health",
+              "port": "8080",
+              "initialDelaySeconds": 5,
+              "periodSeconds": 10,
+              "failureThreshold": 3,
+              "successThreshold": 1,
+              "scheme": "HTTP"
+            },
+            "readiness": {
+              "path": "/ready",
+              "port": "8080",
+              "initialDelaySeconds": 5,
+              "periodSeconds": 10,
+              "failureThreshold": 3,
+              "successThreshold": 1,
+              "scheme": "HTTP"
             }
           }
-        ],
-        "kedaSpec": {
-          "pollingInterval": 15,
-          "minReplicaCount": 1,
-          "maxReplicaCount": 5,
-          "triggers": [
-            {
-              "type": "prometheus",
-              "metadata": {
-                "serverAddress": "http://seldon-monitoring-prometheus.seldon-monitoring.svc.cluster.local:9090",
-                "metricName": "access_frequency",
-                "threshold": "10",
-                "query": "rate(seldon_api_executor_client_requests_seconds_count{model_name=\"classifier\"}[1m])"
-              }
-            }
-          ]
+        ]
+      },
+      "explainer": {
+        "type": "AnchorTabular",
+        "modelUri": "gs://seldon-models/explainer",
+        "serviceAccountName": "explainer-sa",
+        "storageInitializerImage": "seldonio/storage-init:1.18.0-dev",
+        "envSecretRefName": "explainer-secret",
+        "replicas": 1,
+        "initParameters": "threshold: 0.95, top_n: 3",
+        "endpoint": {
+          "type": "REST"
         },
-        "pdbSpec": {
-          "minAvailable": "90%"
+        "config": {
+          "explainer_runtime": "python",
+          "logging": "debug"
+        },
+        "containerSpec": {
+          "name": "custom-explainer",
+          "image": "seldonio/explainer-anchor:0.1",
+          "args": [
+            "--explain"
+          ]
         }
       },
       "graph": {
         "name": "classifier",
         "type": "MODEL",
-        "endpoint": {
-          "type": "REST"
-        },
+        "implementation": "SKLEARN_SERVER",
+        "modelUri": "gs://seldon-models/sklearn/iris",
         "children": []
       }
     }

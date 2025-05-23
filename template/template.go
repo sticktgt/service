@@ -23,7 +23,6 @@ type Values struct {
 	Environment          string            `json:"environment" yaml:"environment"`
 	ApiVersion           string            `json:"apiVersion" yaml:"apiVersion"`
 	Chart                Chart             `json:"chart" yaml:"chart"`
-	DeploymentName       string            `json:"deploymentName" yaml:"deploymentName"`
 	Namespace            string            `json:"namespace" yaml:"namespace"`
 	Metadata             Metadata          `json:"metadata" yaml:"metadata"`
 	Predictors           []Predictor       `json:"predictors" yaml:"predictors"`

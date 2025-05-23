@@ -24,6 +24,7 @@ files:
   - path: values.yaml
     template: true
     content: |
+      subjectArea: {{ .Values.subjectArea }}
       {{- if .Values.apiVersio }}
       apiVersion: {{ .Values.apiVersion }}
       {{- end }}
@@ -38,12 +39,6 @@ files:
         {{- range $k, $v := .Values.annotations }}
         {{ $k }}: {{ $v }}
         {{- end }}
-      {{- end }}
-      {{- if .Values.deploymentName }}
-      deploymentName: {{ .Values.deploymentName }}
-      {{- end }}
-      {{- if .Values.namespace }}
-      namespace: {{ .Values.namespace }}
       {{- end }}
       {{- if .Values.metadata }}
       metadata:
@@ -270,6 +265,9 @@ files:
     outputFilename: values-{{ .Values.environment }}.yaml
     template: true
     content: |
+      {{- if .Values.namespace }}
+      namespace: {{ .Values.namespace }}
+      {{- end }}
       predictors:
       {{- range .Values.predictors }}
         {{ .name }}:
@@ -404,8 +402,12 @@ files:
             {{- end }}
           {{- end }}
           componentSpec:
+            {{- if .componentSpec.serviceAccountName }}
             serviceAccountName: {{ .componentSpec.serviceAccountName }}
+            {{- end }}
+            {{- if .componentSpec.terminationGracePeriodSeconds }}
             terminationGracePeriodSeconds: {{ .componentSpec.terminationGracePeriodSeconds }}
+            {{- end }}
             {{- if .componentSpec.hpaSpec }}
             hpaSpec:
               minReplicas: {{ .componentSpec.hpaSpec.minReplicas }}
@@ -1451,7 +1453,13 @@ files:
             {{- end }}
           {{- end }}
         {{- end }}
-      {{- end }}      
+      {{- end }}
+      {{- define "common.helm-labels" -}}
+      app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+      app.kubernetes.io/revision: {{ .Release.Revision | quote }}
+      app.dognauts/subjectArea: {{ .Values.subjectArea }}
+      {{- end -}}
 
   - path: templates/seldon-deployment.yaml
     template: false
@@ -1459,22 +1467,26 @@ files:
       apiVersion: {{ .Values.apiVersion }}
       kind: SeldonDeployment
       metadata:
-        name: {{ .Values.deploymentName }}
+        name: {{ .Release.Name }}-inference
         namespace: {{ .Values.namespace }}
-        {{- if .Values.metadata.labels }}
         labels:
+          {{- include "common.helm-labels" . | nindent 4 }}
+        {{- if .Values.metadata }}
+        {{- if .Values.metadata.labels }}
         {{- range $k, $v := .Values.metadata.labels }}
           {{ $k }}: {{ $v }}
         {{- end }}
         {{- end }}
+        {{- end }}
+        {{- if .Values.metadata }}
         {{- if .Values.metadata.annotations }}
         annotations:
         {{- range $k, $v := .Values.metadata.annotations }}
           {{ $k }}: {{ $v }}
         {{- end }}
         {{- end }}
+        {{- end }}
       spec:
-        name: {{ .Values.deploymentName }}
         {{- if .Values.protocol }}
         protocol: {{ .Values.protocol }}
         {{- end }}
@@ -1831,10 +1843,6 @@ valuesSchema:
     type: string
     description: Short description of the chart's purpose
     required: true
-  deploymentName:
-    type: string
-    description: Name of the SeldonDeployment resource
-    required: true
   namespace:
     type: string
     description: Kubernetes namespace to deploy the resources in
@@ -1843,7 +1851,7 @@ valuesSchema:
     type: string
     description: A tag to classify a subject area of the target chart.
     required: true
-    default: batch-model-inference
+    default: online-model-inference
   sourceMetafileName:
     type: string
     description: Source metafile name
