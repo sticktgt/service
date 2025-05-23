@@ -1,76 +1,55 @@
 {
-  "apiVersion": "machinelearning.seldon.io/v1alpha2",
+  "environment": "TEST",
+  "apiVersion": "machinelearning.seldon.io/v1",
   "chart": {
     "name": "test-model",
     "version": "0.1.0",
     "description": "Test Seldon deployment chart"
   },
-  "deploymentName": "jokes-openinference",
-  "namespace": "app-llm",
-  "protocol": "v2",
-  "metadata": {
-    "labels": {
-      "components": "seldon-core",
-      "entity": "online-model"
-    },
-    "annotations": {}
-  },
+  "deploymentName": "seldon-model",
+  "namespace": "default",
   "predictors": [
     {
-      "name": "jokes1test",
-      "replicas": 1,
+      "name": "example",
       "componentSpec": {
-        "serviceAccountName": "default-editor",
-        "terminationGracePeriodSeconds": 0,
         "containers": [
           {
-            "name": "jokes-openinference",
-            "env": [
-              {
-                "name": "GUNICORN_WORKERS",
-                "value": "2"
-              },
-              {
-                "name": "GUNICORN_THREADS",
-                "value": "2"
-              }
-            ],
-            "liveness": {
-              "path": "/health/ping",
-              "port": "http",
-              "scheme": "HTTP",
-              "initialDelaySeconds": 80,
-              "periodSeconds": 5,
-              "failureThreshold": 200,
-              "successThreshold": 1
-            },
-            "readiness": {
-              "path": "/health/ping",
-              "port": "http",
-              "scheme": "HTTP",
-              "initialDelaySeconds": 80,
-              "periodSeconds": 5,
-              "failureThreshold": 200,
-              "successThreshold": 1
-            },
+            "name": "classifier",
+            "image": "seldonio/mock_classifier:1.16.0-dev",
+            "imagePullPolicy": "IfNotPresent",
             "resources": {
-              "limits": {
-                "cpu": "2.0",
-                "memory": "2.0Gi"
-              },
               "requests": {
-                "cpu": "2.0",
-                "memory": "2.0Gi"
+                "cpu": "0.5"
               }
             }
           }
-        ]
+        ],
+        "kedaSpec": {
+          "pollingInterval": 15,
+          "minReplicaCount": 1,
+          "maxReplicaCount": 5,
+          "triggers": [
+            {
+              "type": "prometheus",
+              "metadata": {
+                "serverAddress": "http://seldon-monitoring-prometheus.seldon-monitoring.svc.cluster.local:9090",
+                "metricName": "access_frequency",
+                "threshold": "10",
+                "query": "rate(seldon_api_executor_client_requests_seconds_count{model_name=\"classifier\"}[1m])"
+              }
+            }
+          ]
+        },
+        "pdbSpec": {
+          "minAvailable": "90%"
+        }
       },
       "graph": {
-        "name": "jokes-openinference",
-        "implementation": "MLFLOW_SERVER",
-        "modelUri": "s3://app-llm/4/18e6254104ab476eb019bebd0ff2b65d/artifacts/model",
-        "envSecretRefName": "seldon-secret",
+        "name": "classifier",
+        "type": "MODEL",
+        "endpoint": {
+          "type": "REST"
+        },
         "children": []
       }
     }

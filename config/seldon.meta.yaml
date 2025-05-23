@@ -438,6 +438,15 @@ files:
               triggers:
                 {{- range .componentSpec.kedaSpec.triggers }}
                 - type: {{ .type }}
+                  {{- if .name }}
+                  name: {{ .name }}
+                  {{- end }}
+                  {{- if .useCachedMetrics }}
+                  useCachedMetrics: {{ .useCachedMetrics }}
+                  {{- end }}
+                  {{- if .metricType }}
+                  metricType: {{ .metricType }}
+                  {{- end }}
                   {{- if .metadata }}
                   metadata:
                     {{- range $k, $v := .metadata }}
@@ -447,6 +456,9 @@ files:
                   {{- if .authenticationRef }}
                   authenticationRef:
                     name: {{ .authenticationRef.name }}
+                    {{- if .authenticationRef.kind }}
+                    kind: {{ .authenticationRef.kind }}
+                    {{- end }}
                   {{- end }}
                 {{- end }}
               {{- end }}
@@ -457,7 +469,67 @@ files:
                 {{- end }}
                 {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig }}
                 horizontalPodAutoscalerConfig:
-                  {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig }}
+                  {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.name }}
+                  name: {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.name }}
+                  {{- end }}
+                  {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior }}
+                  behavior:
+                    {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp }}
+                    scaleUp:
+                      {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.stabilizationWindowSeconds }}
+                      stabilizationWindowSeconds: {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.stabilizationWindowSeconds }}
+                      {{- end }}
+                      {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.selectPolicy }}
+                      selectPolicy: {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.selectPolicy }}
+                      {{- end }}
+                      {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.tolerance }}
+                      tolerance: {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.tolerance }}
+                      {{- end }}
+                      {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.policies }}
+                      policies:
+                        {{- range .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.policies }}
+                        - type: {{ .type }}
+                          value: {{ .value }}
+                          periodSeconds: {{ .periodSeconds }}
+                        {{- end }}
+                      {{- end }}
+                    {{- end }}
+                    {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown }}
+                    scaleDown:
+                      {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.stabilizationWindowSeconds }}
+                      stabilizationWindowSeconds: {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.stabilizationWindowSeconds }}
+                      {{- end }}
+                      {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.selectPolicy }}
+                      selectPolicy: {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.selectPolicy }}
+                      {{- end }}
+                      {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.tolerance }}
+                      tolerance: {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.tolerance }}
+                      {{- end }}
+                      {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.policies }}
+                      policies:
+                        {{- range .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.policies }}
+                        - type: {{ .type }}
+                          value: {{ .value }}
+                          periodSeconds: {{ .periodSeconds }}
+                        {{- end }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
+                {{- if .componentSpec.kedaSpec.advanced.scalingModifiers }}
+                scalingModifiers:
+                  {{- if .componentSpec.kedaSpec.advanced.scalingModifiers.formula }}
+                  formula: {{ .componentSpec.kedaSpec.advanced.scalingModifiers.formula }}
+                  {{- end }}
+                  {{- if .componentSpec.kedaSpec.advanced.scalingModifiers.target }}
+                  target: {{ .componentSpec.kedaSpec.advanced.scalingModifiers.target }}
+                  {{- end }}
+                  {{- if .componentSpec.kedaSpec.advanced.scalingModifiers.activationTarget }}
+                  activationTarget: {{ .componentSpec.kedaSpec.advanced.scalingModifiers.activationTarget }}
+                  {{- end }}
+                  {{- if .componentSpec.kedaSpec.advanced.scalingModifiers.metricType }}
+                  metricType: {{ .componentSpec.kedaSpec.advanced.scalingModifiers.metricType }}
+                  {{- end }}
                 {{- end }}
               {{- end }}
             {{- end }}
@@ -1587,6 +1659,15 @@ files:
                     triggers:
                       {{- range .componentSpec.kedaSpec.triggers }}
                       - type: {{ .type }}
+                        {{- if .name }}
+                        name: {{ .name }}
+                        {{- end }}
+                        {{- if .useCachedMetrics }}
+                        useCachedMetrics: {{ .useCachedMetrics }}
+                        {{- end }}
+                        {{- if .metricType }}
+                        metricType: {{ .metricType }}
+                        {{- end }}
                         {{- if .metadata }}
                         metadata:
                           {{- range $k, $v := .metadata }}
@@ -1596,6 +1677,9 @@ files:
                         {{- if .authenticationRef }}
                         authenticationRef:
                           name: {{ .authenticationRef.name }}
+                          {{- if .authenticationRef.kind }}
+                          kind: {{ .authenticationRef.kind }}
+                          {{- end }}
                         {{- end }}
                       {{- end }}
                     {{- end }}
@@ -1606,7 +1690,67 @@ files:
                       {{- end }}
                       {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig }}
                       horizontalPodAutoscalerConfig:
-                        {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig }}
+                        {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.name }}
+                        name: {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.name }}
+                        {{- end }}
+                        {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior }}
+                        behavior:
+                          {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp }}
+                          scaleUp:
+                            {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.stabilizationWindowSeconds }}
+                            stabilizationWindowSeconds: {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.stabilizationWindowSeconds }}
+                            {{- end }}
+                            {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.selectPolicy }}
+                            selectPolicy: {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.selectPolicy }}
+                            {{- end }}
+                            {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.tolerance }}
+                            tolerance: {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.tolerance }}
+                            {{- end }}
+                            {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.policies }}
+                            policies:
+                              {{- range .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.policies }}
+                              - type: {{ .type }}
+                                value: {{ .value }}
+                                periodSeconds: {{ .periodSeconds }}
+                              {{- end }}
+                            {{- end }}
+                          {{- end }}
+                          {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown }}
+                          scaleDown:
+                            {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.stabilizationWindowSeconds }}
+                            stabilizationWindowSeconds: {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.stabilizationWindowSeconds }}
+                            {{- end }}
+                            {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.selectPolicy }}
+                            selectPolicy: {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.selectPolicy }}
+                            {{- end }}
+                            {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.tolerance }}
+                            tolerance: {{ .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.tolerance }}
+                            {{- end }}
+                            {{- if .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.policies }}
+                            policies:
+                              {{- range .componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.policies }}
+                              - type: {{ .type }}
+                                value: {{ .value }}
+                                periodSeconds: {{ .periodSeconds }}
+                              {{- end }}
+                            {{- end }}
+                          {{- end }}
+                        {{- end }}
+                      {{- end }}
+                      {{- if .componentSpec.kedaSpec.advanced.scalingModifiers }}
+                      scalingModifiers:
+                        {{- if .componentSpec.kedaSpec.advanced.scalingModifiers.formula }}
+                        formula: {{ .componentSpec.kedaSpec.advanced.scalingModifiers.formula }}
+                        {{- end }}
+                        {{- if .componentSpec.kedaSpec.advanced.scalingModifiers.target }}
+                        target: {{ .componentSpec.kedaSpec.advanced.scalingModifiers.target }}
+                        {{- end }}
+                        {{- if .componentSpec.kedaSpec.advanced.scalingModifiers.activationTarget }}
+                        activationTarget: {{ .componentSpec.kedaSpec.advanced.scalingModifiers.activationTarget }}
+                        {{- end }}
+                        {{- if .componentSpec.kedaSpec.advanced.scalingModifiers.metricType }}
+                        metricType: {{ .componentSpec.kedaSpec.advanced.scalingModifiers.metricType }}
+                        {{- end }}
                       {{- end }}
                     {{- end }}
                   {{- end }}
@@ -2267,13 +2411,29 @@ valuesSchema:
     type: string
     description: Type of KEDA trigger (e.g. cpu, kafka, prometheus)
     required: true
+  predictors.componentSpec.kedaSpec.triggers.name:
+    type: string
+    description: Optional name of the KEDA trigger
+    required: false
+  predictors.componentSpec.kedaSpec.triggers.metricType:
+    type: string
+    description: Metric type reported by this trigger (e.g., External, Resource)
+    required: false
+  predictors.componentSpec.kedaSpec.triggers.useCachedMetrics:
+    type: boolean
+    description: Whether KEDA should cache the trigger's metrics
+    required: false
   predictors.componentSpec.kedaSpec.triggers.metadata:
     type: map
     description: Key-value map with trigger-specific metadata
     required: false
   predictors.componentSpec.kedaSpec.triggers.authenticationRef.name:
     type: string
-    description: Name of the KEDA authentication reference to use
+    description: Name of the authentication reference used by the trigger
+    required: false
+  predictors.componentSpec.kedaSpec.triggers.authenticationRef.kind:
+    type: string
+    description: Optional kind for the authentication reference (e.g., Secret, TriggerAuthentication)
     required: false
   predictors.componentSpec.kedaSpec.advanced.restoreToOriginalReplicaCount:
     type: boolean
@@ -2282,6 +2442,82 @@ valuesSchema:
   predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig:
     type: map
     description: HPA behavior configuration as a key-value map
+    required: false
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.name:
+    type: string
+    description: Name of the generated HPA resource
+    required: false
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.stabilizationWindowSeconds:
+    type: integer
+    description: Time (in seconds) to wait before scaling up again
+    required: false
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.selectPolicy:
+    type: string
+    description: Policy to select scaling behavior (e.g., Max, Min)
+    required: false
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.tolerance:
+    type: integer
+    description: Minimum change required to trigger scale-up
+    required: false
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.policies:
+    type: list
+    description: List of scale-up policies with type, value, and period
+    required: false
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.policies.type:
+    type: string
+    description: Type of policy (e.g., Percent, Pods)
+    required: true
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.policies.value:
+    type: integer
+    description: Value used by the policy
+    required: true
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.policies.periodSeconds:
+    type: integer
+    description: Time period in seconds for this policy
+    required: true
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.stabilizationWindowSeconds:
+    type: integer
+    description: Time (in seconds) to wait before scaling down again
+    required: false
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.selectPolicy:
+    type: string
+    description: Policy to select scaling down behavior
+    required: false
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.tolerance:
+    type: integer
+    description: Minimum change required to trigger scale-down
+    required: false
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.policies:
+    type: list
+    description: List of scale-down policies with type, value, and period
+    required: false
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.policies.type:
+    type: string
+    required: true
+    description: Type of the scale-down policy
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.policies.value:
+    type: integer
+    required: true
+    description: Threshold value for the policy
+  predictors.componentSpec.kedaSpec.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.policies.periodSeconds:
+    type: integer
+    required: true
+    description: Period in seconds for evaluating the scale-down policy
+  predictors.componentSpec.kedaSpec.advanced.ScalingModifiers.formula:
+    type: string
+    description: Formula for adjusting scaling metrics (e.g., "metric / 100")
+    required: false
+  predictors.componentSpec.kedaSpec.advanced.ScalingModifiers.target:
+    type: integer
+    description: Target value used in the scaling formula
+    required: false
+  predictors.componentSpec.kedaSpec.advanced.ScalingModifiers.activationTarget:
+    type: integer
+    description: Threshold to activate scaling
+    required: false
+  predictors.componentSpec.kedaSpec.advanced.ScalingModifiers.metricType:
+    type: string
+    description: Type of metric (e.g., Value, AverageValue)
     required: false
   predictors.componentSpec.pdbSpec.minAvailable:
     type: string
@@ -2325,7 +2561,7 @@ valuesSchema:
     required: false
   predictors.explainer.type:
     type: string
-    description: The type of explainer used to interpret model predictions. Allowed values- anchor_tabular, anchor_text, anchor_image, kernel_shap, tree_shap, integrated_gradients, contrastive, cfproto, counterfactual, alibi, custom
+    description: The type of explainer used to interpret model predictions. Allowed values- AnchorTabular, AnchorImages, AnchorText, Counterfactuals, Contrastive, KernelShap, IntegratedGradients, ALE, TreeShap
     required: false
   predictors.explainer.modelUri:
     type: string
