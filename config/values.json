@@ -39,6 +39,69 @@
       "componentSpec": {
         "serviceAccountName": "explainer-sa",
         "terminationGracePeriodSeconds": 20,
+        "hpaSpec": {
+          "minReplicas": 1,
+          "maxReplicas": 3,
+          "metricsv2": [
+            {
+              "type": "Resource",
+              "resource": {
+                "name": "cpu",
+                "target": {
+                  "type": "Utilization",
+                  "averageUtilization": 75,
+                  "averageValue": "500m",
+                  "value": "600m"
+                }
+              }
+            }
+          ],
+          "metrics": [
+            {
+              "type": "Object",
+              "object": {
+                "target": {
+                  "apiVersion": "v1",
+                  "kind": "Service",
+                  "name": "my-service"
+                },
+                "metricName": "requests-per-second",
+                "targetValue": "100",
+                "selector": {
+                  "matchLabels": {
+                    "app": "my-app"
+                  },
+                  "matchExpressions": [
+                    {
+                      "key": "environment",
+                      "operator": "In",
+                      "values": ["prod", "staging"]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "kedaSpec": {
+          "pollingInterval": 15,
+          "minReplicaCount": 1,
+          "maxReplicaCount": 5,
+          "triggers": [
+            {
+              "type": "prometheus",
+              "metadata": {
+                "serverAddress": "http://seldon-monitoring-prometheus.seldon-monitoring.svc.cluster.local:9090",
+                "metricName": "access_frequency",
+                "threshold": "10",
+                "query": "rate(seldon_api_executor_client_requests_seconds_count{model_name=\"classifier\"}[1m])"
+              }
+            }
+          ]
+        },
+        "pdbSpec": {
+          "minAvailable": "90%"
+        },
         "containers": [
           {
             "name": "classifier",

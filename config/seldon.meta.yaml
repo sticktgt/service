@@ -410,17 +410,260 @@ files:
             {{- end }}
             {{- if .componentSpec.hpaSpec }}
             hpaSpec:
+              {{- if .componentSpec.hpaSpec.minReplicas }}
               minReplicas: {{ .componentSpec.hpaSpec.minReplicas }}
+              {{- end }}
+              {{- if .componentSpec.hpaSpec.maxReplicas }}
               maxReplicas: {{ .componentSpec.hpaSpec.maxReplicas }}
+              {{- end }}
+              {{- if .componentSpec.hpaSpec.metricsv2 }}
               metricsv2:
                 {{- range .componentSpec.hpaSpec.metricsv2 }}
                 - type: {{ .type }}
+                  {{- if .resource }}
                   resource:
                     name: {{ .resource.name }}
                     target:
                       type: {{ .resource.target.type }}
+                      {{- if .resource.target.value }}
+                      value: {{ .resource.target.value }}
+                      {{- end }}
+                      {{- if .resource.target.averageValue }}
+                      averageValue: {{ .resource.target.averageValue }}
+                      {{- end }}
+                      {{- if .resource.target.averageUtilization }}
                       averageUtilization: {{ .resource.target.averageUtilization }}
+                      {{- end }}
+                  {{- end }}
+                  {{- if .pods }}
+                  pods:
+                    metric:
+                      name: {{ .pods.metric.name }}
+                      {{- if .pods.metric.selector }}
+                      selector:
+                        {{- if .pods.metric.selector.matchLabels }}
+                        matchLabels:
+                          {{- range $k, $v := .pods.metric.selector.matchLabels }}
+                          {{ $k }}: {{ $v }}
+                          {{- end }}
+                        {{- end }}
+                        {{- if .pods.metric.selector.matchExpressions }}
+                        matchExpressions:
+                          {{- range .pods.metric.selector.matchExpressions }}
+                          - key: {{ .key }}
+                            operator: {{ .operator }}
+                            {{- if .values }}
+                            values:
+                              {{- range .values }}
+                              - {{ . }}
+                              {{- end }}
+                            {{- end }}
+                          {{- end }}
+                        {{- end }}
+                      {{- end }}
+                    target:
+                      type: {{ .pods.target.type }}
+                      {{- if .pods.target.averageValue }}
+                      averageValue: {{ .pods.target.averageValue }}
+                      {{- end }}
+                      {{- if .pods.target.value }}
+                      value: {{ .pods.target.value }}
+                      {{- end }}
+                      {{- if .pods.target.averageUtilization }}
+                      averageUtilization: {{ .pods.target.averageUtilization }}
+                      {{- end }}
+                  {{- end }}
+                  {{- if .object }}
+                  object:
+                    describedObject:
+                      apiVersion: {{ .object.describedObject.apiVersion }}
+                      kind: {{ .object.describedObject.kind }}
+                      name: {{ .object.describedObject.name }}
+                    metric:
+                      name: {{ .object.metric.name }}
+                      {{- if .object.metric.selector }}
+                      selector:
+                        {{- if .object.metric.selector.matchLabels }}
+                        matchLabels:
+                          {{- range $k, $v := .object.metric.selector.matchLabels }}
+                          {{ $k }}: {{ $v }}
+                          {{- end }}
+                        {{- end }}
+                        {{- if .object.metric.selector.matchExpressions }}
+                        matchExpressions:
+                          {{- range .object.metric.selector.matchExpressions }}
+                          - key: {{ .key }}
+                            operator: {{ .operator }}
+                            {{- if .values }}
+                            values:
+                              {{- range .values }}
+                              - {{ . }}
+                              {{- end }}
+                            {{- end }}
+                          {{- end }}
+                        {{- end }}
+                      {{- end }}
+                    target:
+                      type: {{ .object.target.type }}
+                      {{- if .object.target.value }}
+                      value: {{ .object.target.value }}
+                      {{- end }}
+                      {{- if .object.target.averageValue }}
+                      averageValue: {{ .object.target.averageValue }}
+                      {{- end }}
+                      {{- if .object.target.averageUtilization }}
+                      averageUtilization: {{ .object.target.averageUtilization }}
+                      {{- end }}
+                  {{- end }}
+                  {{- if .external }}
+                  external:
+                    metric:
+                      name: {{ .external.metric.name }}
+                      {{- if .external.metric.selector }}
+                      selector:
+                        {{- if .external.metric.selector.matchLabels }}
+                        matchLabels:
+                          {{- range $k, $v := .external.metric.selector.matchLabels }}
+                          {{ $k }}: {{ $v }}
+                          {{- end }}
+                        {{- end }}
+                        {{- if .external.metric.selector.matchExpressions }}
+                        matchExpressions:
+                          {{- range .external.metric.selector.matchExpressions }}
+                          - key: {{ .key }}
+                            operator: {{ .operator }}
+                            {{- if .values }}
+                            values:
+                              {{- range .values }}
+                              - {{ . }}
+                              {{- end }}
+                            {{- end }}
+                          {{- end }}
+                        {{- end }}
+                      {{- end }}
+                    target:
+                      type: {{ .external.target.type }}
+                      {{- if .external.target.value }}
+                      value: {{ .external.target.value }}
+                      {{- end }}
+                      {{- if .external.target.averageValue }}
+                      averageValue: {{ .external.target.averageValue }}
+                      {{- end }}
+                      {{- if .external.target.averageUtilization }}
+                      averageUtilization: {{ .external.target.averageUtilization }}
+                      {{- end }}
+                  {{- end }}
                 {{- end }}
+              {{- end }}
+              {{- if .componentSpec.hpaSpec.metrics }}
+              metrics:
+                {{- range .componentSpec.hpaSpec.metrics }}
+                - type: {{ .type }}
+                  {{- if .resource }}
+                  resource:
+                    name: {{ .resource.name }}
+                    targetAverageUtilization: {{ .resource.targetAverageUtilization }}
+                    {{- if .resource.targetAverageValue }}
+                    targetAverageValue: {{ .resource.targetAverageValue }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .pods }}
+                  pods:
+                    metricName: {{ .pods.metricName }}
+                    targetAverageValue: {{ .pods.targetAverageValue }}
+                    {{- if .pods.selector }}
+                    selector:
+                      {{- if .pods.selector.matchLabels }}
+                      matchLabels:
+                        {{- range $k, $v := .pods.selector.matchLabels }}
+                        {{ $k }}: {{ $v }}
+                        {{- end }}
+                      {{- end }}
+                      {{- if .pods.selector.matchExpressions }}
+                      matchExpressions:
+                        {{- range .pods.selector.matchExpressions }}
+                        - key: {{ .key }}
+                          operator: {{ .operator }}
+                          {{- if .values }}
+                          values:
+                            {{- range .values }}
+                            - {{ . }}
+                            {{- end }}
+                          {{- end }}
+                        {{- end }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .object }}
+                  object:
+                    target:
+                      apiVersion: {{ .object.target.apiVersion }}
+                      kind: {{ .object.target.kind }}
+                      name: {{ .object.target.name }}
+                    metricName: {{ .object.metricName }}
+                    {{- if .object.targetValue }}
+                    targetValue: {{ .object.targetValue }}
+                    {{- end }}
+                    {{- if .object.averageValue }}
+                    averageValue: {{ .object.averageValue }}
+                    {{- end }}
+                    {{- if .object.selector }}
+                    selector:
+                      {{- if .object.selector.matchLabels }}
+                      matchLabels:
+                        {{- range $k, $v := .object.selector.matchLabels }}
+                        {{ $k }}: {{ $v }}
+                        {{- end }}
+                      {{- end }}
+                      {{- if .object.selector.matchExpressions }}
+                      matchExpressions:
+                        {{- range .object.selector.matchExpressions }}
+                        - key: {{ .key }}
+                          operator: {{ .operator }}
+                          {{- if .values }}
+                          values:
+                            {{- range .values }}
+                            - {{ . }}
+                            {{- end }}
+                          {{- end }}
+                        {{- end }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .external }}
+                  external:
+                    metricName: {{ .external.metricName }}
+                    {{- if .external.metricSelector }}
+                    metricSelector:
+                      {{- if .external.metricSelector.matchLabels }}
+                      matchLabels:
+                        {{- range $k, $v := .external.metricSelector.matchLabels }}
+                        {{ $k }}: {{ $v }}
+                        {{- end }}
+                      {{- end }}
+                      {{- if .external.metricSelector.matchExpressions }}
+                      matchExpressions:
+                        {{- range .external.metricSelector.matchExpressions }}
+                        - key: {{ .key }}
+                          operator: {{ .operator }}
+                          {{- if .values }}
+                          values:
+                            {{- range .values }}
+                            - {{ . }}
+                            {{- end }}
+                          {{- end }}
+                        {{- end }}
+                      {{- end }}
+                    {{- end }}
+                    {{- if .external.targetValue }}
+                    targetValue: {{ .external.targetValue }}
+                    {{- end }}
+                    {{- if .external.targetAverageValue }}
+                    targetAverageValue: {{ .external.targetAverageValue }}
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
             {{- end }}
             {{- if .componentSpec.kedaSpec }}
             kedaSpec:
@@ -1632,18 +1875,261 @@ files:
               {{- include "seldon.graph.node" .graph | indent 8 }}
             {{- if .componentSpec }}
             componentSpecs:
-              {{- if .hpaSpec }}
-              hpaSpec:
-                minReplicas: {{ .hpaSpec.minReplicas }}
-                maxReplicas: {{ .hpaSpec.maxReplicas }}
-                metricsv2:
-                  {{- range .hpaSpec.metricsv2 }}
-                  - type: {{ .type }}
-                    resource:
-                      name: {{ .resource.name }}
-                      target:
-                        type: {{ .resource.target.type }}
-                        averageUtilization: {{ .resource.target.averageUtilization }}
+              {{- if .componentSpec.hpaSpec }}
+              - hpaSpec:
+                  {{- if .componentSpec.hpaSpec.minReplicas }}
+                  minReplicas: {{ .componentSpec.hpaSpec.minReplicas }}
+                  {{- end }}
+                  {{- if .componentSpec.hpaSpec.maxReplicas }}
+                  maxReplicas: {{ .componentSpec.hpaSpec.maxReplicas }}
+                  {{- end }}
+                  {{- if .componentSpec.hpaSpec.metricsv2 }}
+                  metricsv2:
+                    {{- range .componentSpec.hpaSpec.metricsv2 }}
+                    - type: {{ .type }}
+                      {{- if .resource }}
+                      resource:
+                        name: {{ .resource.name }}
+                        target:
+                          type: {{ .resource.target.type }}
+                          {{- if .resource.target.value }}
+                          value: {{ .resource.target.value }}
+                          {{- end }}
+                          {{- if .resource.target.averageValue }}
+                          averageValue: {{ .resource.target.averageValue }}
+                          {{- end }}
+                          {{- if .resource.target.averageUtilization }}
+                          averageUtilization: {{ .resource.target.averageUtilization }}
+                          {{- end }}
+                      {{- end }}
+                      {{- if .pods }}
+                      pods:
+                        metric:
+                          name: {{ .pods.metric.name }}
+                          {{- if .pods.metric.selector }}
+                          selector:
+                            {{- if .pods.metric.selector.matchLabels }}
+                            matchLabels:
+                              {{- range $k, $v := .pods.metric.selector.matchLabels }}
+                              {{ $k }}: {{ $v }}
+                              {{- end }}
+                            {{- end }}
+                            {{- if .pods.metric.selector.matchExpressions }}
+                            matchExpressions:
+                              {{- range .pods.metric.selector.matchExpressions }}
+                              - key: {{ .key }}
+                                operator: {{ .operator }}
+                                {{- if .values }}
+                                values:
+                                  {{- range .values }}
+                                  - {{ . }}
+                                  {{- end }}
+                                {{- end }}
+                              {{- end }}
+                            {{- end }}
+                          {{- end }}
+                        target:
+                          type: {{ .pods.target.type }}
+                          {{- if .pods.target.averageValue }}
+                          averageValue: {{ .pods.target.averageValue }}
+                          {{- end }}
+                          {{- if .pods.target.value }}
+                          value: {{ .pods.target.value }}
+                          {{- end }}
+                          {{- if .pods.target.averageUtilization }}
+                          averageUtilization: {{ .pods.target.averageUtilization }}
+                          {{- end }}
+                      {{- end }}
+                      {{- if .object }}
+                      object:
+                        describedObject:
+                          apiVersion: {{ .object.describedObject.apiVersion }}
+                          kind: {{ .object.describedObject.kind }}
+                          name: {{ .object.describedObject.name }}
+                        metric:
+                          name: {{ .object.metric.name }}
+                          {{- if .object.metric.selector }}
+                          selector:
+                            {{- if .object.metric.selector.matchLabels }}
+                            matchLabels:
+                              {{- range $k, $v := .object.metric.selector.matchLabels }}
+                              {{ $k }}: {{ $v }}
+                              {{- end }}
+                            {{- end }}
+                            {{- if .object.metric.selector.matchExpressions }}
+                            matchExpressions:
+                              {{- range .object.metric.selector.matchExpressions }}
+                              - key: {{ .key }}
+                                operator: {{ .operator }}
+                                {{- if .values }}
+                                values:
+                                  {{- range .values }}
+                                  - {{ . }}
+                                  {{- end }}
+                                {{- end }}
+                              {{- end }}
+                            {{- end }}
+                          {{- end }}
+                        target:
+                          type: {{ .object.target.type }}
+                          {{- if .object.target.value }}
+                          value: {{ .object.target.value }}
+                          {{- end }}
+                          {{- if .object.target.averageValue }}
+                          averageValue: {{ .object.target.averageValue }}
+                          {{- end }}
+                          {{- if .object.target.averageUtilization }}
+                          averageUtilization: {{ .object.target.averageUtilization }}
+                          {{- end }}
+                      {{- end }}
+                      {{- if .external }}
+                      external:
+                        metric:
+                          name: {{ .external.metric.name }}
+                          {{- if .external.metric.selector }}
+                          selector:
+                            {{- if .external.metric.selector.matchLabels }}
+                            matchLabels:
+                              {{- range $k, $v := .external.metric.selector.matchLabels }}
+                              {{ $k }}: {{ $v }}
+                              {{- end }}
+                            {{- end }}
+                            {{- if .external.metric.selector.matchExpressions }}
+                            matchExpressions:
+                              {{- range .external.metric.selector.matchExpressions }}
+                              - key: {{ .key }}
+                                operator: {{ .operator }}
+                                {{- if .values }}
+                                values:
+                                  {{- range .values }}
+                                  - {{ . }}
+                                  {{- end }}
+                                {{- end }}
+                              {{- end }}
+                            {{- end }}
+                          {{- end }}
+                        target:
+                          type: {{ .external.target.type }}
+                          {{- if .external.target.value }}
+                          value: {{ .external.target.value }}
+                          {{- end }}
+                          {{- if .external.target.averageValue }}
+                          averageValue: {{ .external.target.averageValue }}
+                          {{- end }}
+                          {{- if .external.target.averageUtilization }}
+                          averageUtilization: {{ .external.target.averageUtilization }}
+                          {{- end }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .componentSpec.hpaSpec.metrics }}
+                  metrics:
+                    {{- range .componentSpec.hpaSpec.metrics }}
+                    - type: {{ .type }}
+                      {{- if .resource }}
+                      resource:
+                        name: {{ .resource.name }}
+                        targetAverageUtilization: {{ .resource.targetAverageUtilization }}
+                        {{- if .resource.targetAverageValue }}
+                        targetAverageValue: {{ .resource.targetAverageValue }}
+                        {{- end }}
+                      {{- end }}
+                      {{- if .pods }}
+                      pods:
+                        metricName: {{ .pods.metricName }}
+                        targetAverageValue: {{ .pods.targetAverageValue }}
+                        {{- if .pods.selector }}
+                        selector:
+                          {{- if .pods.selector.matchLabels }}
+                          matchLabels:
+                            {{- range $k, $v := .pods.selector.matchLabels }}
+                            {{ $k }}: {{ $v }}
+                            {{- end }}
+                          {{- end }}
+                          {{- if .pods.selector.matchExpressions }}
+                          matchExpressions:
+                            {{- range .pods.selector.matchExpressions }}
+                            - key: {{ .key }}
+                              operator: {{ .operator }}
+                              {{- if .values }}
+                              values:
+                                {{- range .values }}
+                                - {{ . }}
+                                {{- end }}
+                              {{- end }}
+                            {{- end }}
+                          {{- end }}
+                        {{- end }}
+                      {{- end }}
+                      {{- if .object }}
+                      object:
+                        target:
+                          apiVersion: {{ .object.target.apiVersion }}
+                          kind: {{ .object.target.kind }}
+                          name: {{ .object.target.name }}
+                        metricName: {{ .object.metricName }}
+                        {{- if .object.targetValue }}
+                        targetValue: {{ .object.targetValue }}
+                        {{- end }}
+                        {{- if .object.averageValue }}
+                        averageValue: {{ .object.averageValue }}
+                        {{- end }}
+                        {{- if .object.selector }}
+                        selector:
+                          {{- if .object.selector.matchLabels }}
+                          matchLabels:
+                            {{- range $k, $v := .object.selector.matchLabels }}
+                            {{ $k }}: {{ $v }}
+                            {{- end }}
+                          {{- end }}
+                          {{- if .object.selector.matchExpressions }}
+                          matchExpressions:
+                            {{- range .object.selector.matchExpressions }}
+                            - key: {{ .key }}
+                              operator: {{ .operator }}
+                              {{- if .values }}
+                              values:
+                                {{- range .values }}
+                                - {{ . }}
+                                {{- end }}
+                              {{- end }}
+                            {{- end }}
+                          {{- end }}
+                        {{- end }}
+                      {{- end }}
+                      {{- if .external }}
+                      external:
+                        metricName: {{ .external.metricName }}
+                        {{- if .external.metricSelector }}
+                        metricSelector:
+                          {{- if .external.metricSelector.matchLabels }}
+                          matchLabels:
+                            {{- range $k, $v := .external.metricSelector.matchLabels }}
+                            {{ $k }}: {{ $v }}
+                            {{- end }}
+                          {{- end }}
+                          {{- if .external.metricSelector.matchExpressions }}
+                          matchExpressions:
+                            {{- range .external.metricSelector.matchExpressions }}
+                            - key: {{ .key }}
+                              operator: {{ .operator }}
+                              {{- if .values }}
+                              values:
+                                {{- range .values }}
+                                - {{ . }}
+                                {{- end }}
+                              {{- end }}
+                            {{- end }}
+                          {{- end }}
+                        {{- end }}
+                        {{- if .external.targetValue }}
+                        targetValue: {{ .external.targetValue }}
+                        {{- end }}
+                        {{- if .external.targetAverageValue }}
+                        targetAverageValue: {{ .external.targetAverageValue }}
+                        {{- end }}
+                      {{- end }}
+                    {{- end }}
                   {{- end }}
               {{- end }}
               - spec:
@@ -2369,31 +2855,279 @@ valuesSchema:
     required: false
   predictors.componentSpec.hpaSpec.minReplicas:
     type: integer
-    description: Minimum number of replicas allowed
+    description: Minimum number of replicas that the HPA can scale down to.
     required: true
   predictors.componentSpec.hpaSpec.maxReplicas:
     type: integer
-    description: Maximum number of replicas allowed
+    description: Maximum number of replicas that the HPA can scale up to.
     required: true
-  predictors.componentSpec.hpaSpec.metricsV2:
+  predictors.componentSpec.hpaSpec.metricsv2:
     type: list
-    description: List of custom metrics for autoscaling
+    description: List of HPA v2 metrics to use for scaling decisions.
     required: false
-  predictors.componentSpec.hpaSpec.metricsV2.type:
+  predictors.componentSpec.hpaSpec.metricsv2.type:
     type: string
-    description: Type of metric (e.g., Resource)
+    description: Type of metric (e.g., Resource, Pods, Object, External)
     required: true
-  predictors.componentSpec.hpaSpec.metricsV2.resource.name:
+  predictors.componentSpec.hpaSpec.metricsv2.resource.name:
     type: string
-    description: Resource name for autoscaling (e.g., cpu)
+    description: Name of the resource (e.g., cpu, memory).
     required: true
-  predictors.componentSpec.hpaSpec.metricsV2.resource.target.type:
+  predictors.componentSpec.hpaSpec.metricsv2.resource.target.type:
     type: string
-    description: Type of target (e.g., Utilization)
+    description: Type of the target metric (Utilization, Value, AverageValue).
     required: true
-  predictors.componentSpec.hpaSpec.metricsV2.resource.target.averageUtilization:
+  predictors.componentSpec.hpaSpec.metricsv2.resource.target.value:
+    type: string
+    description: Target value of the metric (e.g., 500m for cpu).
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.resource.target.averageValue:
+    type: string
+    description: Average target value across pods.
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.resource.target.averageUtilization:
     type: integer
-    description: Target average utilization percentage
+    description: Target average CPU/Memory utilization (as a percentage of requested value).
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.pods.metric.name:
+    type: string
+    description: Name of the pods metric (e.g., queue_length, requests_per_second).
+    required: true
+  predictors.componentSpec.hpaSpec.metricsv2.pods.metric.selector.matchLabels:
+    type: map
+    description: Match labels for identifying the pods metric (key-value pairs).
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.pods.metric.selector.matchExpressions:
+    type: list
+    description: List of label selector requirements for the pods metric.
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.pods.metric.selector.matchExpressions.key:
+    type: string
+    description: Label key that the selector applies to.
+    required: true
+  predictors.componentSpec.hpaSpec.metricsv2.pods.metric.selector.matchExpressions.operator:
+    type: string
+    description: Relationship between the key and values (In, NotIn, Exists, DoesNotExist).
+    required: true
+  predictors.componentSpec.hpaSpec.metricsv2.pods.metric.selector.matchExpressions.values:
+    type: list
+    description: Array of string values to match against the label key.
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.pods.target.type:
+    type: string
+    description: Type of the pods target metric (Value or AverageValue).
+    required: true
+  predictors.componentSpec.hpaSpec.metricsv2.pods.target.value:
+    type: string
+    description: Specific target value to trigger scaling (e.g., "10").
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.pods.target.averageValue:
+    type: string
+    description: Average value of the metric across all pods.
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.object.describedObject.kind:
+    type: string
+    description: Kind of the target object (e.g., Service, Ingress).
+    required: true
+  predictors.componentSpec.hpaSpec.metricsv2.object.describedObject.name:
+    type: string
+    description: Name of the target Kubernetes object to scale against.
+    required: true
+  predictors.componentSpec.hpaSpec.metricsv2.object.describedObject.apiVersion:
+    type: string
+    description: API version of the target object.
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.object.metric.name:
+    type: string
+    description: Name of the object metric to monitor (e.g., requests_per_second).
+    required: true
+  predictors.componentSpec.hpaSpec.metricsv2.object.metric.selector.matchLabels:
+    type: map
+    description: Match labels for identifying the object metric (key-value pairs).
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.object.metric.selector.matchExpressions:
+    type: list
+    description: List of label selector requirements for the object metric.
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.object.metric.selector.matchExpressions.key:
+    type: string
+    description: Label key that the selector applies to.
+    required: true
+  predictors.componentSpec.hpaSpec.metricsv2.object.metric.selector.matchExpressions.operator:
+    type: string
+    description: Operator for the selector expression (In, NotIn, Exists, DoesNotExist).
+    required: true
+  predictors.componentSpec.hpaSpec.metricsv2.object.metric.selector.matchExpressions.values:
+    type: list
+    description: List of values for the selector expression.
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.object.target.type:
+    type: string
+    description: Type of metric target (Value or AverageValue).
+    required: true
+  predictors.componentSpec.hpaSpec.metricsv2.object.target.value:
+    type: string
+    description: Specific target value to match (e.g., "5").
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.object.target.averageValue:
+    type: string
+    description: Average value of the metric across objects.
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.external.metric.name:
+    type: string
+    description: Name of the external metric to monitor.
+    required: true
+  predictors.componentSpec.hpaSpec.metricsv2.external.metric.selector.matchLabels:
+    type: map
+    description: Match labels for selecting external metrics (key-value pairs).
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.external.metric.selector.matchExpressions:
+    type: list
+    description: Match expressions for filtering external metrics.
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.external.metric.selector.matchExpressions.key:
+    type: string
+    description: Label key to match against in the selector.
+    required: true
+  predictors.componentSpec.hpaSpec.metricsv2.external.metric.selector.matchExpressions.operator:
+    type: string
+    description: Operator to apply to label key (In, NotIn, Exists, DoesNotExist).
+    required: true
+  predictors.componentSpec.hpaSpec.metricsv2.external.metric.selector.matchExpressions.values:
+    type: list
+    description: List of string values for the expression (if applicable).
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.external.target.type:
+    type: string
+    description: Type of target value (Value or AverageValue).
+    required: true
+  predictors.componentSpec.hpaSpec.metricsv2.external.target.value:
+    type: string
+    description: Target value for the external metric.
+    required: false
+  predictors.componentSpec.hpaSpec.metricsv2.external.target.averageValue:
+    type: string
+    description: Average value of the metric over relevant pods.
+    required: false
+  predictors.componentSpec.hpaSpec.metrics.type:
+    type: string
+    description: Type of metric (e.g., Resource, Pods, Object, External).
+    required: true
+  predictors.componentSpec.hpaSpec.metrics.resource.name:
+    type: string
+    description: Name of the resource to scale on (e.g., cpu, memory).
+    required: true
+  predictors.componentSpec.hpaSpec.metrics.resource.targetAverageUtilization:
+    type: integer
+    description: Target average utilization across pods (in percentage).
+    required: false
+  predictors.componentSpec.hpaSpec.metrics.resource.targetAverageValue:
+    type: string
+    description: Target average raw value across pods (e.g., "500Mi").
+    required: false
+  predictors.componentSpec.hpaSpec.metrics.pods.metricName:
+    type: string
+    description: Name of the pods metric to monitor.
+    required: true
+  predictors.componentSpec.hpaSpec.metrics.pods.targetAverageValue:
+    type: string
+    description: Target average value of the metric across all pods.
+    required: true
+  predictors.componentSpec.hpaSpec.metrics.pods.selector.matchLabels:
+    type: map
+    description: Selector labels to filter time series for the pods metric.
+    required: false
+  predictors.componentSpec.hpaSpec.metrics.pods.selector.matchExpressions:
+    type: list
+    description: List of selector expressions to filter the pods metric.
+    required: false
+  predictors.componentSpec.hpaSpec.metrics.pods.selector.matchExpressions.key:
+    type: string
+    description: Label key for selector expression.
+    required: true
+  predictors.componentSpec.hpaSpec.metrics.pods.selector.matchExpressions.operator:
+    type: string
+    description: Operator (In, NotIn, Exists, DoesNotExist).
+    required: true
+  predictors.componentSpec.hpaSpec.metrics.pods.selector.matchExpressions.values:
+    type: list
+    description: Values to match for the label key.
+    required: false
+  predictors.componentSpec.hpaSpec.metrics.object.metricName:
+    type: string
+    description: Name of the metric associated with the object.
+    required: true
+  predictors.componentSpec.hpaSpec.metrics.object.targetValue:
+    type: string
+    description: Target value of the object metric.
+    required: false
+  predictors.componentSpec.hpaSpec.metrics.object.targetAverageValue:
+    type: string
+    description: Average target value of the object metric.
+    required: false
+  predictors.componentSpec.hpaSpec.metrics.object.target.apiVersion:
+    type: string
+    description: API version of the target object.
+    required: true
+  predictors.componentSpec.hpaSpec.metrics.object.target.kind:
+    type: string
+    description: Kind of the target Kubernetes object.
+    required: true
+  predictors.componentSpec.hpaSpec.metrics.object.target.name:
+    type: string
+    description: Name of the target object.
+    required: true
+  predictors.componentSpec.hpaSpec.metrics.object.selector.matchLabels:
+    type: map
+    description: Selector labels to filter time series for the object metric.
+    required: false
+  predictors.componentSpec.hpaSpec.metrics.object.selector.matchExpressions:
+    type: list
+    description: List of selector expressions to filter the object metric.
+    required: false
+  predictors.componentSpec.hpaSpec.metrics.object.selector.matchExpressions.key:
+    type: string
+    description: Label key for selector expression.
+    required: true
+  predictors.componentSpec.hpaSpec.metrics.object.selector.matchExpressions.operator:
+    type: string
+    description: Operator (In, NotIn, Exists, DoesNotExist).
+    required: true
+  predictors.componentSpec.hpaSpec.metrics.object.selector.matchExpressions.values:
+    type: list
+    description: Values to match for the label key.
+    required: false
+  predictors.componentSpec.hpaSpec.metrics.external.metricName:
+    type: string
+    description: Name of the external metric to scale on.
+    required: true
+  predictors.componentSpec.hpaSpec.metrics.external.targetValue:
+    type: string
+    description: Target raw value for the external metric.
+    required: false
+  predictors.componentSpec.hpaSpec.metrics.external.targetAverageValue:
+    type: string
+    description: Target average value for the external metric.
+    required: false
+  predictors.componentSpec.hpaSpec.metrics.external.metricSelector.matchLabels:
+    type: map
+    description: Label selectors to identify a specific time series.
+    required: false
+  predictors.componentSpec.hpaSpec.metrics.external.metricSelector.matchExpressions:
+    type: list
+    description: Match expressions for external metricSelector.
+    required: false
+  predictors.componentSpec.hpaSpec.metrics.external.metricSelector.matchExpressions.key:
+    type: string
+    description: Label key for selector expression.
+    required: true
+  predictors.componentSpec.hpaSpec.metrics.external.metricSelector.matchExpressions.operator:
+    type: string
+    description: Operator (In, NotIn, Exists, DoesNotExist).
+    required: true
+  predictors.componentSpec.hpaSpec.metrics.external.metricSelector.matchExpressions.values:
+    type: list
+    description: Values to match for the label key.
     required: false
   predictors.componentSpec.kedaSpec.minReplicaCount:
     type: integer

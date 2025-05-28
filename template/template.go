@@ -280,25 +280,104 @@ type Endpoint struct {
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 }
 
-type HPATarget struct {
-	Type               string `json:"type" yaml:"type"`
-	AverageUtilization int    `json:"averageUtilization" yaml:"averageUtilization"`
-}
-
-type HPAResourceMetric struct {
-	Name   string    `json:"name" yaml:"name"`
-	Target HPATarget `json:"target" yaml:"target"`
-}
-
-type HPAMetric struct {
-	Type     string            `json:"type" yaml:"type"`
-	Resource HPAResourceMetric `json:"resource" yaml:"resource"`
-}
-
 type HPASpec struct {
-	MinReplicas int         `json:"minReplicas" yaml:"minReplicas"`
-	MaxReplicas int         `json:"maxReplicas" yaml:"maxReplicas"`
-	MetricsV2   []HPAMetric `json:"metricsv2,omitempty" yaml:"metricsv2,omitempty"`
+	MinReplicas int                `json:"minReplicas" yaml:"minReplicas"`
+	MaxReplicas int                `json:"maxReplicas" yaml:"maxReplicas"`
+	MetricsV2   []HPAMetricV2      `json:"metricsv2,omitempty" yaml:"metricsv2,omitempty"`
+	Metrics     []HPAMetricV2Beta1 `json:"metrics,omitempty" yaml:"metrics,omitempty"`
+}
+
+type HPAMetricTarget struct {
+	Type               string `json:"type" yaml:"type"`
+	Value              string `json:"value,omitempty" yaml:"value,omitempty"`
+	AverageValue       string `json:"averageValue,omitempty" yaml:"averageValue,omitempty"`
+	AverageUtilization *int   `json:"averageUtilization,omitempty" yaml:"averageUtilization,omitempty"`
+}
+
+type HPAMetricIdentifier struct {
+	Name     string         `json:"name" yaml:"name"`
+	Selector *LabelSelector `json:"selector,omitempty" yaml:"selector,omitempty"`
+}
+
+type LabelSelector struct {
+	MatchLabels      map[string]string
+	MatchExpressions []LabelSelectorRequirement
+}
+
+type LabelSelectorRequirement struct {
+	Key      string
+	Operator string
+	Values   []string
+}
+
+type HPAMetricV2 struct {
+	Type     string               `json:"type" yaml:"type"`
+	Resource *HPAResourceMetricV2 `json:"resource,omitempty" yaml:"resource,omitempty"`
+	Pods     *HPAPodsMetricV2     `json:"pods,omitempty" yaml:"pods,omitempty"`
+	Object   *HPAObjectMetricV2   `json:"object,omitempty" yaml:"object,omitempty"`
+	External *HPAExternalMetricV2 `json:"external,omitempty" yaml:"external,omitempty"`
+}
+
+type HPAResourceMetricV2 struct {
+	Name   string          `json:"name" yaml:"name"`
+	Target HPAMetricTarget `json:"target" yaml:"target"`
+}
+
+type HPAPodsMetricV2 struct {
+	Metric HPAMetricIdentifier `json:"metric" yaml:"metric"`
+	Target HPAMetricTarget     `json:"target" yaml:"target"`
+}
+
+type HPAObjectMetricV2 struct {
+	DescribedObject HPAObjectReference  `json:"describedObject" yaml:"describedObject"`
+	Metric          HPAMetricIdentifier `json:"metric" yaml:"metric"`
+	Target          HPAMetricTarget     `json:"target" yaml:"target"`
+}
+
+type HPAExternalMetricV2 struct {
+	Metric HPAMetricIdentifier `json:"metric" yaml:"metric"`
+	Target HPAMetricTarget     `json:"target" yaml:"target"`
+}
+
+type HPAObjectReference struct {
+	APIVersion string `json:"apiVersion" yaml:"apiVersion"`
+	Kind       string `json:"kind" yaml:"kind"`
+	Name       string `json:"name" yaml:"name"`
+}
+
+type HPAMetricV2Beta1 struct {
+	Type     string                    `json:"type" yaml:"type"`
+	Resource *HPAResourceMetricV2Beta1 `json:"resource,omitempty" yaml:"resource,omitempty"`
+	Pods     *HPAPodsMetricV2Beta1     `json:"pods,omitempty" yaml:"pods,omitempty"`
+	Object   *HPAObjectMetricV2Beta1   `json:"object,omitempty" yaml:"object,omitempty"`
+	External *HPAExternalMetricV2Beta1 `json:"external,omitempty" yaml:"external,omitempty"`
+}
+
+type HPAResourceMetricV2Beta1 struct {
+	Name                     string `json:"name" yaml:"name"`
+	TargetAverageUtilization *int   `json:"targetAverageUtilization,omitempty" yaml:"targetAverageUtilization,omitempty"`
+	TargetAverageValue       string `json:"targetAverageValue,omitempty" yaml:"targetAverageValue,omitempty"`
+}
+
+type HPAPodsMetricV2Beta1 struct {
+	MetricName         string         `json:"metricName" yaml:"metricName"`
+	TargetAverageValue string         `json:"targetAverageValue" yaml:"targetAverageValue"`
+	Selector           *LabelSelector `json:"selector,omitempty" yaml:"selector,omitempty"`
+}
+
+type HPAObjectMetricV2Beta1 struct {
+	Target       HPAObjectReference `json:"target" yaml:"target"`
+	MetricName   string             `json:"metricName" yaml:"metricName"`
+	TargetValue  string             `json:"targetValue" yaml:"targetValue"`
+	Selector     *LabelSelector     `json:"selector,omitempty" yaml:"selector,omitempty"`
+	AverageValue string             `json:"averageValue,omitempty" yaml:"averageValue,omitempty"`
+}
+
+type HPAExternalMetricV2Beta1 struct {
+	MetricName         string         `json:"metricName" yaml:"metricName"`
+	TargetValue        string         `json:"targetValue,omitempty" yaml:"targetValue,omitempty"`
+	TargetAverageValue string         `json:"targetAverageValue,omitempty" yaml:"targetAverageValue,omitempty"`
+	MetricSelector     *LabelSelector `json:"metricSelector,omitempty" yaml:"selector,omitempty"`
 }
 
 type SvcOrchSpec struct {
