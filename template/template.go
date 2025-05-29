@@ -79,9 +79,9 @@ type Explainer struct {
 }
 
 type EnvVar struct {
-	Name      string     `json:"name" yaml:"name"`
-	Value     string     `json:"value,omitempty" yaml:"value,omitempty"`
-	ValueFrom *ValueFrom `json:"valueFrom,omitempty" yaml:"valueFrom,omitempty"`
+	Name      string       `json:"name" yaml:"name"`
+	Value     *interface{} `json:"value,omitempty" yaml:"value,omitempty"`
+	ValueFrom *ValueFrom   `json:"valueFrom,omitempty" yaml:"valueFrom,omitempty"`
 }
 
 type ValueFrom struct {
@@ -442,7 +442,7 @@ func main() {
 			log.Printf("- %s\n", desc)
 		}
 	}
-	//check(json.Unmarshal(valData, &valuesCheck))
+	check(json.Unmarshal(valData, &valuesCheck))
 
 	var values = make(map[string]interface{})
 	check(json.Unmarshal(valData, &values))

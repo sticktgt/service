@@ -187,7 +187,7 @@
           "type": "string"
         },
         "value": {
-          "type": "string"
+          "type": "object"
         },
         "valueFrom": {
           "$ref": "#/definitions/valueFrom"

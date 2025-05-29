@@ -1,18 +1,12 @@
 {
   "environment": "TEST",
   "apiVersion": "machinelearning.seldon.io/v1",
+  "deploymentName": "graph-metadata-router",
+  "namespace": "default",
   "chart": {
     "name": "test-model",
     "version": "0.1.0",
     "description": "Test Seldon deployment chart"
-  },
-  "deploymentName": "test-explainer-model",
-  "namespace": "default",
-  "metadata": {
-    "labels": {
-      "components": "seldon-core",
-      "entity": "online-model"
-    }
   },
   "subjectArea": "seldon-test-project",
   "sourceMetafileName": "seldon.meta.yaml",
@@ -20,23 +14,18 @@
   "sourceMetafileBranch": "main",
   "predictors": [
     {
-      "name": "loan-approval",
+      "name": "example",
       "replicas": 1,
       "componentSpec": {
-        "serviceAccountName": "default-editor",
-        "terminationGracePeriodSeconds": 0,
         "containers": [
           {
-            "name": "fs33kafka",
+            "name": "node-router",
+            "image": "seldonio/metadata-generic-node:0.4"
+          },
+          {
+            "name": "node-one",
+            "image": "seldonio/metadata-generic-node:0.4",
             "env": [
-              {
-                "name": "GUNICORN_WORKERS",
-                "value": "2"
-              },
-              {
-                "name": "GUNICORN_THREADS",
-                "value": "2"
-              },
               {
                 "name": "MODEL_METADATA",
                 "value": {
@@ -55,172 +44,55 @@
                     "schema": {
                       "names": "[ node-output ]",
                       "shape": "[ 1 ]"
-                    }                    
+                    }
                   }
                 }
               }
-            ],
-            "liveness": {
-              "path": "/health/ping",
-              "port": "http",
-              "scheme": "HTTP",
-              "initialDelaySeconds": 80,
-              "periodSeconds": 5,
-              "failureThreshold": 200,
-              "successThreshold": 1
-            },
-            "readiness": {
-              "path": "/health/ping",
-              "port": "http",
-              "scheme": "HTTP",
-              "initialDelaySeconds": 80,
-              "periodSeconds": 5,
-              "failureThreshold": 200,
-              "successThreshold": 1
-            },
-            "resources": {
-              "limits": {
-                "cpu": "2.0",
-                "memory": "4.0Gi"
-              },
-              "requests": {
-                "cpu": "2.0",
-                "memory": "4.0Gi"
-              }
-            }
+            ]
           },
           {
-            "name": "input-transformer",
-            "image": "harbor-dognauts.neoflex.ru/dognauts/feast-rest-enricher:v0.1.0",
+            "name": "node-two",
+            "image": "seldonio/metadata-generic-node:0.4",
             "env": [
               {
-                "name": "GUNICORN_WORKERS",
-                "value": "2"
-              },
-              {
-                "name": "GUNICORN_THREADS",
-                "value": "2"
-              },
-              {
-                "name": "modelURI",
-                "value": "s3://app-fdd/1/2f50d812d476495d90d4c566a2f99d4d/artifacts/model"
-              },
-              {
-                "name": "MLFLOW_S3_ENDPOINT_URL",
-                "value": "https://s3-mlops.neoflex.ru"
-              },
-              {
-                "name": "AWS_ACCESS_KEY_ID",
-                "value": "8A8TWIG7I0PUKUD5HU7J"
-              },
-              {
-                "name": "AWS_SECRET_ACCESS_KEY",
-                "value": "Ns4Oi92O5DAGZ015rp2zWe4BQw8rt1pFBDkJGrMJ"
-              },
-              {
-                "name": "FEAST_FEATURE_SERVER_URL",
-                "value": "http://feast-feature-server.app-fdd:80/"
+                "name": "MODEL_METADATA",
+                "value": {
+
+                  "name": "node-two",
+                  "versions": "[ generic-node/v0.4 ]",
+                  "platform": "seldon",
+                  "inputs": {
+                  "messagetype": "tensor",
+                    "schema": {
+                      "names": "[ a, b ]",
+                      "shape": "[ 2 ]"
+                    }
+                  },
+                  "outputs": {
+                    "messagetype": "tensor",
+                    "schema": {
+                      "names": "[ node-output ]",
+                      "shape": "[ 1 ]"
+                    }
+                  }
+                }
               }
             ]
           }
         ]
       },
-      "svcOrchSpec": {
-        "env": [
-          {
-            "name": "LOGGER_KAFKA_BROKER",
-            "value": "kafka-kafka-0.kafka-kafka-brokers.dognauts-kafka.svc:9093"
-          },
-          {
-            "name": "LOGGER_KAFKA_TOPIC",
-            "value": "model-drift-demo"
-          },
-          {
-            "name": "KAFKA_SECURITY_PROTOCOL",
-            "value": "sasl_ssl"
-          },
-          {
-            "name": "KAFKA_SSL_CA_CERT",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "kafka-cluster-creds",
-                "key": "cluster-ca.cert"
-              }
-            }
-          },
-          {
-            "name": "KAFKA_SSL_CLIENT_CERT",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "kafka-cluster-creds",
-                "key": "clients-ca.cert"
-              }
-            }
-          },
-          {
-            "name": "KAFKA_SSL_CLIENT_KEY",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "kafka-cluster-creds",
-                "key": "clients-ca.key"
-              }
-            }
-          },
-          {
-            "name": "KAFKA_SSL_CLIENT_KEY_PASS",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "kafka-cluster-creds",
-                "key": "clients-ca.pass"
-              }
-            }
-          },
-          {
-            "name": "KAFKA_SASL_PASSWORD",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "kafka-cluster-creds",
-                "key": "sasl.pass"
-              }
-            }
-          },
-          {
-            "name": "KAFKA_SASL_USERNAME",
-            "valueFrom": {
-              "secretKeyRef": {
-                "name": "kafka-cluster-creds",
-                "key": "sasl-user"
-              }
-            }
-          },
-          {
-            "name": "KAFKA_SASL_MECHANISM",
-            "value": "SCRAM-SHA-512"
-          }
-        ]
-      },
       "graph": {
-        "name": "input-transformer",
-        "type": "TRANSFORMER",
-        "endpoint": {
-          "type": "REST"
-        },
+        "name": "node-router",
+        "type": "ROUTER",
         "children": [
           {
-            "name": "fs33kafka",
-            "implementation": "MLFLOW_SERVER",
-            "modelUri": "s3://app-fdd/1/2f50d812d476495d90d4c566a2f99d4d/artifacts/model",
-            "envSecretRefName": "seldon-secret",
-            "logger": {
-              "mode": "response"
-            },
-            "parameters": [
-              {
-                "name": "xtype",
-                "type": "STRING",
-                "value": "DataFrame"
-              }
-            ],
+            "name": "node-one",
+            "type": "MODEL",
+            "children": []
+          },
+          {
+            "name": "node-two",
+            "type": "MODEL",
             "children": []
           }
         ]
