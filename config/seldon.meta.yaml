@@ -128,7 +128,11 @@ files:
           {{- end }}
           {{- if .componentSpec }}
           componentSpec:
+            {{- if .componentSpec.terminationGracePeriodSeconds }}
             terminationGracePeriodSeconds: {{ .componentSpec.terminationGracePeriodSeconds }}
+            {{- else }}
+            terminationGracePeriodSeconds: 0
+            {{- end }}
             {{- if .componentSpec.volumes }}
             volumes:
             {{- range .componentSpec.volumes }}
