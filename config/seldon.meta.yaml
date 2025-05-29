@@ -59,11 +59,362 @@ files:
       {{- range .Values.predictors }}
         {{ .name }}:
           name: {{ .name }}
-          {{- if .replicas }}
-          replicas: {{ .replicas }}
-          {{- end }}
           {{- if .traffic }}
           traffic: {{ .traffic }}
+          {{- end }}
+          {{- if .labels }}
+          labels:
+            {{- range $k, $v := .labels }}
+            {{ $k }}: {{ $v }}
+            {{- end }}
+          {{- end }}
+          {{- if .shadow }}
+          shadow: {{ .shadow }}
+          {{- end }}
+          {{- if .explainer }}
+          explainer:
+            {{- if .explainer.type }}
+            type: {{ .explainer.type }}
+            {{- end }}
+            {{- if .explainer.storageInitializerImage }}
+            storageInitializerImage: {{ .explainer.storageInitializerImage }}
+            {{- end }}
+            {{- if .explainer.initParameters }}
+            initParameters: '{{ .explainer.initParameters }}'
+            {{- end }}
+            {{- if .explainer.endpoint }}
+            endpoint:
+              type: {{ .explainer.endpoint.type }}
+            {{- end }}
+            {{- if .explainer.config }}
+            config:
+              {{- range $k, $v := .explainer.config }}
+              {{ $k }}: {{ $v }}
+              {{- end }}
+            {{- end }}
+            {{- if .explainer.containerSpec }}
+            containerSpec:
+              name: {{ .explainer.containerSpec.name }}
+              {{- if .explainer.containerSpec.image }}
+              image: {{ .explainer.containerSpec.image }}
+              {{- end }}
+              {{- if .explainer.containerSpec.imagePullPolicy }}
+              imagePullPolicy: {{ .explainer.containerSpec.imagePullPolicy }}
+              {{- end }}
+              {{- if .explainer.containerSpec.args }}
+              args:
+                {{- range .explainer.containerSpec.args }}
+                - {{ . }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- if .svcOrchSpec }}
+          {{- if .svcOrchSpec.env }}
+          svcOrchSpec:
+            env:
+              {{- range .svcOrchSpec.env }}
+              - name: {{ .name }}
+                {{- if .value }}
+                value: {{ .value }}
+                {{- else if .valueFrom }}
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ .valueFrom.secretKeyRef.name }}
+                    key: {{ .valueFrom.secretKeyRef.key }}
+                {{- end }}
+              {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if .componentSpec }}
+          componentSpec:
+            terminationGracePeriodSeconds: {{ .componentSpec.terminationGracePeriodSeconds }}
+            {{- if .componentSpec.volumes }}
+            volumes:
+            {{- range .componentSpec.volumes }}
+              {{ .name }}:
+                name: {{ .name }}
+                {{- if .emptyDir }}
+                emptyDir:
+                  {{- if .emptyDir.medium }}
+                  medium: {{ .emptyDir.medium }}
+                  {{- end }}
+                  {{- if .emptyDir.sizeLimit }}
+                  sizeLimit: {{ .emptyDir.sizeLimit }}
+                  {{- end }}
+                {{- else if .secret }}
+                secret:
+                  secretName: {{ .secret.secretName }}
+                {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- if .componentSpec.containers }}
+            containers:
+            {{- range .componentSpec.containers }}
+              {{ .name }}:
+                name: {{ .name }}
+                {{- if .image }}
+                image: {{ .image }}
+                {{- end }}
+                {{- if .imagePullPolicy }}
+                imagePullPolicy: {{ .imagePullPolicy }}
+                {{- end }}
+                {{- if .args }}
+                args:
+                  {{- range .args }}
+                  - {{ . }}
+                  {{- end }}
+                {{- end }}
+                {{- if .env }}
+                env:
+                  {{- range .env }}
+                  - name: {{ .name }}
+                    {{- if and (eq .name "MODEL_METADATA") .value }}
+                    {{- if .value }}
+                    value:
+                      {{- if .value.name }}
+                      name: {{ .value.name }}
+                      {{- end }}
+                      {{- if .value.versions }}
+                      versions: {{ .value.versions }}
+                      {{- end }}
+                      {{- if .value.platform }}
+                      platform: {{ .value.platform }}
+                      {{- end }}
+                      {{- if .value.inputs }}
+                      inputs:
+                        {{- if .value.inputs.messagetype }}
+                        messagetype: {{ .value.inputs.messagetype }}
+                        {{- end }}
+                        {{- if .value.inputs.schema }}
+                        schema:
+                          {{- if .value.inputs.schema.names }}
+                          names: {{ .value.inputs.schema.names }}
+                          {{- end }}
+                          {{- if .value.inputs.schema.shape }}
+                          shape: {{ .value.inputs.schema.shape }}
+                          {{- end }}
+                        {{- end }}
+                      {{- end }}
+                      {{- if .value.outputs }}
+                      outputs:
+                        {{- if .value.outputs.messagetype }}
+                        messagetype: {{ .value.outputs.messagetype }}
+                        {{- end }}
+                        {{- if .value.outputs.schema }}
+                        schema:
+                          {{- if .value.outputs.schema.names }}
+                          names: {{ .value.outputs.schema.names }}
+                          {{- end }}
+                          {{- if .value.outputs.schema.shape }}
+                          shape: {{ .value.outputs.schema.shape }}
+                          {{- end }}
+                        {{- end }}
+                      {{- end }}
+                    {{- end }}
+                    {{- else if .value }}
+                    value: {{ .value -}}
+                    {{- else if .valueFrom }}
+                    valueFrom:
+                      secretKeyRef:
+                        name: {{ .valueFrom.secretKeyRef.name }}
+                        key: {{ .valueFrom.secretKeyRef.key }}
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
+                {{- if .volumeMounts }}
+                volumeMounts:
+                  {{- range .volumeMounts }}
+                  {{ .name }}:
+                    name: {{ .name }}
+                    mountPath: {{ .mountPath }}
+                    {{- if .readOnly }}
+                    readOnly: {{ .readOnly }}
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
+                {{- if .liveness }}
+                liveness:
+                  path: {{ .liveness.path }}
+                  port: {{ .liveness.port }}
+                  initialDelaySeconds: {{ .liveness.initialDelaySeconds }}
+                  periodSeconds: {{ .liveness.periodSeconds }}
+                  failureThreshold: {{ .liveness.failureThreshold }}
+                  successThreshold: {{ .liveness.successThreshold }}
+                  {{- if .liveness.scheme }}
+                  scheme: {{ .liveness.scheme }}
+                  {{- end }}
+                {{- end }}
+                {{- if .readiness }}
+                readiness:
+                  path: {{ .readiness.path }}
+                  port: {{ .readiness.port }}
+                  initialDelaySeconds: {{ .readiness.initialDelaySeconds }}
+                  periodSeconds: {{ .readiness.periodSeconds }}
+                  failureThreshold: {{ .readiness.failureThreshold }}
+                  successThreshold: {{ .readiness.successThreshold }}
+                  {{- if .readiness.scheme }}
+                  scheme: {{ .readiness.scheme }}
+                  {{- end }}
+                {{- end }}
+                {{- if .lifecycle }}
+                lifecycle:
+                  {{- if .lifecycle.postStart }}
+                  postStart:
+                    {{- if .lifecycle.postStart.exec }}
+                    exec:
+                      command:
+                        {{- range .lifecycle.postStart.exec.command }}
+                        - {{ . }}
+                        {{- end }}
+                    {{- end }}
+                    {{- if .lifecycle.postStart.httpGet }}
+                    httpGet:
+                      path: {{ .lifecycle.postStart.httpGet.path }}
+                      port: {{ .lifecycle.postStart.httpGet.port }}
+                      {{- if .lifecycle.postStart.httpGet.scheme }}
+                      scheme: {{ .lifecycle.postStart.httpGet.scheme }}
+                      {{- end }}
+                      {{- if .lifecycle.postStart.httpGet.host }}
+                      host: {{ .lifecycle.postStart.httpGet.host }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .lifecycle.preStop }}
+                  preStop:
+                    {{- if .lifecycle.preStop.exec }}
+                    exec:
+                      command:
+                        {{- range .lifecycle.preStop.exec.command }}
+                        - {{ . }}
+                        {{- end }}
+                    {{- end }}
+                    {{- if .lifecycle.preStop.httpGet }}
+                    httpGet:
+                      path: {{ .lifecycle.preStop.httpGet.path }}
+                      port: {{ .lifecycle.preStop.httpGet.port }}
+                      {{- if .lifecycle.preStop.httpGet.scheme }}
+                      scheme: {{ .lifecycle.preStop.httpGet.scheme }}
+                      {{- end }}
+                      {{- if .lifecycle.preStop.httpGet.host }}
+                      host: {{ .lifecycle.preStop.httpGet.host }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- if .componentSpec.initContainers }}
+            initContainers:
+            {{- range .componentSpec.initContainers }}
+              {{ .name }}:
+                name: {{ .name }}
+                {{- if .image }}
+                image: {{ .image }}
+                {{- end }}
+                {{- if .imagePullPolicy }}
+                imagePullPolicy: {{ .imagePullPolicy }}
+                {{- end }}
+                {{- if .args }}
+                args:
+                  {{- range .args }}
+                  - {{ . }}
+                  {{- end }}
+                {{- end }}
+                {{- if .env }}
+                env:
+                  {{- range .env }}
+                  - name: {{ .name }}
+                    {{- if .value }}
+                    value: {{ .value -}}
+                    {{- else if .valueFrom }}
+                    valueFrom:
+                      secretKeyRef:
+                        name: {{ .valueFrom.secretKeyRef.name }}
+                        key: {{ .valueFrom.secretKeyRef.key }}
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
+                volumeMounts:
+                  {{- range .volumeMounts }}
+                  {{ .name }}:
+                    name: {{ .name }}
+                    mountPath: {{ .mountPath }}
+                    {{- if .readOnly }}
+                    readOnly: {{ .readOnly }}
+                    {{- end }}
+                  {{- end }}
+                {{- if .liveness }}
+                liveness:
+                  path: {{ .liveness.path }}
+                  port: {{ .liveness.port }}
+                  initialDelaySeconds: {{ .liveness.initialDelaySeconds }}
+                  periodSeconds: {{ .liveness.periodSeconds }}
+                  failureThreshold: {{ .liveness.failureThreshold }}
+                  successThreshold: {{ .liveness.successThreshold }}
+                  {{- if .liveness.scheme }}
+                  scheme: {{ .liveness.scheme }}
+                  {{- end }}
+                {{- end }}
+                {{- if .readiness }}
+                readiness:
+                  path: {{ .readiness.path }}
+                  port: {{ .readiness.port }}
+                  initialDelaySeconds: {{ .readiness.initialDelaySeconds }}
+                  periodSeconds: {{ .readiness.periodSeconds }}
+                  failureThreshold: {{ .readiness.failureThreshold }}
+                  successThreshold: {{ .readiness.successThreshold }}
+                  {{- if .readiness.scheme }}
+                  scheme: {{ .readiness.scheme }}
+                  {{- end }}
+                {{- end }}
+                {{- if .lifecycle }}
+                lifecycle:
+                  {{- if .lifecycle.postStart }}
+                  postStart:
+                    {{- if .lifecycle.postStart.exec }}
+                    exec:
+                      command:
+                        {{- range .lifecycle.postStart.exec.command }}
+                        - {{ . }}
+                        {{- end }}
+                    {{- end }}
+                    {{- if .lifecycle.postStart.httpGet }}
+                    httpGet:
+                      path: {{ .lifecycle.postStart.httpGet.path }}
+                      port: {{ .lifecycle.postStart.httpGet.port }}
+                      {{- if .lifecycle.postStart.httpGet.scheme }}
+                      scheme: {{ .lifecycle.postStart.httpGet.scheme }}
+                      {{- end }}
+                      {{- if .lifecycle.postStart.httpGet.host }}
+                      host: {{ .lifecycle.postStart.httpGet.host }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .lifecycle.preStop }}
+                  preStop:
+                    {{- if .lifecycle.preStop.exec }}
+                    exec:
+                      command:
+                        {{- range .lifecycle.preStop.exec.command }}
+                        - {{ . }}
+                        {{- end }}
+                    {{- end }}
+                    {{- if .lifecycle.preStop.httpGet }}
+                    httpGet:
+                      path: {{ .lifecycle.preStop.httpGet.path }}
+                      port: {{ .lifecycle.preStop.httpGet.port }}
+                      {{- if .lifecycle.preStop.httpGet.scheme }}
+                      scheme: {{ .lifecycle.preStop.httpGet.scheme }}
+                      {{- end }}
+                      {{- if .lifecycle.preStop.httpGet.host }}
+                      host: {{ .lifecycle.preStop.httpGet.host }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
+            {{- end }}
+            {{- end }}
           {{- end }}
           graph:
             name: {{ .graph.name }}
@@ -73,22 +424,9 @@ files:
             {{- if .graph.implementation }}
             implementation: {{ .graph.implementation }}
             {{- end }}
-            {{- if .graph.modelUri }}
-            modelUri: {{ .graph.modelUri }}
-            {{- end }}
-            {{- if .graph.envSecretRefName }}
-            envSecretRefName: {{ .graph.envSecretRefName }}
-            {{- end }}
             {{- if .graph.endpoint }}
             endpoint:
               type: {{ .graph.endpoint.type }}
-            {{- end }}
-            {{- if .graph.logger }}
-            logger:
-              mode: {{ .graph.logger.mode }}
-              {{- if .graph.logger.url }}
-              url: {{ .graph.logger.url }}
-              {{- end }}
             {{- end }}
             {{- if .graph.parameters }}
             parameters:
@@ -109,22 +447,9 @@ files:
                 {{- if .implementation }}
                 implementation: {{ .implementation }}
                 {{- end }}
-                {{- if .modelUri }}
-                modelUri: {{ .modelUri }}
-                {{- end }}
-                {{- if .envSecretRefName }}
-                envSecretRefName: {{ .envSecretRefName }}
-                {{- end }}
                 {{- if .endpoint }}
                 endpoint:
                   type: {{ .endpoint.type }}
-                {{- end }}
-                {{- if .logger }}
-                logger:
-                  mode: {{ .logger.mode }}
-                  {{- if .logger.url }}
-                  url: {{ .logger.url }}
-                  {{- end }}
                 {{- end }}
                 {{- if .parameters }}
                 parameters:
@@ -145,22 +470,9 @@ files:
                     {{- if .implementation }}
                     implementation: {{ .implementation }}
                     {{- end }}
-                    {{- if .modelUri }}
-                    modelUri: {{ .modelUri }}
-                    {{- end }}
-                    {{- if .envSecretRefName }}
-                    envSecretRefName: {{ .envSecretRefName }}
-                    {{- end }}
                     {{- if .endpoint }}
                     endpoint:
                       type: {{ .endpoint.type }}
-                    {{- end }}
-                    {{- if .logger }}
-                    logger:
-                      mode: {{ .logger.mode }}
-                      {{- if .logger.url }}
-                      url: {{ .logger.url }}
-                      {{- end }}
                     {{- end }}
                     {{- if .parameters }}
                     parameters:
@@ -181,22 +493,9 @@ files:
                         {{- if .implementation }}
                         implementation: {{ .implementation }}
                         {{- end }}
-                        {{- if .modelUri }}
-                        modelUri: {{ .modelUri }}
-                        {{- end }}
-                        {{- if .envSecretRefName }}
-                        envSecretRefName: {{ .envSecretRefName }}
-                        {{- end }}
                         {{- if .endpoint }}
                         endpoint:
                           type: {{ .endpoint.type }}
-                        {{- end }}
-                        {{- if .logger }}
-                        logger:
-                          mode: {{ .logger.mode }}
-                          {{- if .logger.url }}
-                          url: {{ .logger.url }}
-                          {{- end }}
                         {{- end }}
                         {{- if .parameters }}
                         parameters:
@@ -217,22 +516,9 @@ files:
                             {{- if .implementation }}
                             implementation: {{ .implementation }}
                             {{- end }}
-                            {{- if .modelUri }}
-                            modelUri: {{ .modelUri }}
-                            {{- end }}
-                            {{- if .envSecretRefName }}
-                            envSecretRefName: {{ .envSecretRefName }}
-                            {{- end }}
                             {{- if .endpoint }}
                             endpoint:
                               type: {{ .endpoint.Type }}
-                            {{- end }}
-                            {{- if .logger }}
-                            logger:
-                              Mode: {{ .logger.Mode }}
-                              {{- if .logger.URL }}
-                              URL: {{ .logger.URL }}
-                              {{- end }}
                             {{- end }}
                             {{- if .parameters }}
                             parameters:
@@ -299,15 +585,6 @@ files:
               {{- end }}
             {{- end }}
           {{- end }}
-          {{- if .labels }}
-          labels:
-            {{- range $k, $v := .labels }}
-            {{ $k }}: {{ $v }}
-            {{- end }}
-          {{- end }}
-          {{- if .shadow }}
-          shadow: {{ .shadow }}
-          {{- end }}
           {{- if .ssl }}
           ssl:
             certSecretName: {{ .ssl.certSecretName }}
@@ -317,55 +594,22 @@ files:
           {{- end }}
           {{- if .explainer }}
           explainer:
-            {{- if .explainer.type }}
-            type: {{ .explainer.type }}
-            {{- end }}
             {{- if .explainer.modelUri }}
             modelUri: {{ .explainer.modelUri }}
             {{- end }}
             {{- if .explainer.serviceAccountName }}
             serviceAccountName: {{ .explainer.serviceAccountName }}
             {{- end }}
-            {{- if .explainer.storageInitializerImage }}
-            storageInitializerImage: {{ .explainer.storageInitializerImage }}
-            {{- end }}
             {{- if .explainer.envSecretRefName }}
             envSecretRefName: {{ .explainer.envSecretRefName }}
-            {{- end }}
-            {{- if .explainer.initParameters }}
-            initParameters: '{{ .explainer.initParameters }}'
             {{- end }}
             {{- if .explainer.replicas }}
             replicas: {{ .explainer.replicas }}
             {{- end }}
-            {{- if .explainer.endpoint }}
-            endpoint:
-              type: {{ .explainer.endpoint.type }}
-            {{- end }}
-            {{- if .explainer.config }}
-            config:
-              {{- range $k, $v := .explainer.config }}
-              {{ $k }}: {{ $v }}
-              {{- end }}
-            {{- end }}
-            {{- if .explainer.containerSpec }}
-            containerSpec:
-              name: {{ .explainer.containerSpec.name }}
-              image: {{ .explainer.containerSpec.image }}
-              {{- if .explainer.containerSpec.imagePullPolicy }}
-              imagePullPolicy: {{ .explainer.containerSpec.imagePullPolicy }}
-              {{- end }}
-              {{- if .explainer.containerSpec.args }}
-              args:
-                {{- range .explainer.containerSpec.args }}
-                - {{ . }}
-                {{- end }}
-              {{- end }}
-            {{- end }}
           {{- end }}
           {{- if .svcOrchSpec }}
+          {{- if .svcOrchSpec.resources }}
           svcOrchSpec:
-            {{- if .svcOrchSpec.resources }}
             resources:
               {{- if .svcOrchSpec.resources.requests }}
               requests:
@@ -385,28 +629,11 @@ files:
                 memory: {{ .svcOrchSpec.resources.limits.memory }}
                 {{- end }}
               {{- end }}
-            {{- end }}
-            {{- if .svcOrchSpec.env }}
-            env:
-              {{- range .svcOrchSpec.env }}
-              - name: {{ .name }}
-                {{- if .value }}
-                value: {{ .value }}
-                {{- else if .valueFrom }}
-                valueFrom:
-                  secretKeyRef:
-                    name: {{ .valueFrom.secretKeyRef.name }}
-                    key: {{ .valueFrom.secretKeyRef.key }}
-                {{- end }}
-              {{- end }}
-            {{- end }}
+          {{- end }}
           {{- end }}
           componentSpec:
             {{- if .componentSpec.serviceAccountName }}
             serviceAccountName: {{ .componentSpec.serviceAccountName }}
-            {{- end }}
-            {{- if .componentSpec.terminationGracePeriodSeconds }}
-            terminationGracePeriodSeconds: {{ .componentSpec.terminationGracePeriodSeconds }}
             {{- end }}
             {{- if .componentSpec.hpaSpec }}
             hpaSpec:
@@ -787,52 +1014,11 @@ files:
               maxUnavailable: {{ .componentSpec.pdbSpec.maxUnavailable }}
               {{- end }}
             {{- end }}
-            {{- if .componentSpec.volumes }}
-            volumes:
-            {{- range .componentSpec.volumes }}
-              {{ .name }}:
-                name: {{ .name }}
-                {{- if .emptyDir }}
-                emptyDir:
-                  {{- if .emptyDir.medium }}
-                  medium: {{ .emptyDir.medium }}
-                  {{- end }}
-                  {{- if .emptyDir.sizeLimit }}
-                  sizeLimit: {{ .emptyDir.sizeLimit }}
-                  {{- end }}
-                {{- else if .secret }}
-                secret:
-                  secretName: {{ .secret.secretName }}
-                {{- end }}
-            {{- end }}
-            {{- end }}
             {{- if .componentSpec.containers }}
             containers:
             {{- range .componentSpec.containers }}
               {{ .name }}:
                 name: {{ .name }}
-                image: {{ .image }}
-                {{- if .imagePullPolicy }}
-                imagePullPolicy: {{ .imagePullPolicy }}
-                {{- end }}
-                {{- if .args }}
-                args:
-                  {{- range .args }}
-                  - {{ . }}
-                  {{- end }}
-                {{- end }}
-                env:
-                  {{- range .env }}
-                  - name: {{ .name }}
-                    {{- if .value }}
-                    value: '{{ .value -}}'
-                    {{- else if .valueFrom }}
-                    valueFrom:
-                      secretKeyRef:
-                        name: {{ .valueFrom.secretKeyRef.name }}
-                        key: {{ .valueFrom.secretKeyRef.key }}
-                    {{- end }}
-                  {{- end }}
                 {{- if .envFrom }}
                 envFrom:
                   {{- range .envFrom }}
@@ -844,17 +1030,6 @@ files:
                   - configMapRef:
                       name: {{ .configMapRef.name }}
                   {{- end }}
-                  {{- end }}
-                {{- end }}
-                {{- if .volumeMounts }}
-                volumeMounts:
-                  {{- range .volumeMounts }}
-                  {{ .name }}:
-                    name: {{ .name }}
-                    mountPath: {{ .mountPath }}
-                    {{- if .readOnly }}
-                    readOnly: {{ .readOnly }}
-                    {{- end }}
                   {{- end }}
                 {{- end }}
                 {{- if .resources }}
@@ -875,75 +1050,6 @@ files:
                     {{- end }}
                     {{- if .resources.limits.memory }}
                     memory: {{ .resources.limits.memory }}
-                    {{- end }}
-                  {{- end }}
-                {{- end }}
-                {{- if .liveness }}
-                liveness:
-                  path: {{ .liveness.path }}
-                  port: {{ .liveness.port }}
-                  initialDelaySeconds: {{ .liveness.initialDelaySeconds }}
-                  periodSeconds: {{ .liveness.periodSeconds }}
-                  failureThreshold: {{ .liveness.failureThreshold }}
-                  successThreshold: {{ .liveness.successThreshold }}
-                  {{- if .liveness.scheme }}
-                  scheme: {{ .liveness.scheme }}
-                  {{- end }}
-                {{- end }}
-                {{- if .readiness }}
-                readiness:
-                  path: {{ .readiness.path }}
-                  port: {{ .readiness.port }}
-                  initialDelaySeconds: {{ .readiness.initialDelaySeconds }}
-                  periodSeconds: {{ .readiness.periodSeconds }}
-                  failureThreshold: {{ .readiness.failureThreshold }}
-                  successThreshold: {{ .readiness.successThreshold }}
-                  {{- if .readiness.scheme }}
-                  scheme: {{ .readiness.scheme }}
-                  {{- end }}
-                {{- end }}
-                {{- if .lifecycle }}
-                lifecycle:
-                  {{- if .lifecycle.postStart }}
-                  postStart:
-                    {{- if .lifecycle.postStart.exec }}
-                    exec:
-                      command:
-                        {{- range .lifecycle.postStart.exec.command }}
-                        - {{ . }}
-                        {{- end }}
-                    {{- end }}
-                    {{- if .lifecycle.postStart.httpGet }}
-                    httpGet:
-                      path: {{ .lifecycle.postStart.httpGet.path }}
-                      port: {{ .lifecycle.postStart.httpGet.port }}
-                      {{- if .lifecycle.postStart.httpGet.scheme }}
-                      scheme: {{ .lifecycle.postStart.httpGet.scheme }}
-                      {{- end }}
-                      {{- if .lifecycle.postStart.httpGet.host }}
-                      host: {{ .lifecycle.postStart.httpGet.host }}
-                      {{- end }}
-                    {{- end }}
-                  {{- end }}
-                  {{- if .lifecycle.preStop }}
-                  preStop:
-                    {{- if .lifecycle.preStop.exec }}
-                    exec:
-                      command:
-                        {{- range .lifecycle.preStop.exec.command }}
-                        - {{ . }}
-                        {{- end }}
-                    {{- end }}
-                    {{- if .lifecycle.preStop.httpGet }}
-                    httpGet:
-                      path: {{ .lifecycle.preStop.httpGet.path }}
-                      port: {{ .lifecycle.preStop.httpGet.port }}
-                      {{- if .lifecycle.preStop.httpGet.scheme }}
-                      scheme: {{ .lifecycle.preStop.httpGet.scheme }}
-                      {{- end }}
-                      {{- if .lifecycle.preStop.httpGet.host }}
-                      host: {{ .lifecycle.preStop.httpGet.host }}
-                      {{- end }}
                     {{- end }}
                   {{- end }}
                 {{- end }}
@@ -954,28 +1060,6 @@ files:
             {{- range .componentSpec.initContainers }}
               {{ .name }}:
                 name: {{ .name }}
-                image: {{ .image }}
-                {{- if .imagePullPolicy }}
-                imagePullPolicy: {{ .imagePullPolicy }}
-                {{- end }}
-                {{- if .args }}
-                args:
-                  {{- range .args }}
-                  - {{ . }}
-                  {{- end }}
-                {{- end }}
-                env:
-                  {{- range .env }}
-                  - name: {{ .name }}
-                    {{- if .value }}
-                    value: '{{ .value -}}
-                    {{- else if .valueFrom }}
-                    valueFrom:
-                      secretKeyRef:
-                        name: {{ .valueFrom.secretKeyRef.name }}
-                        key: {{ .valueFrom.secretKeyRef.key }}
-                    {{- end }}
-                  {{- end }}
                 {{- if .envFrom }}
                 envFrom:
                   {{- range .envFrom }}
@@ -989,15 +1073,6 @@ files:
                   {{- end }}
                   {{- end }}
                 {{- end }}
-                volumeMounts:
-                  {{- range .volumeMounts }}
-                  {{ .name }}:
-                    name: {{ .name }}
-                    mountPath: {{ .mountPath }}
-                    {{- if .readOnly }}
-                    readOnly: {{ .readOnly }}
-                    {{- end }}
-                  {{- end }}
                 {{- if .resources }}
                 resources:
                   {{- if .resources.requests }}
@@ -1019,94 +1094,15 @@ files:
                     {{- end }}
                   {{- end }}
                 {{- end }}
-                {{- if .liveness }}
-                liveness:
-                  path: {{ .liveness.path }}
-                  port: {{ .liveness.port }}
-                  initialDelaySeconds: {{ .liveness.initialDelaySeconds }}
-                  periodSeconds: {{ .liveness.periodSeconds }}
-                  failureThreshold: {{ .liveness.failureThreshold }}
-                  successThreshold: {{ .liveness.successThreshold }}
-                  {{- if .liveness.scheme }}
-                  scheme: {{ .liveness.scheme }}
-                  {{- end }}
-                {{- end }}
-                {{- if .readiness }}
-                readiness:
-                  path: {{ .readiness.path }}
-                  port: {{ .readiness.port }}
-                  initialDelaySeconds: {{ .readiness.initialDelaySeconds }}
-                  periodSeconds: {{ .readiness.periodSeconds }}
-                  failureThreshold: {{ .readiness.failureThreshold }}
-                  successThreshold: {{ .readiness.successThreshold }}
-                  {{- if .readiness.scheme }}
-                  scheme: {{ .readiness.scheme }}
-                  {{- end }}
-                {{- end }}
-                {{- if .lifecycle }}
-                lifecycle:
-                  {{- if .lifecycle.postStart }}
-                  postStart:
-                    {{- if .lifecycle.postStart.exec }}
-                    exec:
-                      command:
-                        {{- range .lifecycle.postStart.exec.command }}
-                        - {{ . }}
-                        {{- end }}
-                    {{- end }}
-                    {{- if .lifecycle.postStart.httpGet }}
-                    httpGet:
-                      path: {{ .lifecycle.postStart.httpGet.path }}
-                      port: {{ .lifecycle.postStart.httpGet.port }}
-                      {{- if .lifecycle.postStart.httpGet.scheme }}
-                      scheme: {{ .lifecycle.postStart.httpGet.scheme }}
-                      {{- end }}
-                      {{- if .lifecycle.postStart.httpGet.host }}
-                      host: {{ .lifecycle.postStart.httpGet.host }}
-                      {{- end }}
-                    {{- end }}
-                  {{- end }}
-                  {{- if .lifecycle.preStop }}
-                  preStop:
-                    {{- if .lifecycle.preStop.exec }}
-                    exec:
-                      command:
-                        {{- range .lifecycle.preStop.exec.command }}
-                        - {{ . }}
-                        {{- end }}
-                    {{- end }}
-                    {{- if .lifecycle.preStop.httpGet }}
-                    httpGet:
-                      path: {{ .lifecycle.preStop.httpGet.path }}
-                      port: {{ .lifecycle.preStop.httpGet.port }}
-                      {{- if .lifecycle.preStop.httpGet.scheme }}
-                      scheme: {{ .lifecycle.preStop.httpGet.scheme }}
-                      {{- end }}
-                      {{- if .lifecycle.preStop.httpGet.host }}
-                      host: {{ .lifecycle.preStop.httpGet.host }}
-                      {{- end }}
-                    {{- end }}
-                  {{- end }}
-                {{- end }}
             {{- end }}
             {{- end }}
           graph:
             name: {{ .graph.name }}
-            {{- if .graph.type }}
-            type: {{ .graph.type }}
-            {{- end }}
-            {{- if .graph.implementation }}
-            implementation: {{ .graph.implementation }}
-            {{- end }}
             {{- if .graph.modelUri }}
             modelUri: {{ .graph.modelUri }}
             {{- end }}
             {{- if .graph.envSecretRefName }}
             envSecretRefName: {{ .graph.envSecretRefName }}
-            {{- end }}
-            {{- if .graph.endpoint }}
-            endpoint:
-              type: {{ .graph.endpoint.type }}
             {{- end }}
             {{- if .graph.logger }}
             logger:
@@ -1115,46 +1111,19 @@ files:
               url: {{ .graph.logger.url }}
               {{- end }}
             {{- end }}
-            {{- if .graph.parameters }}
-            parameters:
-              {{- range .graph.parameters }}
-              - name: {{ .name }}
-                type: {{ .type }}
-                value: {{ .value }}
-              {{- end }}
-            {{- end }}
-            {{- if .graph.methods }}
-            methods:
-              {{- range .graph.methods }}
-              - {{ . }}
-              {{- end }}
-            {{- end }}
             {{- if .graph.serviceAccountName }}
             serviceAccountName: {{ .graph.serviceAccountName }}
-            {{- end }}
-            {{- if .graph.storageInitializerImage }}
-            storageInitializerImage: {{ .graph.storageInitializerImage }}
             {{- end }}
             {{- if .graph.children }}
             children:
               {{- range .graph.children }}
               {{ .name }}:
                 name: {{ .name }}
-                {{- if .type }}
-                type: {{ .type }}
-                {{- end }}
-                {{- if .implementation }}
-                implementation: {{ .implementation }}
-                {{- end }}
                 {{- if .modelUri }}
                 modelUri: {{ .modelUri }}
                 {{- end }}
                 {{- if .envSecretRefName }}
                 envSecretRefName: {{ .envSecretRefName }}
-                {{- end }}
-                {{- if .endpoint }}
-                endpoint:
-                  type: {{ .endpoint.type }}
                 {{- end }}
                 {{- if .logger }}
                 logger:
@@ -1163,46 +1132,19 @@ files:
                   url: {{ .logger.url }}
                   {{- end }}
                 {{- end }}
-                {{- if .parameters }}
-                parameters:
-                  {{- range .parameters }}
-                  - name: {{ .name }}
-                    type: {{ .type }}
-                    value: {{ .value }}
-                  {{- end }}
-                {{- end }}
-                {{- if .methods }}
-                methods:
-                  {{- range .methods }}
-                  - {{ . }}
-                  {{- end }}
-                {{- end }}
                 {{- if .serviceAccountName }}
                 serviceAccountName: {{ .serviceAccountName }}
-                {{- end }}
-                {{- if .storageInitializerImage }}
-                storageInitializerImage: {{ .storageInitializerImage }}
                 {{- end }}
                 {{- if .children }}
                 children:
                   {{- range .children }}
                   {{ .name }}:
                     name: {{ .name }}
-                    {{- if .type }}
-                    type: {{ .type }}
-                    {{- end }}
-                    {{- if .implementation }}
-                    implementation: {{ .implementation }}
-                    {{- end }}
                     {{- if .modelUri }}
                     modelUri: {{ .modelUri }}
                     {{- end }}
                     {{- if .envSecretRefName }}
                     envSecretRefName: {{ .envSecretRefName }}
-                    {{- end }}
-                    {{- if .endpoint }}
-                    endpoint:
-                      type: {{ .endpoint.type }}
                     {{- end }}
                     {{- if .logger }}
                     logger:
@@ -1211,46 +1153,19 @@ files:
                       url: {{ .logger.url }}
                       {{- end }}
                     {{- end }}
-                    {{- if .parameters }}
-                    parameters:
-                      {{- range .parameters }}
-                      - name: {{ .name }}
-                        type: {{ .type }}
-                        value: {{ .value }}
-                      {{- end }}
-                    {{- end }}
-                    {{- if .methods }}
-                    methods:
-                      {{- range .methods }}
-                      - {{ . }}
-                      {{- end }}
-                    {{- end }}
                     {{- if .serviceAccountName }}
                     serviceAccountName: {{ .serviceAccountName }}
-                    {{- end }}
-                    {{- if .storageInitializerImage }}
-                    storageInitializerImage: {{ .storageInitializerImage }}
                     {{- end }}
                     {{- if .children }}
                     children:
                       {{- range .children }}
                       {{ .name }}:
                         name: {{ .name }}
-                        {{- if .type }}
-                        type: {{ .type }}
-                        {{- end }}
-                        {{- if .implementation }}
-                        implementation: {{ .implementation }}
-                        {{- end }}
                         {{- if .modelUri }}
                         modelUri: {{ .modelUri }}
                         {{- end }}
                         {{- if .envSecretRefName }}
                         envSecretRefName: {{ .envSecretRefName }}
-                        {{- end }}
-                        {{- if .endpoint }}
-                        endpoint:
-                          type: {{ .endpoint.type }}
                         {{- end }}
                         {{- if .logger }}
                         logger:
@@ -1259,46 +1174,19 @@ files:
                           url: {{ .logger.url }}
                           {{- end }}
                         {{- end }}
-                        {{- if .parameters }}
-                        parameters:
-                          {{- range .parameters }}
-                          - name: {{ .name }}
-                            type: {{ .type }}
-                            value: {{ .value }}
-                          {{- end }}
-                        {{- end }}
-                        {{- if .methods }}
-                        methods:
-                          {{- range .methods }}
-                          - {{ . }}
-                          {{- end }}
-                        {{- end }}
                         {{- if .serviceAccountName }}
                         serviceAccountName: {{ .serviceAccountName }}
-                        {{- end }}
-                        {{- if .storageInitializerImage }}
-                        storageInitializerImage: {{ .storageInitializerImage }}
                         {{- end }}
                         {{- if .children }}
                         children:
                           {{- range .children }}
                           {{ .name }}:
                             name: {{ .name }}
-                            {{- if .type }}
-                            type: {{ .type }}
-                            {{- end }}
-                            {{- if .implementation }}
-                            implementation: {{ .implementation }}
-                            {{- end }}
                             {{- if .modelUri }}
                             modelUri: {{ .modelUri }}
                             {{- end }}
                             {{- if .envSecretRefName }}
                             envSecretRefName: {{ .envSecretRefName }}
-                            {{- end }}
-                            {{- if .endpoint }}
-                            endpoint:
-                              type: {{ .endpoint.type }}
                             {{- end }}
                             {{- if .logger }}
                             logger:
@@ -1307,25 +1195,8 @@ files:
                               url: {{ .logger.url }}
                               {{- end }}
                             {{- end }}
-                            {{- if .parameters }}
-                            parameters:
-                              {{- range .parameters }}
-                              - name: {{ .name }}
-                                type: {{ .type }}
-                                value: {{ .value }}
-                              {{- end }}
-                            {{- end }}
-                            {{- if .methods }}
-                            methods:
-                              {{- range .methods }}
-                              - {{ . }}
-                              {{- end }}
-                            {{- end }}
                             {{- if .serviceAccountName }}
                             serviceAccountName: {{ .serviceAccountName }}
-                            {{- end }}
-                            {{- if .storageInitializerImage }}
-                            storageInitializerImage: {{ .storageInitializerImage }}
                             {{- end }}
                             children: []
                           {{- end }}
@@ -1423,8 +1294,52 @@ files:
         env:
           {{- range .env }}
           - name: {{ .name }}
+            {{- if and (eq .name "MODEL_METADATA") .value }}
             {{- if .value }}
-            value: '{{ .value -}}'
+            value: |
+              ---
+              {{- if .value.name }}
+              name: {{ .value.name }}
+              {{- end }}
+              {{- if .value.versions }}
+              versions: {{ .value.versions }}
+              {{- end }}
+              {{- if .value.platform }}
+              platform: {{ .value.platform }}
+              {{- end }}
+              {{- if .value.inputs }}
+              inputs:
+                {{- if .value.inputs.messagetype }}
+              - messagetype: {{ .value.inputs.messagetype }}
+                {{- end }}
+                {{- if .value.inputs.schema }}
+                schema:
+                  {{- if .value.inputs.schema.names }}
+                  names: {{ .value.inputs.schema.names }}
+                  {{- end }}
+                  {{- if .value.inputs.schema.shape }}
+                  shape: {{ .value.inputs.schema.shape }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+              {{- if .value.outputs }}
+              outputs:
+                {{- if .value.outputs.messagetype }}
+              - messagetype: {{ .value.outputs.messagetype }}
+                {{- end }}
+                {{- if .value.outputs.schema }}
+                schema:
+                  {{- if .value.outputs.schema.names }}
+                  names: {{ .value.outputs.schema.names }}
+                  {{- end }}
+                  {{- if .value.outputs.schema.shape }}
+                  shape: {{ .value.outputs.schema.shape }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+            {{- else if .value }}          
+            value: {{ .value -}}
             {{- else if .valueFrom }}
             valueFrom:
               secretKeyRef:
@@ -1570,7 +1485,7 @@ files:
           {{- range .env }}
           - name: {{ .name }}
             {{- if .value }}
-            value: '{{ .value -}}'
+            value: {{ .value -}}
             {{- else if .valueFrom }}
             valueFrom:
               secretKeyRef:
@@ -2136,7 +2051,7 @@ files:
                   {{- if .componentSpec.serviceAccountName }}
                   serviceAccountName: {{ .componentSpec.serviceAccountName }}
                   {{- end }}
-                  {{- if .componentSpec.terminationGracePeriodSeconds }}
+                  {{- if hasKey .componentSpec "terminationGracePeriodSeconds" }}
                   terminationGracePeriodSeconds: {{ .componentSpec.terminationGracePeriodSeconds }}
                   {{- end }}
                   {{- if .componentSpec.kedaSpec }}

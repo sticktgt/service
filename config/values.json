@@ -8,175 +8,222 @@
   },
   "deploymentName": "test-explainer-model",
   "namespace": "default",
+  "metadata": {
+    "labels": {
+      "components": "seldon-core",
+      "entity": "online-model"
+    }
+  },
   "subjectArea": "seldon-test-project",
   "sourceMetafileName": "seldon.meta.yaml",
   "sourceMetafileRepo": "https://neogit.neoflex.ru/vsemenov/tservice/",
   "sourceMetafileBranch": "main",
   "predictors": [
     {
-      "name": "default",
-      "replicas": 2,
-      "traffic": 100,
-      "shadow": true,
-      "labels": {
-        "team": "ml",
-        "env": "test"
-      },
-      "ssl": {
-        "certSecretName": "tls-cert-secret"
-      },
-      "progressDeadlineSeconds": 600,
-      "engineResources": {
-        "requests": {
-          "cpu": "200m",
-          "memory": "256Mi"
-        },
-        "limits": {
-          "cpu": "500m",
-          "memory": "512Mi"
-        }
-      },
+      "name": "loan-approval",
+      "replicas": 1,
       "componentSpec": {
-        "serviceAccountName": "explainer-sa",
-        "terminationGracePeriodSeconds": 20,
-        "hpaSpec": {
-          "minReplicas": 1,
-          "maxReplicas": 3,
-          "metricsv2": [
-            {
-              "type": "Resource",
-              "resource": {
-                "name": "cpu",
-                "target": {
-                  "type": "Utilization",
-                  "averageUtilization": 75,
-                  "averageValue": "500m",
-                  "value": "600m"
-                }
-              }
-            }
-          ],
-          "metrics": [
-            {
-              "type": "Object",
-              "object": {
-                "target": {
-                  "apiVersion": "v1",
-                  "kind": "Service",
-                  "name": "my-service"
-                },
-                "metricName": "requests-per-second",
-                "targetValue": "100",
-                "selector": {
-                  "matchLabels": {
-                    "app": "my-app"
-                  },
-                  "matchExpressions": [
-                    {
-                      "key": "environment",
-                      "operator": "In",
-                      "values": ["prod", "staging"]
-                    }
-                  ]
-                }
-              }
-            }
-          ]
-        },
-        "kedaSpec": {
-          "pollingInterval": 15,
-          "minReplicaCount": 1,
-          "maxReplicaCount": 5,
-          "triggers": [
-            {
-              "type": "prometheus",
-              "metadata": {
-                "serverAddress": "http://seldon-monitoring-prometheus.seldon-monitoring.svc.cluster.local:9090",
-                "metricName": "access_frequency",
-                "threshold": "10",
-                "query": "rate(seldon_api_executor_client_requests_seconds_count{model_name=\"classifier\"}[1m])"
-              }
-            }
-          ]
-        },
-        "pdbSpec": {
-          "minAvailable": "90%"
-        },
+        "serviceAccountName": "default-editor",
+        "terminationGracePeriodSeconds": 0,
         "containers": [
           {
-            "name": "classifier",
-            "image": "seldonio/sklearn-iris:0.1",
-            "imagePullPolicy": "IfNotPresent",
-            "args": [
-              "--model",
-              "serve"
-            ],
+            "name": "fs33kafka",
             "env": [
               {
+                "name": "GUNICORN_WORKERS",
+                "value": "2"
+              },
+              {
+                "name": "GUNICORN_THREADS",
+                "value": "2"
+              },
+              {
                 "name": "MODEL_METADATA",
-                "value": "---\\nname: single-node\\nversions: [ generic-node/v0.4 ]\\nplatform: seldon"
+                "value": {
+                  "name": "node-one",
+                  "versions": "[ generic-node/v0.4 ]",
+                  "platform": "seldon",
+                  "inputs": {
+                    "messagetype": "tensor",
+                    "schema": {
+                      "names": "[ a, b ]",
+                      "shape": "[ 2 ]"
+                    }
+                  },
+                  "outputs": {
+                    "messagetype": "tensor",
+                    "schema": {
+                      "names": "[ node-output ]",
+                      "shape": "[ 1 ]"
+                    }                    
+                  }
+                }
               }
             ],
-            "resources": {
-              "requests": {
-                "cpu": "100m",
-                "memory": "128Mi"
-              },
-              "limits": {
-                "cpu": "200m",
-                "memory": "256Mi"
-              }
-            },
             "liveness": {
-              "path": "/health",
-              "port": "8080",
-              "initialDelaySeconds": 5,
-              "periodSeconds": 10,
-              "failureThreshold": 3,
-              "successThreshold": 1,
-              "scheme": "HTTP"
+              "path": "/health/ping",
+              "port": "http",
+              "scheme": "HTTP",
+              "initialDelaySeconds": 80,
+              "periodSeconds": 5,
+              "failureThreshold": 200,
+              "successThreshold": 1
             },
             "readiness": {
-              "path": "/ready",
-              "port": "8080",
-              "initialDelaySeconds": 5,
-              "periodSeconds": 10,
-              "failureThreshold": 3,
-              "successThreshold": 1,
-              "scheme": "HTTP"
+              "path": "/health/ping",
+              "port": "http",
+              "scheme": "HTTP",
+              "initialDelaySeconds": 80,
+              "periodSeconds": 5,
+              "failureThreshold": 200,
+              "successThreshold": 1
+            },
+            "resources": {
+              "limits": {
+                "cpu": "2.0",
+                "memory": "4.0Gi"
+              },
+              "requests": {
+                "cpu": "2.0",
+                "memory": "4.0Gi"
+              }
             }
+          },
+          {
+            "name": "input-transformer",
+            "image": "harbor-dognauts.neoflex.ru/dognauts/feast-rest-enricher:v0.1.0",
+            "env": [
+              {
+                "name": "GUNICORN_WORKERS",
+                "value": "2"
+              },
+              {
+                "name": "GUNICORN_THREADS",
+                "value": "2"
+              },
+              {
+                "name": "modelURI",
+                "value": "s3://app-fdd/1/2f50d812d476495d90d4c566a2f99d4d/artifacts/model"
+              },
+              {
+                "name": "MLFLOW_S3_ENDPOINT_URL",
+                "value": "https://s3-mlops.neoflex.ru"
+              },
+              {
+                "name": "AWS_ACCESS_KEY_ID",
+                "value": "8A8TWIG7I0PUKUD5HU7J"
+              },
+              {
+                "name": "AWS_SECRET_ACCESS_KEY",
+                "value": "Ns4Oi92O5DAGZ015rp2zWe4BQw8rt1pFBDkJGrMJ"
+              },
+              {
+                "name": "FEAST_FEATURE_SERVER_URL",
+                "value": "http://feast-feature-server.app-fdd:80/"
+              }
+            ]
           }
         ]
       },
-      "explainer": {
-        "type": "AnchorTabular",
-        "modelUri": "gs://seldon-models/explainer",
-        "serviceAccountName": "explainer-sa",
-        "storageInitializerImage": "seldonio/storage-init:1.18.0-dev",
-        "envSecretRefName": "explainer-secret",
-        "replicas": 1,
-        "initParameters": "threshold: 0.95, top_n: 3",
+      "svcOrchSpec": {
+        "env": [
+          {
+            "name": "LOGGER_KAFKA_BROKER",
+            "value": "kafka-kafka-0.kafka-kafka-brokers.dognauts-kafka.svc:9093"
+          },
+          {
+            "name": "LOGGER_KAFKA_TOPIC",
+            "value": "model-drift-demo"
+          },
+          {
+            "name": "KAFKA_SECURITY_PROTOCOL",
+            "value": "sasl_ssl"
+          },
+          {
+            "name": "KAFKA_SSL_CA_CERT",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "kafka-cluster-creds",
+                "key": "cluster-ca.cert"
+              }
+            }
+          },
+          {
+            "name": "KAFKA_SSL_CLIENT_CERT",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "kafka-cluster-creds",
+                "key": "clients-ca.cert"
+              }
+            }
+          },
+          {
+            "name": "KAFKA_SSL_CLIENT_KEY",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "kafka-cluster-creds",
+                "key": "clients-ca.key"
+              }
+            }
+          },
+          {
+            "name": "KAFKA_SSL_CLIENT_KEY_PASS",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "kafka-cluster-creds",
+                "key": "clients-ca.pass"
+              }
+            }
+          },
+          {
+            "name": "KAFKA_SASL_PASSWORD",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "kafka-cluster-creds",
+                "key": "sasl.pass"
+              }
+            }
+          },
+          {
+            "name": "KAFKA_SASL_USERNAME",
+            "valueFrom": {
+              "secretKeyRef": {
+                "name": "kafka-cluster-creds",
+                "key": "sasl-user"
+              }
+            }
+          },
+          {
+            "name": "KAFKA_SASL_MECHANISM",
+            "value": "SCRAM-SHA-512"
+          }
+        ]
+      },
+      "graph": {
+        "name": "input-transformer",
+        "type": "TRANSFORMER",
         "endpoint": {
           "type": "REST"
         },
-        "config": {
-          "explainer_runtime": "python",
-          "logging": "debug"
-        },
-        "containerSpec": {
-          "name": "custom-explainer",
-          "image": "seldonio/explainer-anchor:0.1",
-          "args": [
-            "--explain"
-          ]
-        }
-      },
-      "graph": {
-        "name": "classifier",
-        "type": "MODEL",
-        "implementation": "SKLEARN_SERVER",
-        "modelUri": "gs://seldon-models/sklearn/iris",
-        "children": []
+        "children": [
+          {
+            "name": "fs33kafka",
+            "implementation": "MLFLOW_SERVER",
+            "modelUri": "s3://app-fdd/1/2f50d812d476495d90d4c566a2f99d4d/artifacts/model",
+            "envSecretRefName": "seldon-secret",
+            "logger": {
+              "mode": "response"
+            },
+            "parameters": [
+              {
+                "name": "xtype",
+                "type": "STRING",
+                "value": "DataFrame"
+              }
+            ],
+            "children": []
+          }
+        ]
       }
     }
   ]
