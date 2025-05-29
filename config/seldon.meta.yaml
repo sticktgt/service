@@ -3272,3 +3272,1278 @@ valuesSchema:
     type: string
     description: Policy for pulling explainer container image
     required: false
+
+setupValuesSchema: |
+  ---
+  {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "apiVersion": {
+        "type": "string"
+      },
+      "chart": {
+        "$ref": "#/definitions/chart"
+      },
+      "namespace": {
+        "type": "string"
+      },
+      "metadata": {
+        "$ref": "#/definitions/metadata"
+      },
+      "predictors": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/predictor"
+        }
+      },
+      "annotations": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "protocol": {
+        "type": "string",
+        "enum": [
+          "seldon",
+          "tensorflow",
+          "kfserving",
+          "v2"
+        ]
+      },
+      "transport": {
+        "type": "string",
+        "enum": [
+          "rest",
+          "grpc"
+        ]
+      },
+      "subjectArea": {
+        "type": "string"
+      },
+      "sourceMetafileName": {
+        "type": "string"
+      },
+      "sourceMetafileRepo": {
+        "type": "string"
+      },
+      "sourceMetafileBranch": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "chart",
+      "predictors"
+    ],
+    "definitions": {
+      "chart": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "version",
+          "description"
+        ]
+      },
+      "metadata": {
+        "type": "object",
+        "properties": {
+          "labels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "annotations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "predictor": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "replicas": {
+            "type": "integer"
+          },
+          "traffic": {
+            "type": "integer"
+          },
+          "svcOrchSpec": {
+            "$ref": "#/definitions/svcOrchSpec"
+          },
+          "graph": {
+            "$ref": "#/definitions/graphNode"
+          },
+          "componentSpec": {
+            "$ref": "#/definitions/componentSpec"
+          },
+          "engineResources": {
+            "$ref": "#/definitions/resources"
+          },
+          "labels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "explainer": {
+            "$ref": "#/definitions/explainer"
+          },
+          "shadow": {
+            "type": "boolean"
+          },
+          "ssl": {
+            "$ref": "#/definitions/ssl"
+          },
+          "progressDeadlineSeconds": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "graph"
+        ]
+      },
+      "svcOrchSpec": {
+        "type": "object",
+        "properties": {
+          "resources": {
+            "$ref": "#/definitions/resources"
+          },
+          "env": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/envVar"
+            }
+          }
+        }
+      },
+      "resources": {
+        "type": "object",
+        "properties": {
+          "requests": {
+            "$ref": "#/definitions/resourceQuantities"
+          },
+          "limits": {
+            "$ref": "#/definitions/resourceQuantities"
+          }
+        }
+      },
+      "resourceQuantities": {
+        "type": "object",
+        "properties": {
+          "cpu": {
+            "type": "string"
+          },
+          "memory": {
+            "type": "string"
+          }
+        }
+      },
+      "envVar": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object"
+          },
+          "valueFrom": {
+            "$ref": "#/definitions/valueFrom"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "envFrom": {
+        "type": "object",
+        "properties": {
+          "secretRef": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "configMapRef": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "valueFrom": {
+        "type": "object",
+        "properties": {
+          "secretKeyRef": {
+            "$ref": "#/definitions/secretKeyRef"
+          }
+        },
+        "required": [
+          "secretKeyRef"
+        ]
+      },
+      "secretKeyRef": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "key"
+        ]
+      },
+      "graphNode": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "MODEL",
+              "TRANSFORMER",
+              "ROUTER",
+              "COMBINER",
+              "OUTPUT_TRANSFORMER",
+              "UNKNOWN_TYPE"
+            ]
+          },
+          "implementation": {
+            "type": "string",
+            "enum": [
+              "UNKNOWN_IMPLEMENTATION",
+              "SKLEARN_SERVER",
+              "XGBOOST_SERVER",
+              "TENSORFLOW_SERVER",
+              "PYTORCH_SERV",
+              "LIGHTGBM_SERVER",
+              "CUSTOM",
+              "TRITON_SERVER",
+              "HUGGINGFACE_SERVER",
+              "MLFLOW_SERVER",
+              "ONNX_SERVER",
+              "R_SERVER",
+              "CUSTOM_INFERENCE_SERVER"
+            ]
+          },
+          "modelUri": {
+            "type": "string"
+          },
+          "storageInitializerImage": {
+            "type": "string"
+          },
+          "envSecretRefName": {
+            "type": "string"
+          },
+          "endpoint": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "REST",
+                  "GRPC"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "logger": {
+            "type": "object",
+            "properties": {
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "all",
+                  "request",
+                  "response",
+                  "none"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "parameters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "STRING",
+                    "BOOL",
+                    "INT",
+                    "FLOAT",
+                    "DOUBLE"
+                  ]
+                },
+                "value": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "type",
+                "value"
+              ]
+            }
+          },
+          "methods": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "serviceAccountName": {
+            "type": "string"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/graphNode"
+            }
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "componentSpec": {
+        "type": "object",
+        "properties": {
+          "serviceAccountName": {
+            "type": "string"
+          },
+          "terminationGracePeriodSeconds": {
+            "type": "integer"
+          },
+          "containers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/container"
+            }
+          },
+          "initContainers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/container"
+            }
+          },
+          "volumes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/volume"
+            }
+          },
+          "hpaSpec": {
+            "$ref": "#/definitions/hpaSpec"
+          },
+          "kedaSpec": {
+            "$ref": "#/definitions/kedaSpec"
+          },
+          "pdbSpec": {
+            "$ref": "#/definitions/pdbSpec"
+          }
+        }
+      },
+      "container": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "imagePullPolicy": {
+            "type": "string",
+            "enum": [
+              "Always",
+              "IfNotPresent",
+              "Never"
+            ]
+          },
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "env": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/envVar"
+            }
+          },
+          "envFrom": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/envFrom"
+            }
+          },
+          "volumeMounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/volumeMount"
+            }
+          },
+          "resources": {
+            "$ref": "#/definitions/resources"
+          },
+          "liveness": {
+            "$ref": "#/definitions/probe"
+          },
+          "readiness": {
+            "$ref": "#/definitions/probe"
+          },
+          "lifecycle": {
+            "$ref": "#/definitions/lifecycle"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "volumeMount": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "mountPath": {
+            "type": "string"
+          },
+          "readOnly": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "mountPath"
+        ]
+      },
+      "volume": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "emptyDir": {
+            "$ref": "#/definitions/emptyDirVolume"
+          },
+          "secret": {
+            "$ref": "#/definitions/secretVolumeSource"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "emptyDirVolume": {
+        "type": "object",
+        "properties": {
+          "medium": {
+            "type": "string"
+          },
+          "sizeLimit": {
+            "type": "string"
+          }
+        }
+      },
+      "secretVolumeSource": {
+        "type": "object",
+        "properties": {
+          "secretName": {
+            "type": "string"
+          }
+        }
+      },
+      "probe": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "port": {
+            "type": "string"
+          },
+          "initialDelaySeconds": {
+            "type": "integer"
+          },
+          "periodSeconds": {
+            "type": "integer"
+          },
+          "failureThreshold": {
+            "type": "integer"
+          },
+          "successThreshold": {
+            "type": "integer"
+          },
+          "scheme": {
+            "type": "string"
+          }
+        }
+      },
+      "lifecycle": {
+        "type": "object",
+        "properties": {
+          "postStart": {
+            "$ref": "#/definitions/lifecycleHandler"
+          },
+          "preStop": {
+            "$ref": "#/definitions/lifecycleHandler"
+          }
+        }
+      },
+      "lifecycleHandler": {
+        "type": "object",
+        "properties": {
+          "exec": {
+            "type": "object",
+            "properties": {
+              "command": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "httpGet": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "port": {
+                "type": "string"
+              },
+              "host": {
+                "type": "string"
+              },
+              "scheme": {
+                "type": "string"
+              },
+              "httpHeaders": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "tcpSocket": {
+            "type": "object",
+            "properties": {
+              "port": {
+                "type": "string"
+              },
+              "host": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "hpaSpec": {
+        "type": "object",
+        "properties": {
+          "minReplicas": {
+            "type": "integer"
+          },
+          "maxReplicas": {
+            "type": "integer"
+          },
+          "metricsv2": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "Resource",
+                    "Pods",
+                    "Object",
+                    "External"
+                  ]
+                },
+                "resource": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "target": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "Utilization",
+                            "Value",
+                            "AverageValue"
+                          ]
+                        },
+                        "averageUtilization": {
+                          "type": "integer"
+                        },
+                        "averageValue": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "pods": {
+                  "type": "object",
+                  "properties": {
+                    "metric": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "selector": {
+                          "type": "object",
+                          "properties": {
+                            "matchLabels": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "string"
+                              }
+                            },
+                            "matchExpressions": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "key": {
+                                    "type": "string"
+                                  },
+                                  "operator": {
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "target": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "Utilization",
+                            "Value",
+                            "AverageValue"
+                          ]
+                        },
+                        "averageValue": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "object": {
+                  "type": "object",
+                  "properties": {
+                    "describedObject": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "apiVersion": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "metric": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "selector": {
+                          "type": "object",
+                          "properties": {
+                            "matchLabels": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "string"
+                              }
+                            },
+                            "matchExpressions": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "key": {
+                                    "type": "string"
+                                  },
+                                  "operator": {
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "target": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "Utilization",
+                            "Value",
+                            "AverageValue"
+                          ]
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "external": {
+                  "type": "object",
+                  "properties": {
+                    "metric": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "selector": {
+                          "type": "object",
+                          "properties": {
+                            "matchLabels": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "string"
+                              }
+                            },
+                            "matchExpressions": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "key": {
+                                    "type": "string"
+                                  },
+                                  "operator": {
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "target": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "Utilization",
+                            "Value",
+                            "AverageValue"
+                          ]
+                        },
+                        "value": {
+                          "type": "string"
+                        },
+                        "averageValue": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "Resource",
+                    "Pods",
+                    "Object",
+                    "External"
+                  ]
+                },
+                "resource": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "targetAverageUtilization": {
+                      "type": "integer"
+                    },
+                    "targetAverageValue": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "pods": {
+                  "type": "object",
+                  "properties": {
+                    "metricName": {
+                      "type": "string"
+                    },
+                    "targetAverageValue": {
+                      "type": "string"
+                    },
+                    "selector": {
+                      "type": "object",
+                      "properties": {
+                        "matchLabels": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "string"
+                          }
+                        },
+                        "matchExpressions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "operator": {
+                                "type": "string"
+                              },
+                              "values": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "object": {
+                  "type": "object",
+                  "properties": {
+                    "target": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "apiVersion": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "metricName": {
+                      "type": "string"
+                    },
+                    "targetValue": {
+                      "type": "string"
+                    },
+                    "selector": {
+                      "type": "object",
+                      "properties": {
+                        "matchLabels": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "string"
+                          }
+                        },
+                        "matchExpressions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "operator": {
+                                "type": "string"
+                              },
+                              "values": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "averageValue": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "external": {
+                  "type": "object",
+                  "properties": {
+                    "metricName": {
+                      "type": "string"
+                    },
+                    "targetValue": {
+                      "type": "string"
+                    },
+                    "targetAverageValue": {
+                      "type": "string"
+                    },
+                    "metricSelector": {
+                      "type": "object",
+                      "properties": {
+                        "matchLabels": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "string"
+                          }
+                        },
+                        "matchExpressions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "operator": {
+                                "type": "string"
+                              },
+                              "values": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "Utilization",
+                          "Value",
+                          "AverageValue"
+                        ]
+                      },
+                      "value": {
+                        "type": "string"
+                      },
+                      "averageValue": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "kedaSpec": {
+        "type": "object",
+        "properties": {
+          "minReplicaCount": {
+            "type": "integer"
+          },
+          "maxReplicaCount": {
+            "type": "integer"
+          },
+          "cooldownPeriod": {
+            "type": "integer"
+          },
+          "pollingInterval": {
+            "type": "integer"
+          },
+          "triggers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/kedaTrigger"
+            }
+          },
+          "advanced": {
+            "$ref": "#/definitions/kedaAdvancedSpec"
+          }
+        }
+      },
+      "kedaTrigger": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "useCachedMetrics": {
+            "type": "boolean"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "authenticationRef": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "kedaAdvancedSpec": {
+        "type": "object",
+        "properties": {
+          "restoreToOriginalReplicaCount": {
+            "type": "boolean"
+          },
+          "scalingModifiers": {
+            "type": "object",
+            "properties": {
+              "formula": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string"
+              },
+              "activationTarget": {
+                "type": "string"
+              },
+              "metricType": {
+                "type": "string"
+              }
+            }
+          },
+          "horizontalPodAutoscalerConfig": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "behavior": {
+                "type": "object",
+                "properties": {
+                  "scaleUp": {
+                    "$ref": "#/definitions/hpaScalingRules"
+                  },
+                  "scaleDown": {
+                    "$ref": "#/definitions/hpaScalingRules"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "hpaScalingRules": {
+        "type": "object",
+        "properties": {
+          "stabilizationWindowSeconds": {
+            "type": "integer"
+          },
+          "selectPolicy": {
+            "type": "string"
+          },
+          "policies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "integer"
+                },
+                "periodSeconds": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "tolerance": {
+            "type": "string"
+          }
+        }
+      },
+      "pdbSpec": {
+        "type": "object",
+        "properties": {
+          "minAvailable": {
+            "type": "string"
+          },
+          "maxUnavailable": {
+            "type": "string"
+          }
+        }
+      },
+      "explainer": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "AnchorTabular",
+              "AnchorImages",
+              "AnchorText",
+              "Counterfactuals",
+              "Contrastive",
+              "KernelShap",
+              "IntegratedGradients",
+              "ALE",
+              "TreeShap"
+            ]
+          },
+          "modelUri": {
+            "type": "string"
+          },
+          "serviceAccountName": {
+            "type": "string"
+          },
+          "storageInitializerImage": {
+            "type": "string"
+          },
+          "envSecretRefName": {
+            "type": "string"
+          },
+          "initParameters": {
+            "type": "string"
+          },
+          "replicas": {
+            "type": "integer"
+          },
+          "endpoint": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              }
+            }
+          },
+          "config": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "containerSpec": {
+            "$ref": "#/definitions/container"
+          }
+        }
+      },
+      "ssl": {
+        "type": "object",
+        "properties": {
+          "certSecretName": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
