@@ -1,101 +1,59 @@
 {
   "environment": "TEST",
-  "apiVersion": "machinelearning.seldon.io/v1",
-  "deploymentName": "graph-metadata-router",
+  "apiVersion": "machinelearning.seldon.io/v1alpha2",
+  "deploymentName": "mlflow-deployment",
   "namespace": "default",
+  "subjectArea": "seldon-test-project",
   "chart": {
     "name": "test-model",
     "version": "0.1.0",
     "description": "Test Seldon deployment chart"
   },
-  "subjectArea": "seldon-test-project",
-  "sourceMetafileName": "seldon.meta.yaml",
-  "sourceMetafileRepo": "https://neogit.neoflex.ru/vsemenov/tservice/",
-  "sourceMetafileBranch": "main",
   "predictors": [
     {
-      "name": "example",
+      "name": "mlflow-deployment-dag",
       "replicas": 1,
+      "svcOrchSpec": {
+        "env": [
+          {
+            "name": "SELDON_LOG_LEVEL",
+            "value": "DEBUG"
+          }
+        ]
+      },
       "componentSpec": {
+        "terminationGracePeriodSeconds": 900,
         "containers": [
           {
-            "name": "node-router",
-            "image": "seldonio/metadata-generic-node:0.4"
-          },
-          {
-            "name": "node-one",
-            "image": "seldonio/metadata-generic-node:0.4",
-            "env": [
-              {
-                "name": "MODEL_METADATA",
-                "value": {
-                  "name": "node-one",
-                  "versions": "[ generic-node/v0.4 ]",
-                  "platform": "seldon",
-                  "inputs": {
-                    "messagetype": "tensor",
-                    "schema": {
-                      "names": "[ a, b ]",
-                      "shape": "[ 2 ]"
-                    }
-                  },
-                  "outputs": {
-                    "messagetype": "tensor",
-                    "schema": {
-                      "names": "[ node-output ]",
-                      "shape": "[ 1 ]"
-                    }
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "name": "node-two",
-            "image": "seldonio/metadata-generic-node:0.4",
-            "env": [
-              {
-                "name": "MODEL_METADATA",
-                "value": {
-
-                  "name": "node-two",
-                  "versions": "[ generic-node/v0.4 ]",
-                  "platform": "seldon",
-                  "inputs": {
-                  "messagetype": "tensor",
-                    "schema": {
-                      "names": "[ a, b ]",
-                      "shape": "[ 2 ]"
-                    }
-                  },
-                  "outputs": {
-                    "messagetype": "tensor",
-                    "schema": {
-                      "names": "[ node-output ]",
-                      "shape": "[ 1 ]"
-                    }
-                  }
-                }
-              }
-            ]
+            "name": "wines-classifier",
+            "readiness": {
+              "httpGet": {
+                "path": "/v2/health/ready",
+                "port": 9000
+              },
+              "initialDelaySeconds": 240,
+              "periodSeconds": 20,
+              "timeoutSeconds": 5,
+              "failureThreshold": 5
+            },
+            "liveness": {
+              "httpGet": {
+                "path": "/v2/health/live",
+                "port": 9000
+              },
+              "initialDelaySeconds": 240,
+              "periodSeconds": 20,
+              "timeoutSeconds": 5,
+              "failureThreshold": 5
+            }
           }
         ]
       },
       "graph": {
-        "name": "node-router",
-        "type": "ROUTER",
-        "children": [
-          {
-            "name": "node-one",
-            "type": "MODEL",
-            "children": []
-          },
-          {
-            "name": "node-two",
-            "type": "MODEL",
-            "children": []
-          }
-        ]
+        "name": "wines-classifier",
+        "implementation": "MLFLOW_SERVER",
+        "modelUri": "gs://seldon-models/mlflow/elasticnet_wine_model_mlserver_1_1/",
+        "children": []
       }
     }
   ]

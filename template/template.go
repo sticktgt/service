@@ -240,13 +240,21 @@ type SecretVolumeSource struct {
 }
 
 type Probe struct {
-	Path                string `json:"path" yaml:"path"`
-	Port                string `json:"port" yaml:"port"`
-	InitialDelaySeconds int    `json:"initialDelaySeconds" yaml:"initialDelaySeconds"`
-	PeriodSeconds       int    `json:"periodSeconds" yaml:"periodSeconds"`
-	FailureThreshold    int    `json:"failureThreshold" yaml:"failureThreshold"`
-	SuccessThreshold    int    `json:"successThreshold" yaml:"successThreshold"`
-	Scheme              string `json:"scheme,omitempty" yaml:"scheme,omitempty"`
+	Exec                          *ExecAction      `json:"exec,omitempty" yaml:"exec,omitempty"`
+	HTTPGet                       *HTTPGetAction   `json:"httpGet,omitempty" yaml:"httpGet,omitempty"`
+	TCPSocket                     *TCPSocketAction `json:"tcpSocket,omitempty" yaml:"tcpSocket,omitempty"`
+	GRPC                          *GRPCAction      `json:"grpc,omitempty" yaml:"grpc,omitempty"`
+	InitialDelaySeconds           int              `json:"initialDelaySeconds,omitempty" yaml:"initialDelaySeconds,omitempty"`
+	TimeoutSeconds                int              `json:"timeoutSeconds,omitempty" yaml:"timeoutSeconds,omitempty"`
+	PeriodSeconds                 int              `json:"periodSeconds,omitempty" yaml:"periodSeconds,omitempty"`
+	SuccessThreshold              int              `json:"successThreshold,omitempty" yaml:"successThreshold,omitempty"`
+	FailureThreshold              int              `json:"failureThreshold,omitempty" yaml:"failureThreshold,omitempty"`
+	TerminationGracePeriodSeconds *int64           `json:"terminationGracePeriodSeconds,omitempty" yaml:"terminationGracePeriodSeconds,omitempty"`
+}
+
+type GRPCAction struct {
+	Port    int    `json:"port" yaml:"port"`
+	Service string `json:"service,omitempty" yaml:"service,omitempty"` // Optional
 }
 
 type InitContainer struct {
@@ -401,11 +409,16 @@ type ExecAction struct {
 }
 
 type HTTPGetAction struct {
-	Path        string            `json:"path,omitempty" yaml:"path,omitempty"`
-	Port        string            `json:"port" yaml:"port"`
-	Host        string            `json:"host,omitempty" yaml:"host,omitempty"`
-	Scheme      string            `json:"scheme,omitempty" yaml:"scheme,omitempty"`
-	HTTPHeaders map[string]string `json:"httpHeaders,omitempty" yaml:"httpHeaders,omitempty"`
+	Path        string       `json:"path,omitempty" yaml:"path,omitempty"`
+	Port        *interface{} `json:"port" yaml:"port"`
+	Host        string       `json:"host,omitempty" yaml:"host,omitempty"`
+	Scheme      string       `json:"scheme,omitempty" yaml:"scheme,omitempty"`
+	HTTPHeaders []HTTPHeader `json:"httpHeaders,omitempty" yaml:"httpHeaders,omitempty"`
+}
+
+type HTTPHeader struct {
+	Name  string `json:"name" yaml:"name"`
+	Value string `json:"value" yaml:"value"`
 }
 
 type TCPSocketAction struct {
@@ -449,7 +462,7 @@ func main() {
 
 	var meta ChartTemplate
 	log.Printf("Reading template file")
-	tmplData, err := os.ReadFile("../config/seldon.meta.yaml")
+	tmplData, err := os.ReadFile("../config/meta-online-inference-seldon-v1.yaml")
 	check(err)
 	check(yaml.Unmarshal(tmplData, &meta))
 

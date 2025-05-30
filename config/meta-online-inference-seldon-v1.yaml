@@ -239,27 +239,97 @@ files:
                 {{- end }}
                 {{- if .liveness }}
                 liveness:
-                  path: {{ .liveness.path }}
-                  port: {{ .liveness.port }}
+                  {{- if .liveness.httpGet }}
+                  httpGet:
+                    path: {{ .liveness.httpGet.path }}
+                    port: {{ .liveness.httpGet.port }}
+                    {{- if .liveness.httpGet.host }}
+                    host: {{ .liveness.httpGet.host }}
+                    {{- end }}
+                    {{- if .liveness.httpGet.scheme }}
+                    scheme: {{ .liveness.httpGet.scheme }}
+                    {{- end }}
+                    {{- if .liveness.httpGet.httpHeaders }}
+                    httpHeaders:
+                      {{- range .liveness.httpGet.httpHeaders }}
+                      - name: {{ .name }}
+                        value: {{ .value }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .liveness.tcpSocket }}
+                  tcpSocket:
+                    port: {{ .liveness.tcpSocket.port }}
+                    {{- if .liveness.tcpSocket.host }}
+                    host: {{ .liveness.tcpSocket.host }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .liveness.exec }}
+                  exec:
+                    command:
+                      {{- range .liveness.exec.command }}
+                      - {{ . }}
+                      {{- end }}
+                  {{- end }}
+                  {{- if .liveness.grpc }}
+                  grpc:
+                    port: {{ .liveness.grpc.port }}
+                    {{- if .liveness.grpc.service }}
+                    service: {{ .liveness.grpc.service }}
+                    {{- end }}
+                  {{- end }}
                   initialDelaySeconds: {{ .liveness.initialDelaySeconds }}
                   periodSeconds: {{ .liveness.periodSeconds }}
+                  timeoutSeconds: {{ .liveness.timeoutSeconds }}
+                  vsuccessThreshold: {{ .liveness.successThreshold }}
                   failureThreshold: {{ .liveness.failureThreshold }}
-                  successThreshold: {{ .liveness.successThreshold }}
-                  {{- if .liveness.scheme }}
-                  scheme: {{ .liveness.scheme }}
-                  {{- end }}
                 {{- end }}
                 {{- if .readiness }}
                 readiness:
-                  path: {{ .readiness.path }}
-                  port: {{ .readiness.port }}
+                  {{- if .readiness.httpGet }}
+                  httpGet:
+                    path: {{ .readiness.httpGet.path }}
+                    port: {{ .readiness.httpGet.port }}
+                    {{- if .readiness.httpGet.host }}
+                    host: {{ .readiness.httpGet.host }}
+                    {{- end }}
+                    {{- if .readiness.httpGet.scheme }}
+                    scheme: {{ .readiness.httpGet.scheme }}
+                    {{- end }}
+                    {{- if .readiness.httpGet.httpHeaders }}
+                    httpHeaders:
+                      {{- range .readiness.httpGet.httpHeaders }}
+                      - name: {{ .name }}
+                        value: {{ .value }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .readiness.tcpSocket }}
+                  tcpSocket:
+                    port: {{ .readiness.tcpSocket.port }}
+                    {{- if .readiness.tcpSocket.host }}
+                    host: {{ .readiness.tcpSocket.host }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .readiness.exec }}
+                  exec:
+                    command:
+                      {{- range .readiness.exec.command }}
+                      - {{ . }}
+                      {{- end }}
+                  {{- end }}
+                  {{- if .readiness.grpc }}
+                  grpc:
+                    port: {{ .readiness.grpc.port }}
+                    {{- if .readiness.grpc.service }}
+                    service: {{ .readiness.grpc.service }}
+                    {{- end }}
+                  {{- end }}
                   initialDelaySeconds: {{ .readiness.initialDelaySeconds }}
                   periodSeconds: {{ .readiness.periodSeconds }}
-                  failureThreshold: {{ .readiness.failureThreshold }}
+                  timeoutSeconds: {{ .readiness.timeoutSeconds }}
                   successThreshold: {{ .readiness.successThreshold }}
-                  {{- if .readiness.scheme }}
-                  scheme: {{ .readiness.scheme }}
-                  {{- end }}
+                  failureThreshold: {{ .readiness.failureThreshold }}
                 {{- end }}
                 {{- if .lifecycle }}
                 lifecycle:
@@ -350,27 +420,97 @@ files:
                   {{- end }}
                 {{- if .liveness }}
                 liveness:
-                  path: {{ .liveness.path }}
-                  port: {{ .liveness.port }}
+                  {{- if .liveness.httpGet }}
+                  httpGet:
+                    path: {{ .liveness.httpGet.path }}
+                    port: {{ .liveness.httpGet.port }}
+                    {{- if .liveness.httpGet.host }}
+                    host: {{ .liveness.httpGet.host }}
+                    {{- end }}
+                    {{- if .liveness.httpGet.scheme }}
+                    scheme: {{ .liveness.httpGet.scheme }}
+                    {{- end }}
+                    {{- if .liveness.httpGet.httpHeaders }}
+                    httpHeaders:
+                      {{- range .liveness.httpGet.httpHeaders }}
+                      - name: {{ .name }}
+                        value: {{ .value }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .liveness.tcpSocket }}
+                  tcpSocket:
+                    port: {{ .liveness.tcpSocket.port }}
+                    {{- if .liveness.tcpSocket.host }}
+                    host: {{ .liveness.tcpSocket.host }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .liveness.exec }}
+                  exec:
+                    command:
+                      {{- range .liveness.exec.command }}
+                      - {{ . }}
+                      {{- end }}
+                  {{- end }}
+                  {{- if .liveness.grpc }}
+                  grpc:
+                    port: {{ .liveness.grpc.port }}
+                    {{- if .liveness.grpc.service }}
+                    service: {{ .liveness.grpc.service }}
+                    {{- end }}
+                  {{- end }}
                   initialDelaySeconds: {{ .liveness.initialDelaySeconds }}
                   periodSeconds: {{ .liveness.periodSeconds }}
+                  timeoutSeconds: {{ .liveness.timeoutSeconds }}
+                  vsuccessThreshold: {{ .liveness.successThreshold }}
                   failureThreshold: {{ .liveness.failureThreshold }}
-                  successThreshold: {{ .liveness.successThreshold }}
-                  {{- if .liveness.scheme }}
-                  scheme: {{ .liveness.scheme }}
-                  {{- end }}
                 {{- end }}
                 {{- if .readiness }}
                 readiness:
-                  path: {{ .readiness.path }}
-                  port: {{ .readiness.port }}
+                  {{- if .readiness.httpGet }}
+                  httpGet:
+                    path: {{ .readiness.httpGet.path }}
+                    port: {{ .readiness.httpGet.port }}
+                    {{- if .readiness.httpGet.host }}
+                    host: {{ .readiness.httpGet.host }}
+                    {{- end }}
+                    {{- if .readiness.httpGet.scheme }}
+                    scheme: {{ .readiness.httpGet.scheme }}
+                    {{- end }}
+                    {{- if .readiness.httpGet.httpHeaders }}
+                    httpHeaders:
+                      {{- range .readiness.httpGet.httpHeaders }}
+                      - name: {{ .name }}
+                        value: {{ .value }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .readiness.tcpSocket }}
+                  tcpSocket:
+                    port: {{ .readiness.tcpSocket.port }}
+                    {{- if .readiness.tcpSocket.host }}
+                    host: {{ .readiness.tcpSocket.host }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if .readiness.exec }}
+                  exec:
+                    command:
+                      {{- range .readiness.exec.command }}
+                      - {{ . }}
+                      {{- end }}
+                  {{- end }}
+                  {{- if .readiness.grpc }}
+                  grpc:
+                    port: {{ .readiness.grpc.port }}
+                    {{- if .readiness.grpc.service }}
+                    service: {{ .readiness.grpc.service }}
+                    {{- end }}
+                  {{- end }}
                   initialDelaySeconds: {{ .readiness.initialDelaySeconds }}
                   periodSeconds: {{ .readiness.periodSeconds }}
-                  failureThreshold: {{ .readiness.failureThreshold }}
+                  timeoutSeconds: {{ .readiness.timeoutSeconds }}
                   successThreshold: {{ .readiness.successThreshold }}
-                  {{- if .readiness.scheme }}
-                  scheme: {{ .readiness.scheme }}
-                  {{- end }}
+                  failureThreshold: {{ .readiness.failureThreshold }}
                 {{- end }}
                 {{- if .lifecycle }}
                 lifecycle:
@@ -1400,29 +1540,97 @@ files:
         {{- end }}
         {{- if .liveness }}
         livenessProbe:
+          {{- if .liveness.httpGet }}
           httpGet:
-            path: {{ .liveness.path }}
-            port: {{ .liveness.port }}
-            {{- if .liveness.scheme }}
-            scheme: {{ .liveness.scheme }}
+            path: {{ .liveness.httpGet.path }}
+            port: {{ .liveness.httpGet.port }}
+            {{- if .liveness.httpGet.host }}
+            host: {{ .liveness.httpGet.host }}
             {{- end }}
+            {{- if .liveness.httpGet.scheme }}
+            scheme: {{ .liveness.httpGet.scheme }}
+            {{- end }}
+            {{- if .liveness.httpGet.httpHeaders }}
+            httpHeaders:
+              {{- range .liveness.httpGet.httpHeaders }}
+              - name: {{ .name }}
+                value: {{ .value }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- if .liveness.tcpSocket }}
+          tcpSocket:
+            port: {{ .liveness.tcpSocket.port }}
+            {{- if .liveness.tcpSocket.host }}
+            host: {{ .liveness.tcpSocket.host }}
+            {{- end }}
+          {{- end }}
+          {{- if .liveness.exec }}
+          exec:
+            command:
+              {{- range .liveness.exec.command }}
+              - {{ . }}
+              {{- end }}
+          {{- end }}
+          {{- if .liveness.grpc }}
+          grpc:
+            port: {{ .liveness.grpc.port }}
+            {{- if .liveness.grpc.service }}
+            service: {{ .liveness.grpc.service }}
+            {{- end }}
+          {{- end }}
           initialDelaySeconds: {{ .liveness.initialDelaySeconds }}
           periodSeconds: {{ .liveness.periodSeconds }}
-          failureThreshold: {{ .liveness.failureThreshold }}
+          timeoutSeconds: {{ .liveness.timeoutSeconds }}
           successThreshold: {{ .liveness.successThreshold }}
+          failureThreshold: {{ .liveness.failureThreshold }}
         {{- end }}
         {{- if .readiness }}
         readinessProbe:
+          {{- if .readiness.httpGet }}
           httpGet:
-            path: {{ .readiness.path }}
-            port: {{ .readiness.port }}
-            {{- if .readiness.scheme }}
-            scheme: {{ .readiness.scheme }}
+            path: {{ .readiness.httpGet.path }}
+            port: {{ .readiness.httpGet.port }}
+            {{- if .readiness.httpGet.host }}
+            host: {{ .readiness.httpGet.host }}
             {{- end }}
+            {{- if .readiness.httpGet.scheme }}
+            scheme: {{ .readiness.httpGet.scheme }}
+            {{- end }}
+            {{- if .readiness.httpGet.httpHeaders }}
+            httpHeaders:
+              {{- range .readiness.httpGet.httpHeaders }}
+              - name: {{ .name }}
+                value: {{ .value }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- if .readiness.tcpSocket }}
+          tcpSocket:
+            port: {{ .readiness.tcpSocket.port }}
+            {{- if .readiness.tcpSocket.host }}
+            host: {{ .readiness.tcpSocket.host }}
+            {{- end }}
+          {{- end }}
+          {{- if .readiness.exec }}
+          exec:
+            command:
+              {{- range .readiness.exec.command }}
+              - {{ . }}
+              {{- end }}
+          {{- end }}
+          {{- if .readiness.grpc }}
+          grpc:
+            port: {{ .readiness.grpc.port }}
+            {{- if .readiness.grpc.service }}
+            service: {{ .readiness.grpc.service }}
+            {{- end }}
+          {{- end }}
           initialDelaySeconds: {{ .readiness.initialDelaySeconds }}
           periodSeconds: {{ .readiness.periodSeconds }}
-          failureThreshold: {{ .readiness.failureThreshold }}
+          timeoutSeconds: {{ .readiness.timeoutSeconds }}
           successThreshold: {{ .readiness.successThreshold }}
+          failureThreshold: {{ .readiness.failureThreshold }}
         {{- end }}
         {{- if .lifecycle }}
         lifecycle:
@@ -2508,61 +2716,141 @@ valuesSchema:
     type: string
     description: Maximum amount of memory allowed for the container
     required: false
-  predictors.componentSpec.containers.liveness.path:
-    type: string
-    description: HTTP path to access on the container to perform liveness check
-    required: false
-  predictors.componentSpec.containers.liveness.port:
-    type: string
-    description: Port to access for the liveness probe
-    required: false
-  predictors.componentSpec.containers.liveness.scheme:
-    type: string
-    description: Scheme to use for connecting to the host (HTTP or HTTPS)
-    required: false
   predictors.componentSpec.containers.liveness.initialDelaySeconds:
     type: integer
-    description: Number of seconds after the container has started before liveness probe is initiated
+    description: Number of seconds after the container has started before liveness probes are initiated.
     required: false
   predictors.componentSpec.containers.liveness.periodSeconds:
     type: integer
-    description: How often (in seconds) to perform the liveness probe
+    description: How often (in seconds) to perform the liveness probe.
     required: false
-  predictors.componentSpec.containers.liveness.failureThreshold:
+  predictors.componentSpec.containers.liveness.timeoutSeconds:
     type: integer
-    description: Number of times the liveness probe can fail before the container is restarted
+    description: Number of seconds after which the liveness probe times out.
     required: false
   predictors.componentSpec.containers.liveness.successThreshold:
     type: integer
-    description: Minimum consecutive successes for the liveness probe to be considered successful
+    description: Minimum consecutive successes for the liveness probe to be considered successful.
     required: false
-  predictors.componentSpec.containers.readiness.path:
-    type: string
-    description: HTTP path to access on the container to perform readiness check
+  predictors.componentSpec.containers.liveness.failureThreshold:
+    type: integer
+    description: When a probe fails, Kubernetes will try `failureThreshold` times before giving up.
     required: false
-  predictors.componentSpec.containers.readiness.port:
+  predictors.componentSpec.containers.liveness.httpGet.path:
     type: string
-    description: Port to access for the readiness probe
+    description: Path to access on the HTTP server for the liveness probe.
     required: false
-  predictors.componentSpec.containers.readiness.scheme:
+  predictors.componentSpec.containers.liveness.httpGet.port:
     type: string
-    description: Scheme to use for connecting to the host (HTTP or HTTPS)
+    description: Name or number of the port to access on the container.
+    required: false
+  predictors.componentSpec.containers.liveness.httpGet.host:
+    type: string
+    description: Host name to connect to, defaults to the pod IP.
+    required: false
+  predictors.componentSpec.containers.liveness.httpGet.scheme:
+    type: string
+    description: Scheme to use for connecting to the host (HTTP or HTTPS).
+    required: false
+  predictors.componentSpec.containers.liveness.httpGet.httpHeaders:
+    type: list
+    description: Custom headers to set in the request.
+    required: false
+  predictors.componentSpec.containers.liveness.httpGet.httpHeaders.name:
+    type: string
+    description: Name of the HTTP header.
+    required: true
+  predictors.componentSpec.containers.liveness.httpGet.httpHeaders.value:
+    type: string
+    description: Value of the HTTP header.
+    required: true
+  predictors.componentSpec.containers.liveness.tcpSocket.port:
+    type: string
+    description: Port to access on the container.
+    required: false
+  predictors.componentSpec.containers.liveness.tcpSocket.host:
+    type: string
+    description: Optional host name to connect to.
+    required: false
+  predictors.componentSpec.containers.liveness.exec.command:
+    type: list
+    description: Command line to execute inside the container.
+    required: false
+  predictors.componentSpec.containers.liveness.grpc.port:
+    type: integer
+    description: Port number to access gRPC service.
+    required: false
+  predictors.componentSpec.containers.liveness.grpc.service:
+    type: string
+    description: Name of the gRPC service to call.
     required: false
   predictors.componentSpec.containers.readiness.initialDelaySeconds:
     type: integer
-    description: Number of seconds after the container has started before readiness probe is initiated
+    description: Number of seconds after the container has started before readiness probes are initiated.
     required: false
   predictors.componentSpec.containers.readiness.periodSeconds:
     type: integer
-    description: How often (in seconds) to perform the readiness probe
+    description: How often (in seconds) to perform the readiness probe.
     required: false
-  predictors.componentSpec.containers.readiness.failureThreshold:
+  predictors.componentSpec.containers.readiness.timeoutSeconds:
     type: integer
-    description: Number of times the readiness probe can fail before the container is marked unhealthy
+    description: Number of seconds after which the readiness probe times out.
     required: false
   predictors.componentSpec.containers.readiness.successThreshold:
     type: integer
-    description: Minimum consecutive successes for the readiness probe to be considered successful
+    description: Minimum consecutive successes for the readiness probe to be considered successful.
+    required: false
+  predictors.componentSpec.containers.readiness.failureThreshold:
+    type: integer
+    description: When a probe fails, Kubernetes will try `failureThreshold` times before giving up.
+    required: false
+  predictors.componentSpec.containers.readiness.httpGet.path:
+    type: string
+    description: Path to access on the HTTP server for the readiness probe.
+    required: false
+  predictors.componentSpec.containers.readiness.httpGet.port:
+    type: string
+    description: Name or number of the port to access on the container.
+    required: false
+  predictors.componentSpec.containers.readiness.httpGet.host:
+    type: string
+    description: Host name to connect to, defaults to the pod IP.
+    required: false
+  predictors.componentSpec.containers.readiness.httpGet.scheme:
+    type: string
+    description: Scheme to use for connecting to the host (HTTP or HTTPS).
+    required: false
+  predictors.componentSpec.containers.readiness.httpGet.httpHeaders:
+    type: list
+    description: Custom headers to set in the request.
+    required: false
+  predictors.componentSpec.containers.readiness.httpGet.httpHeaders.name:
+    type: string
+    description: Name of the HTTP header.
+    required: true
+  predictors.componentSpec.containers.readiness.httpGet.httpHeaders.value:
+    type: string
+    description: Value of the HTTP header.
+    required: true
+  predictors.componentSpec.containers.readiness.tcpSocket.port:
+    type: string
+    description: Port to access on the container.
+    required: false
+  predictors.componentSpec.containers.readiness.tcpSocket.host:
+    type: string
+    description: Optional host name to connect to.
+    required: false
+  predictors.componentSpec.containers.readiness.exec.command:
+    type: list
+    description: Command line to execute inside the container.
+    required: false
+  predictors.componentSpec.containers.readiness.grpc.port:
+    type: integer
+    description: Port number to access gRPC service.
+    required: false
+  predictors.componentSpec.containers.readiness.grpc.service:
+    type: string
+    description: Name of the gRPC service to call.
     required: false
   predictors.componentSpec.containers.lifecycle.preStop.exec.command:
     type: list
@@ -2692,61 +2980,141 @@ valuesSchema:
     type: string
     description: Maximum amount of memory allowed for the init container
     required: false
-  predictors.componentSpec.initContainers.liveness.path:
-    type: string
-    description: HTTP path to access on the container to perform liveness check
-    required: false
-  predictors.componentSpec.initContainers.liveness.port:
-    type: string
-    description: Port to access for the liveness probe
-    required: false
-  predictors.componentSpec.initContainers.liveness.scheme:
-    type: string
-    description: Scheme to use for connecting to the host (HTTP or HTTPS)
-    required: false
   predictors.componentSpec.initContainers.liveness.initialDelaySeconds:
     type: integer
-    description: Number of seconds after the container has started before liveness probe is initiated
+    description: Number of seconds after the container has started before liveness probes are initiated.
     required: false
   predictors.componentSpec.initContainers.liveness.periodSeconds:
     type: integer
-    description: How often (in seconds) to perform the liveness probe
+    description: How often (in seconds) to perform the liveness probe.
     required: false
-  predictors.componentSpec.initContainers.liveness.failureThreshold:
+  predictors.componentSpec.initContainers.liveness.timeoutSeconds:
     type: integer
-    description: Number of times the liveness probe can fail before the container is restarted
+    description: Number of seconds after which the liveness probe times out.
     required: false
   predictors.componentSpec.initContainers.liveness.successThreshold:
     type: integer
-    description: Minimum consecutive successes for the liveness probe to be considered successful
+    description: Minimum consecutive successes for the liveness probe to be considered successful.
     required: false
-  predictors.componentSpec.initContainers.readiness.path:
-    type: string
-    description: HTTP path to access on the container to perform readiness check
+  predictors.componentSpec.initContainers.liveness.failureThreshold:
+    type: integer
+    description: When a probe fails, Kubernetes will try `failureThreshold` times before giving up.
     required: false
-  predictors.componentSpec.initContainers.readiness.port:
+  predictors.componentSpec.initContainers.liveness.httpGet.path:
     type: string
-    description: Port to access for the readiness probe
+    description: Path to access on the HTTP server for the liveness probe.
     required: false
-  predictors.componentSpec.initContainers.readiness.scheme:
+  predictors.componentSpec.initContainers.liveness.httpGet.port:
     type: string
-    description: Scheme to use for connecting to the host (HTTP or HTTPS)
+    description: Name or number of the port to access on the container.
+    required: false
+  predictors.componentSpec.initContainers.liveness.httpGet.host:
+    type: string
+    description: Host name to connect to, defaults to the pod IP.
+    required: false
+  predictors.componentSpec.initContainers.liveness.httpGet.scheme:
+    type: string
+    description: Scheme to use for connecting to the host (HTTP or HTTPS).
+    required: false
+  predictors.componentSpec.initContainers.liveness.httpGet.httpHeaders:
+    type: list
+    description: Custom headers to set in the request.
+    required: false
+  predictors.componentSpec.initContainers.liveness.httpGet.httpHeaders.name:
+    type: string
+    description: Name of the HTTP header.
+    required: true
+  predictors.componentSpec.initContainers.liveness.httpGet.httpHeaders.value:
+    type: string
+    description: Value of the HTTP header.
+    required: true
+  predictors.componentSpec.initContainers.liveness.tcpSocket.port:
+    type: string
+    description: Port to access on the container.
+    required: false
+  predictors.componentSpec.initContainers.liveness.tcpSocket.host:
+    type: string
+    description: Optional host name to connect to.
+    required: false
+  predictors.componentSpec.initContainers.liveness.exec.command:
+    type: list
+    description: Command line to execute inside the container.
+    required: false
+  predictors.componentSpec.initContainers.liveness.grpc.port:
+    type: integer
+    description: Port number to access gRPC service.
+    required: false
+  predictors.componentSpec.initContainers.liveness.grpc.service:
+    type: string
+    description: Name of the gRPC service to call.
     required: false
   predictors.componentSpec.initContainers.readiness.initialDelaySeconds:
     type: integer
-    description: Number of seconds after the container has started before readiness probe is initiated
+    description: Number of seconds after the container has started before readiness probes are initiated.
     required: false
   predictors.componentSpec.initContainers.readiness.periodSeconds:
     type: integer
-    description: How often (in seconds) to perform the readiness probe
+    description: How often (in seconds) to perform the readiness probe.
     required: false
-  predictors.componentSpec.initContainers.readiness.failureThreshold:
+  predictors.componentSpec.initContainers.readiness.timeoutSeconds:
     type: integer
-    description: Number of times the readiness probe can fail before the container is marked unhealthy
+    description: Number of seconds after which the readiness probe times out.
     required: false
   predictors.componentSpec.initContainers.readiness.successThreshold:
     type: integer
-    description: Minimum consecutive successes for the readiness probe to be considered successful
+    description: Minimum consecutive successes for the readiness probe to be considered successful.
+    required: false
+  predictors.componentSpec.initContainers.readiness.failureThreshold:
+    type: integer
+    description: When a probe fails, Kubernetes will try `failureThreshold` times before giving up.
+    required: false
+  predictors.componentSpec.initContainers.readiness.httpGet.path:
+    type: string
+    description: Path to access on the HTTP server for the readiness probe.
+    required: false
+  predictors.componentSpec.initContainers.readiness.httpGet.port:
+    type: string
+    description: Name or number of the port to access on the container.
+    required: false
+  predictors.componentSpec.initContainers.readiness.httpGet.host:
+    type: string
+    description: Host name to connect to, defaults to the pod IP.
+    required: false
+  predictors.componentSpec.initContainers.readiness.httpGet.scheme:
+    type: string
+    description: Scheme to use for connecting to the host (HTTP or HTTPS).
+    required: false
+  predictors.componentSpec.initContainers.readiness.httpGet.httpHeaders:
+    type: list
+    description: Custom headers to set in the request.
+    required: false
+  predictors.componentSpec.initContainers.readiness.httpGet.httpHeaders.name:
+    type: string
+    description: Name of the HTTP header.
+    required: true
+  predictors.componentSpec.initContainers.readiness.httpGet.httpHeaders.value:
+    type: string
+    description: Value of the HTTP header.
+    required: true
+  predictors.componentSpec.initContainers.readiness.tcpSocket.port:
+    type: string
+    description: Port to access on the container.
+    required: false
+  predictors.componentSpec.initContainers.readiness.tcpSocket.host:
+    type: string
+    description: Optional host name to connect to.
+    required: false
+  predictors.componentSpec.initContainers.readiness.exec.command:
+    type: list
+    description: Command line to execute inside the container.
+    required: false
+  predictors.componentSpec.initContainers.readiness.grpc.port:
+    type: integer
+    description: Port number to access gRPC service.
+    required: false
+  predictors.componentSpec.initContainers.readiness.grpc.service:
+    type: string
+    description: Name of the gRPC service to call.
     required: false
   predictors.componentSpec.initContainers.lifecycle.preStop.exec.command:
     type: list
@@ -3802,26 +4170,86 @@ setupValuesSchema: |
       "probe": {
         "type": "object",
         "properties": {
-          "path": {
-            "type": "string"
-          },
-          "port": {
-            "type": "string"
-          },
           "initialDelaySeconds": {
             "type": "integer"
           },
           "periodSeconds": {
             "type": "integer"
           },
-          "failureThreshold": {
+          "timeoutSeconds": {
             "type": "integer"
           },
           "successThreshold": {
             "type": "integer"
           },
-          "scheme": {
-            "type": "string"
+          "failureThreshold": {
+            "type": "integer"
+          },
+          "httpGet": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "port": { },
+              "host": {
+                "type": "string"
+              },
+              "scheme": {
+                "type": "string"
+              },
+              "httpHeaders": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "value"
+                  ]
+                }
+              }
+            }
+          },
+          "tcpSocket": {
+            "type": "object",
+            "properties": {
+              "port": {
+                "type": "string"
+              },
+              "host": {
+                "type": "string"
+              }
+            }
+          },
+          "exec": {
+            "type": "object",
+            "properties": {
+              "command": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "grpc": {
+            "type": "object",
+            "properties": {
+              "port": {
+                "type": "integer"
+              },
+              "service": {
+                "type": "string"
+              }
+            }
           }
         }
       },
