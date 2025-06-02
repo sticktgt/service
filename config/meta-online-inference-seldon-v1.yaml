@@ -25,7 +25,7 @@ files:
     template: true
     content: |
       subjectArea: {{ .Values.subjectArea }}
-      {{- if .Values.apiVersio }}
+      {{- if .Values.apiVersion }}
       apiVersion: {{ .Values.apiVersion }}
       {{- end }}
       {{- if .Values.protocol }}
@@ -278,11 +278,21 @@ files:
                     service: {{ .liveness.grpc.service }}
                     {{- end }}
                   {{- end }}
+                  {{- if .liveness.initialDelaySeconds }}
                   initialDelaySeconds: {{ .liveness.initialDelaySeconds }}
+                  {{- end }}
+                  {{- if .liveness.periodSeconds }}
                   periodSeconds: {{ .liveness.periodSeconds }}
+                  {{- end }}
+                  {{- if .liveness.timeoutSeconds }}
                   timeoutSeconds: {{ .liveness.timeoutSeconds }}
+                  {{- end }}
+                  {{- if .liveness.successThreshold }}
                   vsuccessThreshold: {{ .liveness.successThreshold }}
+                  {{- end }}
+                  {{- if .liveness.failureThreshold }}
                   failureThreshold: {{ .liveness.failureThreshold }}
+                  {{- end }}
                 {{- end }}
                 {{- if .readiness }}
                 readiness:
@@ -325,11 +335,21 @@ files:
                     service: {{ .readiness.grpc.service }}
                     {{- end }}
                   {{- end }}
+                  {{- if .readiness.initialDelaySeconds }}
                   initialDelaySeconds: {{ .readiness.initialDelaySeconds }}
+                  {{- end }}
+                  {{- if .readiness.periodSeconds }}
                   periodSeconds: {{ .readiness.periodSeconds }}
+                  {{- end }}
+                  {{- if .readiness.timeoutSeconds }}
                   timeoutSeconds: {{ .readiness.timeoutSeconds }}
+                  {{- end }}
+                  {{- if .readiness.successThreshold }}
                   successThreshold: {{ .readiness.successThreshold }}
+                  {{- end }}
+                  {{- if .readiness.failureThreshold }}
                   failureThreshold: {{ .readiness.failureThreshold }}
+                  {{- end }}
                 {{- end }}
                 {{- if .lifecycle }}
                 lifecycle:
@@ -459,11 +479,21 @@ files:
                     service: {{ .liveness.grpc.service }}
                     {{- end }}
                   {{- end }}
+                  {{- if .liveness.initialDelaySeconds }}
                   initialDelaySeconds: {{ .liveness.initialDelaySeconds }}
+                  {{- end }}
+                  {{- if .liveness.periodSeconds }}
                   periodSeconds: {{ .liveness.periodSeconds }}
+                  {{- end }}
+                  {{- if .liveness.timeoutSeconds }}
                   timeoutSeconds: {{ .liveness.timeoutSeconds }}
+                  {{- end }}
+                  {{- if .liveness.successThreshold }}
                   vsuccessThreshold: {{ .liveness.successThreshold }}
+                  {{- end }}
+                  {{- if .liveness.failureThreshold }}
                   failureThreshold: {{ .liveness.failureThreshold }}
+                  {{- end }}
                 {{- end }}
                 {{- if .readiness }}
                 readiness:
@@ -506,11 +536,21 @@ files:
                     service: {{ .readiness.grpc.service }}
                     {{- end }}
                   {{- end }}
+                  {{- if .readiness.initialDelaySeconds }}
                   initialDelaySeconds: {{ .readiness.initialDelaySeconds }}
+                  {{- end }}
+                  {{- if .readiness.periodSeconds }}
                   periodSeconds: {{ .readiness.periodSeconds }}
+                  {{- end }}
+                  {{- if .readiness.timeoutSeconds }}
                   timeoutSeconds: {{ .readiness.timeoutSeconds }}
+                  {{- end }}
+                  {{- if .readiness.successThreshold }}
                   successThreshold: {{ .readiness.successThreshold }}
+                  {{- end }}
+                  {{- if .readiness.failureThreshold }}
                   failureThreshold: {{ .readiness.failureThreshold }}
+                  {{- end }}
                 {{- end }}
                 {{- if .lifecycle }}
                 lifecycle:
@@ -1364,7 +1404,7 @@ files:
   - path: templates/_helpers.tpl
     template: false
     content: |
-      {{- define "seldon.graph.node" }}
+      {{- define "seldon.graph.node" -}}
       name: {{ .name }}
       {{- if .type }}
       type: {{ .type }}
@@ -1419,8 +1459,8 @@ files:
       {{- else }}
       children: []
       {{- end }}
-      {{- end }}
-      {{- define "seldon.container" }}
+      {{- end -}}
+      {{- define "seldon.container" -}}
       - name: {{ .name }}
         {{- if .image }}
         image: {{ .image }}
@@ -1482,7 +1522,7 @@ files:
                 {{- end }}
               {{- end }}
             {{- end }}
-            {{- else if .value }}          
+            {{- else if .value }}
             value: {{ .value -}}
             {{- else if .valueFrom }}
             valueFrom:
@@ -1508,7 +1548,7 @@ files:
         {{- if .volumeMounts }}
         volumeMounts:
           {{- range $name, $vm := .volumeMounts }}
-          {{- with $vm }}                  
+          {{- with $vm }}
           - name: {{ .name }}
             mountPath: {{ .mountPath }}
             {{- if .readOnly }}
@@ -1579,11 +1619,21 @@ files:
             service: {{ .liveness.grpc.service }}
             {{- end }}
           {{- end }}
+          {{- if .liveness.initialDelaySeconds }}
           initialDelaySeconds: {{ .liveness.initialDelaySeconds }}
+          {{- end }}
+          {{- if .liveness.periodSeconds }}
           periodSeconds: {{ .liveness.periodSeconds }}
+          {{- end }}
+          {{- if .liveness.timeoutSeconds }}
           timeoutSeconds: {{ .liveness.timeoutSeconds }}
+          {{- end }}
+          {{- if .liveness.successThreshold }}
           successThreshold: {{ .liveness.successThreshold }}
+          {{- end }}
+          {{- if .liveness.failureThreshold }}
           failureThreshold: {{ .liveness.failureThreshold }}
+          {{- end }}
         {{- end }}
         {{- if .readiness }}
         readinessProbe:
@@ -1626,11 +1676,21 @@ files:
             service: {{ .readiness.grpc.service }}
             {{- end }}
           {{- end }}
+          {{- if .readiness.initialDelaySeconds }}
           initialDelaySeconds: {{ .readiness.initialDelaySeconds }}
+          {{- end }}
+          {{- if .readiness.periodSeconds }}
           periodSeconds: {{ .readiness.periodSeconds }}
+          {{- end }}
+          {{- if .readiness.timeoutSeconds }}
           timeoutSeconds: {{ .readiness.timeoutSeconds }}
+          {{- end }}
+          {{- if .readiness.successThreshold }}
           successThreshold: {{ .readiness.successThreshold }}
+          {{- end }}
+          {{- if .readiness.failureThreshold }}
           failureThreshold: {{ .readiness.failureThreshold }}
+          {{- end }}
         {{- end }}
         {{- if .lifecycle }}
         lifecycle:
@@ -1677,9 +1737,9 @@ files:
             {{- end }}
           {{- end }}
         {{- end }}
-      {{- end }}
-      {{- define "seldon.container-s" }}
-        name: {{ .name }}
+      {{- end -}}
+      {{- define "seldon.container-s" -}}
+        {{ "name: " | indent 2 }}{{ .name }}
         {{- if .image }}
         image: {{ .image }}
         {{- end }}
@@ -1722,7 +1782,7 @@ files:
         {{- if .volumeMounts }}
         volumeMounts:
           {{- range $name, $vm := .volumeMounts }}
-          {{- with $vm }}         
+          {{- with $vm }}
           - name: {{ .name }}
             mountPath: {{ .mountPath }}
             {{- if .readOnly }}
@@ -1754,29 +1814,117 @@ files:
         {{- end }}
         {{- if .liveness }}
         livenessProbe:
+          {{- if .liveness.httpGet }}
           httpGet:
-            path: {{ .liveness.path }}
-            port: {{ .liveness.port }}
-            {{- if .liveness.scheme }}
-            scheme: {{ .liveness.scheme }}
+            path: {{ .liveness.httpGet.path }}
+            port: {{ .liveness.httpGet.port }}
+            {{- if .liveness.httpGet.host }}
+            host: {{ .liveness.httpGet.host }}
             {{- end }}
+            {{- if .liveness.httpGet.scheme }}
+            scheme: {{ .liveness.httpGet.scheme }}
+            {{- end }}
+            {{- if .liveness.httpGet.httpHeaders }}
+            httpHeaders:
+              {{- range .liveness.httpGet.httpHeaders }}
+              - name: {{ .name }}
+                value: {{ .value }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- if .liveness.tcpSocket }}
+          tcpSocket:
+            port: {{ .liveness.tcpSocket.port }}
+            {{- if .liveness.tcpSocket.host }}
+            host: {{ .liveness.tcpSocket.host }}
+            {{- end }}
+          {{- end }}
+          {{- if .liveness.exec }}
+          exec:
+            command:
+              {{- range .liveness.exec.command }}
+              - {{ . }}
+              {{- end }}
+          {{- end }}
+          {{- if .liveness.grpc }}
+          grpc:
+            port: {{ .liveness.grpc.port }}
+            {{- if .liveness.grpc.service }}
+            service: {{ .liveness.grpc.service }}
+            {{- end }}
+          {{- end }}
+          {{- if .liveness.initialDelaySeconds }}
           initialDelaySeconds: {{ .liveness.initialDelaySeconds }}
+          {{- end }}
+          {{- if .liveness.periodSeconds }}
           periodSeconds: {{ .liveness.periodSeconds }}
-          failureThreshold: {{ .liveness.failureThreshold }}
+          {{- end }}
+          {{- if .liveness.timeoutSeconds }}
+          timeoutSeconds: {{ .liveness.timeoutSeconds }}
+          {{- end }}
+          {{- if .liveness.successThreshold }}
           successThreshold: {{ .liveness.successThreshold }}
+          {{- end }}
+          {{- if .liveness.failureThreshold }}
+          failureThreshold: {{ .liveness.failureThreshold }}
+          {{- end }}
         {{- end }}
         {{- if .readiness }}
         readinessProbe:
+          {{- if .readiness.httpGet }}
           httpGet:
-            path: {{ .readiness.path }}
-            port: {{ .readiness.port }}
-            {{- if .readiness.scheme }}
-            scheme: {{ .readiness.scheme }}
+            path: {{ .readiness.httpGet.path }}
+            port: {{ .readiness.httpGet.port }}
+            {{- if .readiness.httpGet.host }}
+            host: {{ .readiness.httpGet.host }}
             {{- end }}
+            {{- if .readiness.httpGet.scheme }}
+            scheme: {{ .readiness.httpGet.scheme }}
+            {{- end }}
+            {{- if .readiness.httpGet.httpHeaders }}
+            httpHeaders:
+              {{- range .readiness.httpGet.httpHeaders }}
+              - name: {{ .name }}
+                value: {{ .value }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- if .readiness.tcpSocket }}
+          tcpSocket:
+            port: {{ .readiness.tcpSocket.port }}
+            {{- if .readiness.tcpSocket.host }}
+            host: {{ .readiness.tcpSocket.host }}
+            {{- end }}
+          {{- end }}
+          {{- if .readiness.exec }}
+          exec:
+            command:
+              {{- range .readiness.exec.command }}
+              - {{ . }}
+              {{- end }}
+          {{- end }}
+          {{- if .readiness.grpc }}
+          grpc:
+            port: {{ .readiness.grpc.port }}
+            {{- if .readiness.grpc.service }}
+            service: {{ .readiness.grpc.service }}
+            {{- end }}
+          {{- end }}
+          {{- if .readiness.initialDelaySeconds }}
           initialDelaySeconds: {{ .readiness.initialDelaySeconds }}
+          {{- end }}
+          {{- if .readiness.periodSeconds }}
           periodSeconds: {{ .readiness.periodSeconds }}
-          failureThreshold: {{ .readiness.failureThreshold }}
+          {{- end }}
+          {{- if .readiness.timeoutSeconds }}
+          timeoutSeconds: {{ .readiness.timeoutSeconds }}
+          {{- end }}
+          {{- if .readiness.successThreshold }}
           successThreshold: {{ .readiness.successThreshold }}
+          {{- end }}
+          {{- if .readiness.failureThreshold }}
+          failureThreshold: {{ .readiness.failureThreshold }}
+          {{- end }}
         {{- end }}
         {{- if .lifecycle }}
         lifecycle:
@@ -1823,7 +1971,7 @@ files:
             {{- end }}
           {{- end }}
         {{- end }}
-      {{- end }}
+      {{- end -}}
       {{- define "common.helm-labels" -}}
       app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
       app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -1957,7 +2105,7 @@ files:
               {{- end }}
               {{- if .explainer.containerSpec }}
               containerSpec:
-              {{- include "seldon.container-s" .explainer.containerSpec | indent 8 }}
+                {{- "\n" }}{{ include "seldon.container-s" .explainer.containerSpec | indent 8 }}
               {{- end }}
             {{- end }}
             {{- if .svcOrchSpec }}
@@ -1999,7 +2147,7 @@ files:
               {{- end }}
             {{- end }}
             graph:
-              {{- include "seldon.graph.node" .graph | indent 8 }}
+              {{- "\n" }}{{ include "seldon.graph.node" .graph | indent 8 }}
             {{- if .componentSpec }}
             componentSpecs:
               {{- if .componentSpec.hpaSpec }}
@@ -2388,11 +2536,11 @@ files:
                     maxUnavailable: {{ .componentSpec.pdbSpec.maxUnavailable }}
                     {{- end }}
                   {{- end }}
-                  {{- if .componentSpec.containers }}      
+                  {{- if .componentSpec.containers }}
                   containers:
                     {{- range $name, $cn := .componentSpec.containers }}
                     {{- with $cn }}
-                    {{- include "seldon.container" . | indent 14 }}
+                    {{- "\n" }}{{ include "seldon.container" . | indent 14 }}
                     {{- end }}
                     {{- end }}
                   {{- end }}
@@ -2400,14 +2548,14 @@ files:
                   initContainers:
                     {{- range $name, $icn := .componentSpec.initContainers }}
                     {{- with $icn }}
-                    {{- include "seldon.container" . | indent 14 }}
+                    {{- "\n" }}{{ include "seldon.container" . | indent 14 }}
                     {{- end }}
                     {{- end }}
                   {{- end }}
                   {{- if .componentSpec.volumes }}
                   volumes:
                     {{- range $name, $vm := .componentSpec.volumes }}
-                    {{- with $vm }}                    
+                    {{- with $vm }}
                     - name: {{ .name }}
                       {{- if .emptyDir }}
                       emptyDir:
@@ -2425,7 +2573,7 @@ files:
                     {{- end }}
                   {{- end }}
             {{- end }}
-          {{- end }}    
+          {{- end }}
         {{- end }}
 
   - path: .helmignore

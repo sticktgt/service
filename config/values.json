@@ -11,7 +11,7 @@
   },
   "predictors": [
     {
-      "name": "mlflow-deployment-dag",
+      "name": "default",
       "replicas": 1,
       "svcOrchSpec": {
         "env": [
@@ -21,38 +21,10 @@
           }
         ]
       },
-      "componentSpec": {
-        "terminationGracePeriodSeconds": 900,
-        "containers": [
-          {
-            "name": "wines-classifier",
-            "readiness": {
-              "httpGet": {
-                "path": "/v2/health/ready",
-                "port": 9000
-              },
-              "initialDelaySeconds": 240,
-              "periodSeconds": 20,
-              "timeoutSeconds": 5,
-              "failureThreshold": 5
-            },
-            "liveness": {
-              "httpGet": {
-                "path": "/v2/health/live",
-                "port": 9000
-              },
-              "initialDelaySeconds": 240,
-              "periodSeconds": 20,
-              "timeoutSeconds": 5,
-              "failureThreshold": 5
-            }
-          }
-        ]
-      },
       "graph": {
-        "name": "wines-classifier",
-        "implementation": "MLFLOW_SERVER",
-        "modelUri": "gs://seldon-models/mlflow/elasticnet_wine_model_mlserver_1_1/",
+        "name": "classifier",
+        "implementation": "SKLEARN_SERVER",
+        "modelUri": "gs://seldon-models/v1.19.0-dev/sklearn/iris",
         "children": []
       }
     }
