@@ -14,6 +14,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/xeipuuv/gojsonschema"
 	"gopkg.in/yaml.v3"
+
+	corev1 "k8s.io/api/core/v1"
 )
 
 /*
@@ -33,6 +35,135 @@ type Values struct {
 	SourceMetafileName   string            `json:"sourceMetafileName,omitempty" yaml:"sourceMetafileName,omitempty"`
 	SourceMetafileRepo   string            `json:"sourceMetafileRepo,omitempty" yaml:"sourceMetafileRepo,omitempty"`
 	SourceMetafileBranch string            `json:"sourceMetafileBranch,omitempty" yaml:"sourceMetafileBranch,omitempty"`
+}
+
+type Values2 struct {
+	Environment          string        `json:"environment" yaml:"environment"`
+	ApiVersion           string        `json:"apiVersion" yaml:"apiVersion"`
+	Chart                Chart         `json:"chart" yaml:"chart"`
+	Namespace            string        `json:"namespace" yaml:"namespace"`
+	Metadata             Metadata      `json:"metadata" yaml:"metadata"`
+	Servers              []ServerInput `json:"servers,omitempty" yaml:"servers,omitempty"`
+	Models               []ModelInput  `json:"models,omitempty" yaml:"models,omitempty"`
+	Pipelines            []Pipeline    `json:"pipelines"`
+	SubjectArea          string        `json:"subjectArea,omitempty" yaml:"subjectArea,omitempty"`
+	SourceMetafileName   string        `json:"sourceMetafileName,omitempty" yaml:"sourceMetafileName,omitempty"`
+	SourceMetafileRepo   string        `json:"sourceMetafileRepo,omitempty" yaml:"sourceMetafileRepo,omitempty"`
+	SourceMetafileBranch string        `json:"sourceMetafileBranch,omitempty" yaml:"sourceMetafileBranch,omitempty"`
+}
+
+type Pipeline struct {
+	Name            string            `json:"name"`
+	Labels          map[string]string `json:"labels,omitempty"`
+	Annotations     map[string]string `json:"annotations,omitempty"`
+	Input           *PipelineInput    `json:"input,omitempty"`
+	Steps           []PipelineStep    `json:"steps"`
+	Output          *PipelineOutput   `json:"output,omitempty"`
+	Dataflow        *DataflowSpec     `json:"dataflow,omitempty"`
+	AllowCycles     bool              `json:"allowCycles,omitempty"`
+	MaxStepRevisits uint32            `json:"maxStepRevisits,omitempty"`
+}
+
+type PipelineInput struct {
+	ExternalInputs   []string          `json:"externalInputs,omitempty"`
+	ExternalTriggers []string          `json:"externalTriggers,omitempty"`
+	JoinWindowMs     *uint32           `json:"joinWindowMs,omitempty"`
+	JoinType         *JoinType         `json:"joinType,omitempty"`
+	TriggersJoinType *JoinType         `json:"triggersJoinType,omitempty"`
+	TensorMap        map[string]string `json:"tensorMap,omitempty"`
+}
+
+type DataflowSpec struct {
+	CleanTopicsOnDelete bool `json:"cleanTopicsOnDelete,omitempty"`
+}
+
+type JoinType string // enum: "inner", "outer", "any"
+
+type PipelineStep struct {
+	Name             string            `json:"name"`
+	Inputs           []string          `json:"inputs,omitempty"`
+	JoinWindowMs     *uint32           `json:"joinWindowMs,omitempty"`
+	TensorMap        map[string]string `json:"tensorMap,omitempty"`
+	Triggers         []string          `json:"triggers,omitempty"`
+	InputsJoinType   *JoinType         `json:"inputsJoinType,omitempty"`
+	TriggersJoinType *JoinType         `json:"triggersJoinType,omitempty"`
+	Batch            *PipelineBatch    `json:"batch,omitempty"`
+}
+
+type PipelineBatch struct {
+	Size     *uint32 `json:"size,omitempty"`
+	WindowMs *uint32 `json:"windowMs,omitempty"`
+	Rolling  *bool   `json:"rolling,omitempty"`
+}
+
+type PipelineOutput struct {
+	Steps        []string          `json:"steps,omitempty"`
+	JoinWindowMs *uint32           `json:"joinWindowMs,omitempty"`
+	StepsJoin    *JoinType         `json:"stepsJoin,omitempty"`
+	TensorMap    map[string]string `json:"tensorMap,omitempty"`
+}
+
+type ModelInput struct {
+	Name            string            `json:"name"`
+	Labels          map[string]string `json:"labels,omitempty"`
+	Annotations     map[string]string `json:"annotations,omitempty"`
+	StorageUri      string            `json:"storageUri"`
+	ArtifactVersion *uint32           `json:"artifactVersion,omitempty"`
+	ModelType       *string           `json:"modelType,omitempty"`
+	SchemaUri       *string           `json:"schemaUri,omitempty"`
+	SecretName      *string           `json:"secretName,omitempty"`
+	Requirements    []string          `json:"requirements,omitempty"`
+	Memory          *string           `json:"memory,omitempty"`
+	ScalingSpec     `yaml:",inline"`
+	Server          *string         `json:"server,omitempty"`
+	Preloaded       bool            `json:"preloaded,omitempty"`
+	Dedicated       bool            `json:"dedicated,omitempty"`
+	Logger          *LoggingSpec    `json:"logger,omitempty"`
+	Explainer       *ExplainerSpec  `json:"explainer,omitempty"`
+	Parameters      []ParameterSpec `json:"parameters,omitempty"`
+	Llm             *LlmSpec        `json:"llm,omitempty"`
+}
+
+type LoggingSpec struct {
+	Percent *uint `json:"percent,omitempty"`
+}
+
+type ExplainerSpec struct {
+	Type        string  `json:"type,omitempty"`
+	ModelRef    *string `json:"modelRef,omitempty"`
+	PipelineRef *string `json:"pipelineRef,omitempty"`
+}
+
+type LlmSpec struct {
+	ModelRef    *string `json:"modelRef,omitempty"`
+	PipelineRef *string `json:"pipelineRef,omitempty"`
+}
+
+type ParameterSpec struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+type ServerInput struct {
+	Name              string                 `json:"name" yaml:"name"`
+	Labels            map[string]string      `json:"labels,omitempty" yaml:"labels,omitempty"`
+	Annotations       map[string]string      `json:"annotations,omitempty" yaml:"annotations,omitempty"`
+	ServerConfig      string                 `json:"serverConfig" yaml:"serverConfig"`
+	ExtraCapabilities []string               `json:"extraCapabilities,omitempty" yaml:"extraCapabilities,omitempty"`
+	ImageOverrides    *ContainerOverrideSpec `json:"imageOverrides,omitempty" yaml:"imageOverrides,omitempty"`
+	PodSpec           *corev1.PodSpec        `json:"podSpec,omitempty" yaml:"podSpec,omitempty"`
+	ScalingSpec       `yaml:",inline"`
+}
+
+type ContainerOverrideSpec struct {
+	Agent  *corev1.Container `json:"agent,omitempty" yaml:"agent,omitempty"`
+	RClone *corev1.Container `json:"rclone,omitempty" yaml:"rclone,omitempty"`
+}
+
+type ScalingSpec struct {
+	Replicas    *int32 `json:"replicas,omitempty" yaml:"replicas,omitempty"`
+	MinReplicas *int32 `json:"minReplicas,omitempty" yaml:"minReplicas,omitempty"`
+	MaxReplicas *int32 `json:"maxReplicas,omitempty" yaml:"maxReplicas,omitempty"`
 }
 
 type Chart struct {
@@ -437,14 +568,14 @@ type ChartTemplate struct {
 var log = logrus.New()
 
 func main() {
-	var valuesCheck Values
+	var valuesCheck Values2
 	log.Printf("Reading values file")
-	valData, err := os.ReadFile("../config/values.json")
+	valData, err := os.ReadFile("../config/values2.json")
 	check(err)
 
 	log.Printf("Loading schema file")
-	schemaLoader := gojsonschema.NewReferenceLoader("file://../config/schema.json")
-	documentLoader := gojsonschema.NewReferenceLoader("file://../config/values.json")
+	schemaLoader := gojsonschema.NewReferenceLoader("file://../config/schema2.json")
+	documentLoader := gojsonschema.NewReferenceLoader("file://../config/values2.json")
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
 	check(err)
 	if result.Valid() {
@@ -462,10 +593,9 @@ func main() {
 
 	var meta ChartTemplate
 	log.Printf("Reading template file")
-	tmplData, err := os.ReadFile("../config/meta-online-inference-seldon-v1.yaml")
+	tmplData, err := os.ReadFile("../config/meta-online-inference-seldon-v2.yaml")
 	check(err)
 	check(yaml.Unmarshal(tmplData, &meta))
-
 	/*
 		valuesStr, err := json.Marshal(values)
 		check(err)

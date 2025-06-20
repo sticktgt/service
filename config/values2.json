@@ -1,0 +1,139 @@
+{
+  "environment": "TEST",
+  "apiVersion": "machinelearning.seldon.io/v1alpha2",
+  "deploymentName": "mlflow-deployment",
+  "namespace": "default",
+  "subjectArea": "seldon-test-project",
+  "chart": {
+    "name": "test-model",
+    "version": "0.1.0",
+    "description": "Test Seldon deployment chart"
+  },
+  "metadata": {
+      "labels": {
+        "provider": "neoflex"
+      },
+      "annotations": {
+        "platform": "dognauts"
+      }
+  },
+  "models": [
+    {
+      "name": "iris-model",
+      "labels": {
+        "app": "iris",
+        "team": "ml"
+      },
+      "annotations": {
+        "maintainer": "mlops-team@example.com"
+      },
+      "storageUri": "gs://seldon-models/scv2/samples/mlserver_1.5.0/iris-sklearn",
+      "artifactVersion": 1,
+      "modelType": "sklearn",
+      "schemaUri": "gs://schemas/iris-schema.yaml",
+      "secretName": "storage-credentials",
+      "requirements": [
+        "scikit-learn",
+        "numpy"
+      ],
+      "memory": "256Mi",
+      "replicas": 2,
+      "minReplicas": 1,
+      "maxReplicas": 4,
+      "server": "mlserver",
+      "preloaded": true,
+      "dedicated": false,
+      "logger": {
+        "percent": 100
+      },
+      "explainer": {
+        "type": "AnchorTabular",
+        "modelRef": "iris-model-explainer",
+        "pipelineRef": "iris-pipeline"
+      },
+      "parameters": [
+        {
+          "name": "batch_size",
+          "value": "32"
+        },
+        {
+          "name": "threshold",
+          "value": "0.7"
+        }
+      ],
+      "llm": {
+        "modelRef": "gpt4-model",
+        "pipelineRef": "llm-pipeline"
+      }
+    },
+    {
+      "name": "xgboost-model",
+      "storageUri": "s3://mybucket/xgboost/model.bst",
+      "modelType": "xgboost",
+      "requirements": ["xgboost"],
+      "replicas": 1
+    }
+  ],
+  "pipelines": [
+    {
+      "name": "main-pipeline",
+      "labels": {
+        "team": "ml"
+      },
+      "annotations": {
+        "maintainer": "alice@example.com"
+      },
+      "input": {
+        "externalInputs": ["upstream-model", "data-prep"],
+        "externalTriggers": ["my-trigger"],
+        "joinWindowMs": 1000,
+        "joinType": "inner",
+        "triggersJoinType": "outer",
+        "tensorMap": {
+          "inputA": "tensorA",
+          "inputB": "tensorB"
+        }
+      },
+      "steps": [
+        {
+          "name": "feature-step",
+          "inputs": ["inputA"],
+          "joinWindowMs": 200,
+          "tensorMap": {
+            "features": "featuresTensor"
+          },
+          "triggers": ["my-trigger"],
+          "inputsJoinType": "outer",
+          "triggersJoinType": "any",
+          "batch": {
+            "size": 64,
+            "windowMs": 500,
+            "rolling": true
+          }
+        },
+        {
+          "name": "model-step",
+          "inputs": ["feature-step"],
+          "joinWindowMs": 100,
+          "tensorMap": {
+            "output": "outputTensor"
+          }
+        }
+      ],
+      "output": {
+        "steps": ["model-step"],
+        "joinWindowMs": 50,
+        "stepsJoin": "inner",
+        "tensorMap": {
+          "final": "outputTensor"
+        }
+      }
+    },
+    {
+      "name": "simple-pipeline",
+      "steps": [
+        { "name": "just-one-step" }
+      ]
+    }
+  ]
+}

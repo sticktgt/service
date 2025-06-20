@@ -612,6 +612,9 @@ files:
             endpoint:
               type: {{ .graph.endpoint.type }}
             {{- end }}
+            {{- if .graph.storageInitializerImage }}
+            storageInitializerImage: {{ .graph.storageInitializerImage }}
+            {{- end }}            
             {{- if .graph.parameters }}
             parameters:
               {{- range .graph.parameters }}
@@ -635,6 +638,9 @@ files:
                 endpoint:
                   type: {{ .endpoint.type }}
                 {{- end }}
+                {{- if .storageInitializerImage }}
+                storageInitializerImage: {{ .storageInitializerImage }}
+                {{- end }}                    
                 {{- if .parameters }}
                 parameters:
                   {{- range .parameters }}
@@ -657,6 +663,9 @@ files:
                     {{- if .endpoint }}
                     endpoint:
                       type: {{ .endpoint.type }}
+                    {{- end }}
+                    {{- if .storageInitializerImage }}
+                    storageInitializerImage: {{ .storageInitializerImage }}
                     {{- end }}
                     {{- if .parameters }}
                     parameters:
@@ -681,6 +690,9 @@ files:
                         endpoint:
                           type: {{ .endpoint.type }}
                         {{- end }}
+                        {{- if .storageInitializerImage }}
+                        storageInitializerImage: {{ .storageInitializerImage }}
+                        {{- end }}                        
                         {{- if .parameters }}
                         parameters:
                           {{- range .parameters }}
@@ -704,6 +716,9 @@ files:
                             endpoint:
                               type: {{ .endpoint.Type }}
                             {{- end }}
+                            {{- if .storageInitializerImage }}
+                            storageInitializerImage: {{ .storageInitializerImage }}
+                            {{- end }}                                 
                             {{- if .parameters }}
                             parameters:
                               {{- range .parameters }}

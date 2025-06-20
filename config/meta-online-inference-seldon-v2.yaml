@@ -1,0 +1,877 @@
+chart:
+  name: seldon-core-v2
+  version: 1.0.0
+  description: Seldon Core V2 Chart
+
+files:
+  - path: Chart.yaml
+    template: true
+    content: |
+      apiVersion: v2
+      name: {{ .Values.chart.name }}
+      version: {{ .Values.chart.version }}
+      description: {{ .Values.chart.description }}
+      type: application
+      app.dognauts:
+        subjectArea: {{ .Values.subjectArea }}
+        sourceMetafileRepo: {{ .Values.sourceMetafileRepo }}
+        sourceMetafileBranch: {{ .Values.sourceMetafileBranch }}
+        sourceMetafileName: {{ .Values.sourceMetafileName }}
+      annotations:
+        app.dognauts/platform-generated: true
+        app.dognauts/subjectArea: {{ .Values.subjectArea }}
+
+  - path: values.yaml
+    template: true
+    content: |
+      subjectArea: {{ .Values.subjectArea }}
+      {{- if .Values.apiVersion }}
+      apiVersion: {{ .Values.apiVersion }}
+      {{- end }}
+      {{- if .Values.namespace }}
+      namespace: {{ .Values.namespace }}
+      {{- end }}      
+      {{- if .Values.metadata }}
+      metadata:
+        {{- if .Values.metadata.labels }}
+        labels:
+          {{- range $k, $v := .Values.metadata.labels }}
+          {{ $k }}: {{ $v }}
+          {{- end }}
+        {{- end }}
+        {{- if .Values.metadata.annotations }}
+        annotations:
+          {{- range $k, $v := .Values.metadata.annotations }}
+          {{ $k }}: {{ $v }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- if .Values.servers }}
+      servers:
+      {{- range .Values.servers }}
+        {{ .name }}:      
+      {{- end }}
+      {{- end }}
+      {{- if .Values.models }}
+      models:
+      {{- range .Values.models }}
+        {{ .name }}:
+          name: {{ .name }}
+          {{- if .labels }}
+          labels:
+            {{- range $k, $v := .labels }}
+            {{ $k }}: {{ $v }}
+            {{- end }}
+          {{- end }}
+          {{- if .annotations }}
+          annotations:
+            {{- range $k, $v := .annotations }}
+            {{ $k }}: {{ $v }}
+            {{- end }}
+          {{- end }}        
+          storageUri: {{ .storageUri }}
+          {{- if .artifactVersion }}
+          artifactVersion: {{ .artifactVersion }}
+          {{- end }}
+          {{- if .modelType }}
+          modelType: {{ .modelType }}
+          {{- end }}
+          {{- if .schemaUri }}
+          schemaUri: {{ .schemaUri }}
+          {{- end }}
+          {{- if .secretName }}
+          secretName: {{ .secretName }}
+          {{- end }}
+          {{- if .requirements }}
+          requirements:
+            {{- range .requirements }}
+            - {{ . }}
+            {{- end }}
+          {{- end }}
+          {{- if .memory }}
+          memory: {{ .memory }}
+          {{- end }}
+          {{- if .replicas }}
+          replicas: {{ .replicas }}
+          {{- end }}
+          {{- if .minReplicas }}
+          minReplicas: {{ .minReplicas }}
+          {{- end }}
+          {{- if .maxReplicas }}
+          maxReplicas: {{ .maxReplicas }}
+          {{- end }}
+          {{- if .server }}
+          server: {{ .server }}
+          {{- end }}
+          {{- if .preloaded }}
+          preloaded: {{ .preloaded }}
+          {{- end }}
+          {{- if .dedicated }}
+          dedicated: {{ .dedicated }}
+          {{- end }}
+          {{- if .logger }}
+          logger:
+            {{- if .logger.percent }}
+            percent: {{ .logger.percent }}
+            {{- end }}
+          {{- end }}
+          {{- if .explainer }}
+          explainer:
+            {{- if .explainer.type }}
+            type: {{ .explainer.type }}
+            {{- end }}
+            {{- if .explainer.modelRef }}
+            modelRef: {{ .explainer.modelRef }}
+            {{- end }}
+            {{- if .explainer.pipelineRef }}
+            pipelineRef: {{ .explainer.pipelineRef }}
+            {{- end }}
+          {{- end }}
+          {{- if .parameters }}
+          parameters:
+            {{- range .parameters }}
+            - name: {{ .name }}
+              value: {{ .value }}
+            {{- end }}
+          {{- end }}
+          {{- if .Llm }}
+          llm:
+            {{- if .llm.modelRef }}
+            modelRef: {{ .llm.ModelRef }}
+            {{- end }}
+            {{- if .llm.pipelineRef }}
+            pipelineRef: {{ .Llm.pipelineRef }}
+            {{- end }}
+          {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.pipelines }}
+      pipelines:
+      {{- range .Values.pipelines }}
+        {{ .name }}:
+          name: {{ .name }}
+          {{- if .labels }}
+          labels:
+            {{- range $k, $v := .labels }}
+            {{ $k }}: {{ $v }}
+            {{- end }}
+          {{- end }}
+          {{- if .annotations }}
+          annotations:
+            {{- range $k, $v := .annotations }}
+            {{ $k }}: {{ $v }}
+            {{- end }}
+          {{- end }}
+          {{- if .input }}
+          input:
+            {{- if .input.externalInputs }}
+            externalInputs:
+              {{- range .input.externalInputs }}
+              - {{ . }}
+              {{- end }}
+            {{- end }}
+            {{- if .input.externalTriggers }}
+            externalTriggers:
+              {{- range .input.externalTriggers }}
+              - {{ . }}
+              {{- end }}
+            {{- end }}
+            {{- if .input.joinWindowMs }}
+            joinWindowMs: {{ .input.joinWindowMs }}
+            {{- end }}
+            {{- if .input.joinType }}
+            joinType: {{ .input.joinType }}
+            {{- end }}
+            {{- if .input.triggersJoinType }}
+            triggersJoinType: {{ .input.triggersJoinType }}
+            {{- end }}
+            {{- if .input.tensorMap }}
+            tensorMap:
+              {{- range $k, $v := .input.tensorMap }}
+              {{ $k }}: {{ $v }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          steps:
+            {{- range .steps }}
+            - name: {{ .name }}
+              {{- if .inputs }}
+              inputs:
+                {{- range .inputs }}
+                - {{ . }}
+                {{- end }}
+              {{- end }}
+              {{- if .joinWindowMs }}
+              joinWindowMs: {{ .joinWindowMs }}
+              {{- end }}
+              {{- if .tensorMap }}
+              tensorMap:
+                {{- range $k, $v := .tensorMap }}
+                {{ $k }}: {{ $v }}
+                {{- end }}
+              {{- end }}
+              {{- if .triggers }}
+              triggers:
+                {{- range .triggers }}
+                - {{ . }}
+                {{- end }}
+              {{- end }}
+              {{- if .inputsJoinType }}
+              inputsJoinType: {{ .inputsJoinType }}
+              {{- end }}
+              {{- if .triggersJoinType }}
+              triggersJoinType: {{ .triggersJoinType }}
+              {{- end }}
+              {{- if .batch }}
+              batch:
+                {{- if .batch.size }}
+                size: {{ .batch.size }}
+                {{- end }}
+                {{- if .batch.windowMs }}
+                windowMs: {{ .batch.windowMs }}
+                {{- end }}
+                {{- if .batch.rolling }}
+                rolling: {{ .batch.rolling }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+          {{- if .output }}
+          output:
+            {{- if .output.steps }}
+            steps:
+              {{- range .output.steps }}
+              - {{ . }}
+              {{- end }}
+            {{- end }}
+            {{- if .output.joinWindowMs }}
+            joinWindowMs: {{ .output.joinWindowMs }}
+            {{- end }}
+            {{- if .output.stepsJoin }}
+            stepsJoin: {{ .output.stepsJoin }}
+            {{- end }}
+            {{- if .output.tensorMap }}
+            tensorMap:
+              {{- range $k, $v := .output.tensorMap }}
+              {{ $k }}: {{ $v }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- if .Dataflow }}
+          dataflow:
+            {{- if ne .Dataflow.CleanTopicsOnDelete false }}
+            cleanTopicsOnDelete: {{ .Dataflow.CleanTopicsOnDelete }}
+            {{- end }}
+          {{- end }}
+          {{- if ne .AllowCycles false }}
+          allowCycles: {{ .AllowCycles }}
+          {{- end }}
+          {{- if .MaxStepRevisits }}
+          maxStepRevisits: {{ .MaxStepRevisits }}
+          {{- end }}
+      {{- end }}
+      {{- end }}
+
+  - path: templates/01_servers.yaml
+    template: false
+    content: |
+      {{- if .Values.servers }}
+      {{- range $name, $server := .Values.servers }}
+      {{- with $server }}
+      ---
+      apiVersion: {{ $.Values.apiVersion }}
+      kind: Server
+      metadata:
+        name: {{ .name }}
+        namespace: {{ $.Values.namespace }}
+        labels:
+          {{- include "common.helm-labels" $ | nindent 4 }}
+        {{- if $.Values.metadata }}
+        {{- if $.Values.metadata.labels }}
+        {{- range $k, $v :=$.Values.metadata.labels }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .labels }}
+        {{- range $k, $v :=.labels }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- if or (and $.Values.metadata $.Values.metadata.annotations) .annotations }}
+        annotations:
+        {{- end }}
+        {{- if $.Values.metadata }}
+        {{- if $.Values.metadata.annotations }}
+        {{- range $k, $v := $.Values.metadata.annotations }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .annotations }}
+        {{- range $k, $v := .annotations }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+
+  - path: templates/02_models.yaml
+    template: false
+    content: |
+      {{- if .Values.models }}
+      {{- range $name, $model := .Values.models }}
+      {{- with $model }}
+      ---
+      apiVersion: {{ $.Values.apiVersion }}
+      kind: Model
+      metadata:
+        name: {{ .name }}
+        namespace: {{ $.Values.namespace }}
+        labels:
+          {{- include "common.helm-labels" $ | nindent 4 }}
+        {{- if $.Values.metadata }}
+        {{- if $.Values.metadata.labels }}
+        {{- range $k, $v :=$.Values.metadata.labels }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .labels }}
+        {{- range $k, $v :=.labels }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- if or (and $.Values.metadata $.Values.metadata.annotations) .annotations }}
+        annotations:
+        {{- end }}
+        {{- if $.Values.metadata }}
+        {{- if $.Values.metadata.annotations }}
+        {{- range $k, $v := $.Values.metadata.annotations }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .annotations }}
+        {{- range $k, $v := .annotations }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+      spec:
+        storageUri: {{ .storageUri | quote }}
+        {{- if .artifactVersion }}
+        artifactVersion: {{ .artifactVersion }}
+        {{- end }}
+        {{- if .modelType }}
+        modelType: {{ .modelType }}
+        {{- end }}
+        {{- if .schemaUri }}
+        schemaUri: {{ .schemaUri | quote }}
+        {{- end }}
+        {{- if .secretName }}
+        secretName: {{ .secretName }}
+        {{- end }}
+        {{- if .requirements }}
+        requirements:
+          {{- range .requirements }}
+          - {{ . }}
+          {{- end }}
+        {{- end }}
+        {{- if .memory }}
+        memory: {{ .memory }}
+        {{- end }}
+        {{- if .replicas }}
+        replicas: {{ .replicas }}
+        {{- end }}
+        {{- if .minReplicas }}
+        minReplicas: {{ .minReplicas }}
+        {{- end }}
+        {{- if .maxReplicas }}
+        maxReplicas: {{ .maxReplicas }}
+        {{- end }}
+        {{- if .server }}
+        server: {{ .server }}
+        {{- end }}
+        {{- if .preloaded }}
+        preloaded: {{ .preloaded }}
+        {{- end }}
+        {{- if .dedicated }}
+        dedicated: {{ .dedicated }}
+        {{- end }}
+        {{- if .logger }}
+        logger:
+          {{- if .logger.percent }}
+          percent: {{ .logger.percent }}
+          {{- end }}
+        {{- end }}
+        {{- if .explainer }}
+        explainer:
+          {{- if .explainer.type }}
+          type: {{ .explainer.type }}
+          {{- end }}
+          {{- if .explainer.modelRef }}
+          modelRef: {{ .explainer.modelRef }}
+          {{- end }}
+          {{- if .explainer.pipelineRef }}
+          pipelineRef: {{ .explainer.pipelineRef }}
+          {{- end }}
+        {{- end }}
+        {{- if .parameters }}
+        parameters:
+          {{- range .parameters }}
+          - name: {{ .name }}
+            value: {{ .value }}
+          {{- end }}
+        {{- end }}
+        {{- if .llm }}
+        llm:
+          {{- if .llm.modelRef }}
+          modelRef: {{ .llm.modelRef }}
+          {{- end }}
+          {{- if .llm.pipelineRef }}
+          pipelineRef: {{ .llm.pipelineRef }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+
+  - path: templates/03_pipelines.yaml
+    template: false
+    content: |
+      {{- if .Values.pipelines }}
+      {{- range $name, $pipeline := .Values.pipelines }}
+      {{- with $pipeline }}
+      ---
+      apiVersion: {{ $.Values.apiVersion }}
+      kind: Pipeline
+      metadata:
+        name: {{ .name }}
+        namespace: {{ $.Values.namespace }}
+        labels:
+          {{- include "common.helm-labels" $ | nindent 4 }}
+        {{- if $.Values.metadata }}
+        {{- if $.Values.metadata.labels }}
+        {{- range $k, $v :=$.Values.metadata.labels }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .labels }}
+        {{- range $k, $v :=.labels }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- if or (and $.Values.metadata $.Values.metadata.annotations) .annotations }}
+        annotations:
+        {{- end }}
+        {{- if $.Values.metadata }}
+        {{- if $.Values.metadata.annotations }}
+        {{- range $k, $v := $.Values.metadata.annotations }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .annotations }}
+        {{- range $k, $v := .annotations }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+      spec:
+        {{- if .input }}
+        input:
+          {{- if .input.externalInputs }}
+          externalInputs:
+            {{- range .input.externalInputs }}
+            - {{ . }}
+            {{- end }}
+          {{- end }}
+          {{- if .input.externalTriggers }}
+          externalTriggers:
+            {{- range .input.externalTriggers }}
+            - {{ . }}
+            {{- end }}
+          {{- end }}
+          {{- if .input.joinWindowMs }}
+          joinWindowMs: {{ .input.joinWindowMs }}
+          {{- end }}
+          {{- if .input.joinType }}
+          joinType: {{ .input.joinType }}
+          {{- end }}
+          {{- if .input.triggersJoinType }}
+          triggersJoinType: {{ .input.triggersJoinType }}
+          {{- end }}
+          {{- if .input.tensorMap }}
+          tensorMap:
+            {{- range $k, $v := .input.tensorMap }}
+            {{ $k }}: {{ $v }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        steps:
+          {{- range .steps }}
+          - name: {{ .name }}
+            {{- if .inputs }}
+            inputs:
+              {{- range .inputs }}
+              - {{ . }}
+              {{- end }}
+            {{- end }}
+            {{- if .joinWindowMs }}
+            joinWindowMs: {{ .joinWindowMs }}
+            {{- end }}
+            {{- if .tensorMap }}
+            tensorMap:
+              {{- range $k, $v := .tensorMap }}
+              {{ $k }}: {{ $v }}
+              {{- end }}
+            {{- end }}
+            {{- if .triggers }}
+            triggers:
+              {{- range .triggers }}
+              - {{ . }}
+              {{- end }}
+            {{- end }}
+            {{- if .inputsJoinType }}
+            inputsJoinType: {{ .inputsJoinType }}
+            {{- end }}
+            {{- if .triggersJoinType }}
+            triggersJoinType: {{ .triggersJoinType }}
+            {{- end }}
+            {{- if .batch }}
+            batch:
+              {{- if .batch.size }}
+              size: {{ .batch.size }}
+              {{- end }}
+              {{- if .batch.windowMs }}
+              windowMs: {{ .batch.windowMs }}
+              {{- end }}
+              {{- if .batch.rolling }}
+              rolling: {{ .batch.rolling }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+        {{- if .output }}
+        output:
+          {{- if .output.steps }}
+          steps:
+            {{- range .output.steps }}
+            - {{ . }}
+            {{- end }}
+          {{- end }}
+          {{- if .output.joinWindowMs }}
+          joinWindowMs: {{ .output.joinWindowMs }}
+          {{- end }}
+          {{- if .output.stepsJoin }}
+          stepsJoin: {{ .output.stepsJoin }}
+          {{- end }}
+          {{- if .output.tensorMap }}
+          tensorMap:
+            {{- range $k, $v := .output.tensorMap }}
+            {{ $k }}: {{ $v }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- if .Dataflow }}
+        dataflow:
+          {{- if ne .Dataflow.CleanTopicsOnDelete false }}
+          cleanTopicsOnDelete: {{ .Dataflow.CleanTopicsOnDelete }}
+          {{- end }}
+        {{- end }}
+        {{- if ne .AllowCycles false }}
+        allowCycles: {{ .AllowCycles }}
+        {{- end }}
+        {{- if .MaxStepRevisits }}
+        maxStepRevisits: {{ .MaxStepRevisits }}
+        {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- end }}      
+      
+  - path: templates/_helpers.tpl
+    template: false
+    content: |
+      {{- define "common.helm-labels" -}}
+      app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+      app.kubernetes.io/revision: {{ .Release.Revision | quote }}
+      app.dognauts/subjectArea: {{ .Values.subjectArea }}
+      {{- end -}}
+
+  - path: .helmignore
+    template: false
+
+    content: |
+      *.tgz
+      .DS_Store
+      .idea/
+      *.swp
+      __pycache__/
+      .ipynb_checkpoints/
+
+valuesSchema:
+  apiVersion:
+    type: string
+    description: Kubernetes API version for the SeldonDeployment resource (e.g., machinelearning.seldon.io/v1)
+    required: true
+    default: mlops.seldon.io/v1alpha1
+  chart.name:
+    type: string
+    description: Name of the Helm chart
+    required: true
+  chart.version:
+    type: string
+    description: Version of the Helm chart
+    required: true
+  chart.description:
+    type: string
+    description: Short description of the chart's purpose
+    required: true
+  namespace:
+    type: string
+    description: Kubernetes namespace to deploy the resources in
+    required: true
+  subjectArea:
+    type: string
+    description: A tag to classify a subject area of the target chart.
+    required: true
+    default: online-model-inference
+  sourceMetafileName:
+    type: string
+    description: Source metafile name
+    required: true
+    default: no_data
+  sourceMetafileRepo:
+    type: string
+    description: Source metafile name
+    required: true
+    default: no_data
+  sourceMetafileBranch:
+    type: string
+    description: Source metafile name
+    required: true
+    default: no_data
+  metadata.labels:
+    type: map
+    description: Key-value pairs used to categorize and select Kubernetes objects
+    required: false
+  metadata.annotations:
+    type: list
+    description: Annotations applied to the SeldonDeployment additional metadata for tooling, policies, and configuration
+    required: false
+  models:
+    type: list
+    description: List of Seldon Core V2 Model objects to deploy.
+    required: true
+  models.name:
+    type: string
+    description: Name of the Model resource (metadata.name).
+    required: true
+  models.labels:
+    type: map
+    description: Additional labels to set on the Model resource (metadata.labels).
+    required: false
+  models.annotations:
+    type: map
+    description: Additional annotations to set on the Model resource (metadata.annotations).
+    required: false
+  models.storageUri:
+    type: string
+    description: Storage URI for the model artifact (spec.storageUri). This can be a GCS/S3 bucket or a path supported by the storage initializer.
+    required: true
+  models.artifactVersion:
+    type: integer
+    description: Optional artifact version number to use with the storageUri.
+    required: false
+  models.modelType:
+    type: string
+    description: Type of model to deploy. Supported values include - sklearn, xgboost, mlflow, triton, pytorch, tensorflow, huggingface, openllm, spacy, custom, etc.
+    required: false
+  models.schemaUri:
+    type: string
+    description: Optional URI for the model’s schema.
+    required: false
+  models.secretName:
+    type: string
+    description: Name of the Kubernetes Secret containing credentials for accessing the storageUri.
+    required: false
+  models.requirements:
+    type: list
+    description: List of extra requirements for this model to be loaded on a compatible server
+    required: false
+  models.memory:
+    type: string
+    description: Requested memory for the model server (e.g., "256Mi", "1Gi").
+    required: false
+  models.replicas:
+    type: integer
+    description: Number of replicas - default 1
+    required: false
+  models.minReplicas:
+    type: integer
+    description: Min number of replicas - default equal to 0
+    required: false
+  models.maxReplicas:
+    type: integer
+    description: Max number of replicas - default equal to 0
+    required: false
+  models.server:
+    type: string
+    description: Name of the Server resource to use for this model. This must match the metadata.name of a Server object.
+    required: false
+  models.preloaded:
+    type: boolean
+    description: Model already loaded on a server. Don't schedule.
+    required: false
+  models.dedicated:
+    type: boolean
+    description: If true, launches a dedicated model server (rather than shared with others).
+    required: false
+  models.logger.percent:
+    type: integer
+    description: Percentage of payloads to log
+    required: false
+  models.explainer.type:
+    type: string
+    description: type of explainer - AnchorTabular, AnchorImages, AnchorText, etc.
+    required: false
+  models.explainer.modelRef:
+    type: string
+    description: Reference to another Model for the explainer to use.
+    required: false
+  models.explainer.pipelineRef:
+    type: string
+    description: Reference to a Pipeline for the explainer to use.
+    required: false
+  models.parameters:
+    type: list
+    description: List of custom parameters to pass to the model server (name/value pairs).
+    required: false
+  models.parameters.name:
+    type: string
+    description: Name of the parameter.
+    required: true
+  models.parameters.value:
+    type: string
+    description: Value of the parameter (string format).
+    required: true
+  models.llm.modelRef:
+    type: string
+    description: Reference to another Model resource for LLM chaining.
+    required: false
+  models.llm.pipelineRef:
+    type: string
+    description: Reference to a Pipeline resource for LLM chaining.
+    required: false
+  pipelines:
+    type: list
+    description: List of Seldon Core V2 Pipeline objects to deploy.
+    required: true
+  pipelines.name:
+    type: string
+    description: Name of the Pipeline resource (metadata.name).
+    required: true
+  pipelines.labels:
+    type: map
+    description: Additional labels to set on the Pipeline resource (metadata.labels).
+    required: false
+  pipelines.annotations:
+    type: map
+    description: Additional annotations to set on the Pipeline resource (metadata.annotations).
+    required: false
+  pipelines.input.externalInputs:
+    type: list
+    description: Previous external pipeline steps to receive data from
+    required: false
+  pipelines.input.externalTriggers:
+    type: list
+    description: Triggers required to activate inputs
+    required: false
+  pipelines.input.joinWindowMs:
+    type: integer
+    description: msecs to wait for messages from multiple inputs to arrive before joining the inputs
+    required: false
+  pipelines.input.joinType:
+    type: string
+    description: How to join the external inputs. Possible values -  "inner", "outer", "any".
+    required: false
+  pipelines.input.triggersJoinType:
+    type: string
+    description: How to join the triggers. Possible values - "inner", "outer", "any".
+    required: false
+  pipelines.input.tensorMap:
+    type: map
+    description: Mapping of tensor names for the pipeline input (key is input name, value is tensor name).
+    required: false
+  pipelines.steps:
+    type: list
+    description: Ordered list of steps (nodes) in the pipeline graph.
+    required: true
+  pipelines.steps.name:
+    type: string
+    description: Name of the pipeline step.
+    required: true
+  pipelines.steps.inputs:
+    type: list
+    description: List of names of input steps or external inputs for this step.
+    required: false
+  pipelines.steps.joinWindowMs:
+    type: integer
+    description: Time window (in milliseconds) for joining inputs for this step.
+    required: false
+  pipelines.steps.tensorMap:
+    type: map
+    description: Mapping of tensor names for this pipeline step (key is input name, value is tensor name).
+    required: false
+  pipelines.steps.triggers:
+    type: list
+    description: List of triggers for this step (names of pipeline steps, external triggers, or models).
+    required: false
+  pipelines.steps.inputsJoinType:
+    type: string
+    description: How to join the step’s inputs. Possible values- "inner", "outer", "any".
+    required: false
+  pipelines.steps.triggersJoinType:
+    type: string
+    description: How to join the triggers for this step. Possible values- "inner", "outer", "any".
+    required: false
+  pipelines.steps.batch.size:
+    type: integer
+    description: Batch size for this step (number of items per batch).
+    required: false
+  pipelines.steps.batch.windowMs:
+    type: integer
+    description: Batch window for this step (in milliseconds).
+    required: false
+  pipelines.steps.batch.rolling:
+    type: boolean
+    description: Whether batching should use a rolling window for this step.
+    required: false
+  pipelines.output.steps:
+    type: list
+    description: List of names of steps to use as the pipeline outputs.
+    required: false
+  pipelines.output.joinWindowMs:
+    type: integer
+    description: Time window (in milliseconds) for joining output steps.
+    required: false
+  pipelines.output.stepsJoin:
+    type: string
+    description: How to join the output steps. Possible values- "inner", "outer", "any".
+    required: false
+  pipelines.output.tensorMap:
+    type: map
+    description: Mapping of tensor names for the pipeline output (key is step name, value is tensor name).
+    required: false
+  pipelines.dataflow.cleanTopicsOnDelete:
+    type: boolean
+    description: 
+    required: false
+  pipelines.allowCycles:
+    type: boolean
+    description: 
+    required: false
+  pipelines.maxStepRevisits:
+    type: integer
+    description: 
+    required: false
