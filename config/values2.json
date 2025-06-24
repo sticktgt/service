@@ -19,23 +19,11 @@
   },
   "servers": [
     {
-      "name": "sklearn-server",
-      "namespace": "ml-prod",
-      "labels": {
-        "team": "inference",
-        "env": "prod"
-      },
-      "annotations": {
-        "owner": "alice@example.com"
-      },
-      "serverConfig": "sklearn-default",
+      "name": "example-server",
+      "serverConfig": "mlserver",
       "extraCapabilities": [
-        "metadata",
+        "async",
         "explain"
-      ],
-      "capabilities": [
-        "predict",
-        "metadata"
       ],
       "imageOverrides": {
         "agent": {
@@ -56,6 +44,37 @@
               "cpu": "100m",
               "memory": "128Mi"
             }
+          }
+        },
+        "rclone": {
+          "name": "my-rclone",
+          "image": "rclone/rclone:1.58",
+          "env": [
+            {
+              "name": "RCLONE_CONFIG_PATH",
+              "value": "/etc/rclone/rclone.conf"
+            }
+          ],
+          "command": [
+            "rclone",
+            "serve",
+            "http"
+          ],
+          "args": [
+            "--addr",
+            ":5572",
+            "--config",
+            "/etc/rclone/rclone.conf"
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "200m",
+              "memory": "128Mi"
+            },
+            "requests": {
+              "cpu": "50m",
+              "memory": "64Mi"
+            }
           },
           "livenessProbe": {
             "httpGet": {
@@ -65,74 +84,143 @@
             "initialDelaySeconds": 5,
             "timeoutSeconds": 2
           }
-        },
-        "rclone": {
-          "name": "my-rclone",
-          "image": "rclone/rclone:1.63",
-          "args": [
-            "sync",
-            "remote:bucket",
-            "/data"
-          ],
-          "env": [
-            {
-              "name": "RCLONE_CONFIG",
-              "value": "/etc/rclone/rclone.conf"
-            }
-          ]
         }
       },
       "podSpec": {
-        "serviceAccountName": "sklearn-sa",
-        "priorityClassName": "high-priority",
-        "nodeSelector": {
-          "disktype": "ssd"
+        "affinity": {
+          "nodeAffinity": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "nodeSelectorTerms": [
+                {
+                  "matchExpressions": [
+                    {
+                      "key": "kubernetes.io/e2e-az-name",
+                      "operator": "In",
+                      "values": [
+                        "e2e-az1",
+                        "e2e-az2"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": [
+              {
+                "weight": 1,
+                "preference": {
+                  "matchExpressions": [
+                    {
+                      "key": "another-node-label-key",
+                      "operator": "In",
+                      "values": [
+                        "another-node-label-value"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "podAffinity": {
+            "requiredDuringSchedulingIgnoredDuringExecution": [
+              {
+                "labelSelector": {
+                  "matchExpressions": [
+                    {
+                      "key": "security",
+                      "operator": "In",
+                      "values": [
+                        "S1"
+                      ]
+                    }
+                  ]
+                },
+                "topologyKey": "failure-domain.beta.kubernetes.io/zone"
+              }
+            ]
+          },
+          "podAntiAffinity": {
+            "preferredDuringSchedulingIgnoredDuringExecution": [
+              {
+                "weight": 1,
+                "podAffinityTerm": {
+                  "labelSelector": {
+                    "matchExpressions": [
+                      {
+                        "key": "security",
+                        "operator": "In",
+                        "values": [
+                          "S2"
+                        ]
+                      }
+                    ]
+                  },
+                  "topologyKey": "kubernetes.io/hostname"
+                }
+              }
+            ]
+          }
         },
         "containers": [
           {
-            "name": "main",
-            "image": "seldonio/mlserver:1.23.0",
-            "ports": [
-              {
-                "name": "http",
-                "containerPort": 8080
-              }
+            "name": "custom-container",
+            "image": "busybox:1.35",
+            "command": [
+              "/bin/sh",
+              "-c"
+            ],
+            "args": [
+              "echo",
+              "hello world"
             ],
             "env": [
               {
-                "name": "MODEL_NAME",
-                "value": "iris"
+                "name": "DEMO_ENV",
+                "value": "demo"
               }
             ],
             "resources": {
               "limits": {
-                "cpu": "1",
-                "memory": "1Gi"
+                "cpu": "100m",
+                "memory": "64Mi"
               },
               "requests": {
-                "cpu": "500m",
-                "memory": "512Mi"
+                "cpu": "50m",
+                "memory": "32Mi"
               }
             }
           }
         ],
-        "volumes": [
+        "ephemeralContainers": [
           {
-            "name": "model-data",
-            "emptyDir": {
-              "medium": "Memory"
-            }
+            "name": "debugger",
+            "image": "busybox:1.35",
+            "command": [
+              "sh"
+            ],
+            "args": [
+              "-c",
+              "sleep 1000"
+            ],
+            "env": [
+              {
+                "name": "DEBUG",
+                "value": "true"
+              }
+            ],
+            "stdin": true,
+            "tty": true,
+            "targetContainerName": "custom-container"
           }
-        ]
-      },
-      "statefulSetPersistentVolumeClaimRetentionPolicy": {
-        "whenDeleted": "Retain",
-        "whenScaled": "Delete"
-      },
-      "replicas": 2,
-      "minReplicas": 1,
-      "maxReplicas": 5,
-      "disableAutoUpdate": true
+        ],
+        "nodeSelector": {
+          "disktype": "ssd"
+        },
+        "priorityClassName": "high-priority",
+        "hostNetwork": false,
+        "dnsPolicy": "ClusterFirst"
+      }
     }
   ]
 }

@@ -643,8 +643,115 @@ files:
               {{- end }}
             {{- end }}
             {{- if .affinity }}
-              # expand all fields for affinity (nodeAffinity, podAffinity, podAntiAffinity)
-              # ... (add nodeAffinity, podAffinity, podAntiAffinity, preferred fields)
+            affinity:
+            {{- with .affinity.nodeAffinity }}
+              nodeAffinity:
+              {{- with .requiredDuringSchedulingIgnoredDuringExecution }}
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                  {{- range .nodeSelectorTerms }}
+                    - matchExpressions:
+                      {{- range .matchExpressions }}
+                        - key: {{ .key }}
+                          operator: {{ .operator }}
+                          values:
+                          {{- range .values }}
+                            - {{ . }}
+                          {{- end }}
+                      {{- end }}
+                  {{- end }}
+              {{- end }}
+              {{- with .preferredDuringSchedulingIgnoredDuringExecution }}
+                preferredDuringSchedulingIgnoredDuringExecution:
+                {{- range . }}
+                  - weight: {{ .weight }}
+                    preference:
+                      matchExpressions:
+                      {{- range .preference.matchExpressions }}
+                        - key: {{ .key }}
+                          operator: {{ .operator }}
+                          values:
+                          {{- range .values }}
+                            - {{ . }}
+                          {{- end }}
+                      {{- end }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+            {{- with .affinity.podAffinity }}
+              podAffinity:
+              {{- with .requiredDuringSchedulingIgnoredDuringExecution }}
+                requiredDuringSchedulingIgnoredDuringExecution:
+                {{- range . }}
+                  - labelSelector:
+                      matchExpressions:
+                      {{- range .labelSelector.matchExpressions }}
+                        - key: {{ .key }}
+                          operator: {{ .operator }}
+                          values:
+                          {{- range .values }}
+                            - {{ . }}
+                          {{- end }}
+                      {{- end }}
+                    topologyKey: {{ .topologyKey }}
+                {{- end }}
+              {{- end }}
+              {{- with .preferredDuringSchedulingIgnoredDuringExecution }}
+                preferredDuringSchedulingIgnoredDuringExecution:
+                {{- range . }}
+                  - weight: {{ .weight }}
+                    podAffinityTerm:
+                      labelSelector:
+                        matchExpressions:
+                        {{- range .podAffinityTerm.labelSelector.matchExpressions }}
+                          - key: {{ .key }}
+                            operator: {{ .operator }}
+                            values:
+                            {{- range .values }}
+                              - {{ . }}
+                            {{- end }}
+                        {{- end }}
+                      topologyKey: {{ .podAffinityTerm.topologyKey }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+            {{- with .affinity.podAntiAffinity }}
+              podAntiAffinity:
+              {{- with .requiredDuringSchedulingIgnoredDuringExecution }}
+                requiredDuringSchedulingIgnoredDuringExecution:
+                {{- range . }}
+                  - labelSelector:
+                      matchExpressions:
+                      {{- range .labelSelector.matchExpressions }}
+                        - key: {{ .key }}
+                          operator: {{ .operator }}
+                          values:
+                          {{- range .values }}
+                            - {{ . }}
+                          {{- end }}
+                      {{- end }}
+                    topologyKey: {{ .topologyKey }}
+                {{- end }}
+              {{- end }}
+              {{- with .preferredDuringSchedulingIgnoredDuringExecution }}
+                preferredDuringSchedulingIgnoredDuringExecution:
+                {{- range . }}
+                  - weight: {{ .weight }}
+                    podAffinityTerm:
+                      labelSelector:
+                        matchExpressions:
+                        {{- range .podAffinityTerm.labelSelector.matchExpressions }}
+                          - key: {{ .key }}
+                            operator: {{ .operator }}
+                            values:
+                            {{- range .values }}
+                              - {{ . }}
+                            {{- end }}
+                        {{- end }}
+                      topologyKey: {{ .podAffinityTerm.topologyKey }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
             {{- end }}
             {{- if .nodeSelector }}
             nodeSelector:
@@ -732,6 +839,189 @@ files:
                 {{- end }}
               {{- end }}  
             {{- end -}}
+            {{- if .topologySpreadConstraints }}
+            topologySpreadConstraints:
+            {{- range .topologySpreadConstraints }}
+              - maxSkew: {{ .maxSkew }}
+                topologyKey: {{ .topologyKey }}
+                whenUnsatisfiable: {{ .whenUnsatisfiable }}
+                {{- if .labelSelector }}
+                labelSelector:
+                  matchLabels:
+                  {{- range $k, $v := .labelSelector.matchLabels }}
+                    {{ $k }}: {{ $v }}
+                  {{- end }}
+                  matchExpressions:
+                  {{- range .labelSelector.matchExpressions }}
+                    - key: {{ .key }}
+                      operator: {{ .operator }}
+                      values:
+                      {{- range .values }}
+                        - {{ . }}
+                      {{- end }}
+                  {{- end }}
+                {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- if .schedulerName }}
+            schedulerName: {{ .schedulerName }}
+            {{- end }}
+            {{- if .runtimeClassName }}
+            runtimeClassName: {{ .runtimeClassName }}
+            {{- end }}
+            {{- if .enableServiceLinks }}
+            enableServiceLinks: {{ .enableServiceLinks }}
+            {{- end }}
+            {{- if .preemptionPolicy }}
+            preemptionPolicy: {{ .preemptionPolicy }}
+            {{- end }}
+            {{- if .setHostnameAsFQDN }}
+            setHostnameAsFQDN: {{ .setHostnameAsFQDN }}
+            {{- end }}
+            {{- if .shareProcessNamespace }}
+            shareProcessNamespace: {{ .shareProcessNamespace }}
+            {{- end }}
+            {{- if .securityContext }}
+            securityContext:
+              {{- if .securityContext.runAsUser }}
+              runAsUser: {{ .securityContext.runAsUser }}
+              {{- end }}
+              {{- if .securityContext.runAsGroup }}
+              runAsGroup: {{ .securityContext.runAsGroup }}
+              {{- end }}
+              {{- if .securityContext.fsGroup }}
+              fsGroup: {{ .securityContext.fsGroup }}
+              {{- end }}
+              {{- if .securityContext.seLinuxOptions }}
+              seLinuxOptions:
+                level: {{ .securityContext.seLinuxOptions.level }}
+                role: {{ .securityContext.seLinuxOptions.role }}
+                type: {{ .securityContext.seLinuxOptions.type }}
+                user: {{ .securityContext.seLinuxOptions.user }}
+              {{- end }}
+              # add other securityContext fields as needed
+            {{- end }}
+            {{- if .imagePullSecrets }}
+            imagePullSecrets:
+            {{- range .imagePullSecrets }}
+              - name: {{ .name }}
+            {{- end }}
+            {{- end }}
+            {{- if .hostAliases }}
+            hostAliases:
+            {{- range .hostAliases }}
+              - ip: {{ .ip }}
+                hostnames:
+                {{- range .hostnames }}
+                  - {{ . }}
+                {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- if .dnsConfig }}
+            dnsConfig:
+              nameservers:
+              {{- range .dnsConfig.nameservers }}
+                - {{ . }}
+              {{- end }}
+              searches:
+              {{- range .dnsConfig.searches }}
+                - {{ . }}
+              {{- end }}
+              options:
+              {{- range .dnsConfig.options }}
+                - name: {{ .name }}
+                  value: {{ .value }}
+              {{- end }}
+            {{- end }}
+            {{- if .readinessGates }}
+            readinessGates:
+            {{- range .readinessGates }}
+              - conditionType: {{ .conditionType }}
+            {{- end }}
+            {{- end }}
+            {{- if .os }}
+            os:
+              name: {{ .os.name }}
+            {{- end }}
+            {{- if .resourceClaims }}
+            resourceClaims:
+            {{- range .resourceClaims }}
+              - name: {{ .name }}
+                resourceClaimTemplateName: {{ .resourceClaimTemplateName }}
+            {{- end }}
+            {{- end }}
+            {{- if .ephemeralContainers }}
+            ephemeralContainers:
+            {{- range .ephemeralContainers }}
+              - name: {{ .name }}
+                image: {{ .image }}
+                {{- if .command }}
+                command:
+                  {{- range .command }}
+                  - {{ . }}
+                  {{- end }}
+                {{- end }}
+                {{- if .args }}
+                args:
+                  {{- range .args }}
+                  - {{ . }}
+                  {{- end }}
+                {{- end }}
+                {{- if .workingDir }}
+                workingDir: {{ .workingDir }}
+                {{- end }}
+                {{- if .env }}
+                env:
+                  {{- range .env }}
+                  - name: {{ .name }}
+                    value: {{ .value }}
+                  {{- end }}
+                {{- end }}
+                {{- if .envFrom }}
+                envFrom:
+                  {{- range .envFrom }}
+                  - configMapRef:
+                      name: {{ .configMapRef.name }}
+                    prefix: {{ .prefix }}
+                  {{- end }}
+                {{- end }}
+                {{- if .stdin }}
+                stdin: {{ .stdin }}
+                {{- end }}
+                {{- if .tty }}
+                tty: {{ .tty }}
+                {{- end }}
+                {{- if .securityContext }}
+                securityContext:
+                  runAsUser: {{ .securityContext.runAsUser }}
+                  runAsGroup: {{ .securityContext.runAsGroup }}
+                  privileged: {{ .securityContext.privileged }}
+                  allowPrivilegeEscalation: {{ .securityContext.allowPrivilegeEscalation }}
+                  # ...add more fields as needed...
+                {{- end }}
+                {{- if .targetContainerName }}
+                targetContainerName: {{ .targetContainerName }}
+                {{- end }}
+                {{- if .resources }}
+                resources:
+                  limits:
+                    {{- range $k, $v := .resources.limits }}
+                    {{ $k }}: {{ $v }}
+                    {{- end }}
+                  requests:
+                    {{- range $k, $v := .resources.requests }}
+                    {{ $k }}: {{ $v }}
+                    {{- end }}
+                {{- end }}
+                {{- if .volumeMounts }}
+                volumeMounts:
+                  {{- range .volumeMounts }}
+                  - name: {{ .name }}
+                    mountPath: {{ .mountPath }}
+                  {{- end }}
+                {{- end }}
+            {{- end }}
+            {{- end }}
       {{- end -}}
       subjectArea: {{ .Values.subjectArea }}
       {{- if .Values.apiVersion }}
@@ -2038,8 +2328,115 @@ files:
           {{- end }}
         {{- end }}
         {{- if .affinity }}
-          # expand all fields for affinity (nodeAffinity, podAffinity, podAntiAffinity)
-          # ... (add nodeAffinity, podAffinity, podAntiAffinity, preferred fields)
+        affinity:
+        {{- with .affinity.nodeAffinity }}
+          nodeAffinity:
+          {{- with .requiredDuringSchedulingIgnoredDuringExecution }}
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              {{- range .nodeSelectorTerms }}
+                - matchExpressions:
+                  {{- range .matchExpressions }}
+                    - key: {{ .key }}
+                      operator: {{ .operator }}
+                      values:
+                      {{- range .values }}
+                        - {{ . }}
+                      {{- end }}
+                  {{- end }}
+              {{- end }}
+          {{- end }}
+          {{- with .preferredDuringSchedulingIgnoredDuringExecution }}
+            preferredDuringSchedulingIgnoredDuringExecution:
+            {{- range . }}
+              - weight: {{ .weight }}
+                preference:
+                  matchExpressions:
+                  {{- range .preference.matchExpressions }}
+                    - key: {{ .key }}
+                      operator: {{ .operator }}
+                      values:
+                      {{- range .values }}
+                        - {{ . }}
+                      {{- end }}
+                  {{- end }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- with .affinity.podAffinity }}
+          podAffinity:
+          {{- with .requiredDuringSchedulingIgnoredDuringExecution }}
+            requiredDuringSchedulingIgnoredDuringExecution:
+            {{- range . }}
+              - labelSelector:
+                  matchExpressions:
+                  {{- range .labelSelector.matchExpressions }}
+                    - key: {{ .key }}
+                      operator: {{ .operator }}
+                      values:
+                      {{- range .values }}
+                        - {{ . }}
+                      {{- end }}
+                  {{- end }}
+                topologyKey: {{ .topologyKey }}
+            {{- end }}
+          {{- end }}
+          {{- with .preferredDuringSchedulingIgnoredDuringExecution }}
+            preferredDuringSchedulingIgnoredDuringExecution:
+            {{- range . }}
+              - weight: {{ .weight }}
+                podAffinityTerm:
+                  labelSelector:
+                    matchExpressions:
+                    {{- range .podAffinityTerm.labelSelector.matchExpressions }}
+                      - key: {{ .key }}
+                        operator: {{ .operator }}
+                        values:
+                        {{- range .values }}
+                          - {{ . }}
+                        {{- end }}
+                    {{- end }}
+                  topologyKey: {{ .podAffinityTerm.topologyKey }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- with .affinity.podAntiAffinity }}
+          podAntiAffinity:
+          {{- with .requiredDuringSchedulingIgnoredDuringExecution }}
+            requiredDuringSchedulingIgnoredDuringExecution:
+            {{- range . }}
+              - labelSelector:
+                  matchExpressions:
+                  {{- range .labelSelector.matchExpressions }}
+                    - key: {{ .key }}
+                      operator: {{ .operator }}
+                      values:
+                      {{- range .values }}
+                        - {{ . }}
+                      {{- end }}
+                  {{- end }}
+                topologyKey: {{ .topologyKey }}
+            {{- end }}
+          {{- end }}
+          {{- with .preferredDuringSchedulingIgnoredDuringExecution }}
+            preferredDuringSchedulingIgnoredDuringExecution:
+            {{- range . }}
+              - weight: {{ .weight }}
+                podAffinityTerm:
+                  labelSelector:
+                    matchExpressions:
+                    {{- range .podAffinityTerm.labelSelector.matchExpressions }}
+                      - key: {{ .key }}
+                        operator: {{ .operator }}
+                        values:
+                        {{- range .values }}
+                          - {{ . }}
+                        {{- end }}
+                    {{- end }}
+                  topologyKey: {{ .podAffinityTerm.topologyKey }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
         {{- end }}
         {{- if .nodeSelector }}
         nodeSelector:
@@ -2127,6 +2524,189 @@ files:
             {{- end }}
           {{- end }}  
         {{- end -}}
+        {{- if .topologySpreadConstraints }}
+        topologySpreadConstraints:
+        {{- range .topologySpreadConstraints }}
+          - maxSkew: {{ .maxSkew }}
+            topologyKey: {{ .topologyKey }}
+            whenUnsatisfiable: {{ .whenUnsatisfiable }}
+            {{- if .labelSelector }}
+            labelSelector:
+              matchLabels:
+              {{- range $k, $v := .labelSelector.matchLabels }}
+                {{ $k }}: {{ $v }}
+              {{- end }}
+              matchExpressions:
+              {{- range .labelSelector.matchExpressions }}
+                - key: {{ .key }}
+                  operator: {{ .operator }}
+                  values:
+                  {{- range .values }}
+                    - {{ . }}
+                  {{- end }}
+              {{- end }}
+            {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .schedulerName }}
+        schedulerName: {{ .schedulerName }}
+        {{- end }}
+        {{- if .runtimeClassName }}
+        runtimeClassName: {{ .runtimeClassName }}
+        {{- end }}
+        {{- if .enableServiceLinks }}
+        enableServiceLinks: {{ .enableServiceLinks }}
+        {{- end }}
+        {{- if .preemptionPolicy }}
+        preemptionPolicy: {{ .preemptionPolicy }}
+        {{- end }}
+        {{- if .setHostnameAsFQDN }}
+        setHostnameAsFQDN: {{ .setHostnameAsFQDN }}
+        {{- end }}
+        {{- if .shareProcessNamespace }}
+        shareProcessNamespace: {{ .shareProcessNamespace }}
+        {{- end }}
+        {{- if .securityContext }}
+        securityContext:
+          {{- if .securityContext.runAsUser }}
+          runAsUser: {{ .securityContext.runAsUser }}
+          {{- end }}
+          {{- if .securityContext.runAsGroup }}
+          runAsGroup: {{ .securityContext.runAsGroup }}
+          {{- end }}
+          {{- if .securityContext.fsGroup }}
+          fsGroup: {{ .securityContext.fsGroup }}
+          {{- end }}
+          {{- if .securityContext.seLinuxOptions }}
+          seLinuxOptions:
+            level: {{ .securityContext.seLinuxOptions.level }}
+            role: {{ .securityContext.seLinuxOptions.role }}
+            type: {{ .securityContext.seLinuxOptions.type }}
+            user: {{ .securityContext.seLinuxOptions.user }}
+          {{- end }}
+          # add other securityContext fields as needed
+        {{- end }}
+        {{- if .imagePullSecrets }}
+        imagePullSecrets:
+        {{- range .imagePullSecrets }}
+          - name: {{ .name }}
+        {{- end }}
+        {{- end }}
+        {{- if .hostAliases }}
+        hostAliases:
+        {{- range .hostAliases }}
+          - ip: {{ .ip }}
+            hostnames:
+            {{- range .hostnames }}
+              - {{ . }}
+            {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .dnsConfig }}
+        dnsConfig:
+          nameservers:
+          {{- range .dnsConfig.nameservers }}
+            - {{ . }}
+          {{- end }}
+          searches:
+          {{- range .dnsConfig.searches }}
+            - {{ . }}
+          {{- end }}
+          options:
+          {{- range .dnsConfig.options }}
+            - name: {{ .name }}
+              value: {{ .value }}
+          {{- end }}
+        {{- end }}
+        {{- if .readinessGates }}
+        readinessGates:
+        {{- range .readinessGates }}
+          - conditionType: {{ .conditionType }}
+        {{- end }}
+        {{- end }}
+        {{- if .os }}
+        os:
+          name: {{ .os.name }}
+        {{- end }}
+        {{- if .resourceClaims }}
+        resourceClaims:
+        {{- range .resourceClaims }}
+          - name: {{ .name }}
+            resourceClaimTemplateName: {{ .resourceClaimTemplateName }}
+        {{- end }}
+        {{- end }}
+        {{- if .ephemeralContainers }}
+        ephemeralContainers:
+        {{- range .ephemeralContainers }}
+          - name: {{ .name }}
+            image: {{ .image }}
+            {{- if .command }}
+            command:
+              {{- range .command }}
+              - {{ . }}
+              {{- end }}
+            {{- end }}
+            {{- if .args }}
+            args:
+              {{- range .args }}
+              - {{ . }}
+              {{- end }}
+            {{- end }}
+            {{- if .workingDir }}
+            workingDir: {{ .workingDir }}
+            {{- end }}
+            {{- if .env }}
+            env:
+              {{- range .env }}
+              - name: {{ .name }}
+                value: {{ .value }}
+              {{- end }}
+            {{- end }}
+            {{- if .envFrom }}
+            envFrom:
+              {{- range .envFrom }}
+              - configMapRef:
+                  name: {{ .configMapRef.name }}
+                prefix: {{ .prefix }}
+              {{- end }}
+            {{- end }}
+            {{- if .stdin }}
+            stdin: {{ .stdin }}
+            {{- end }}
+            {{- if .tty }}
+            tty: {{ .tty }}
+            {{- end }}
+            {{- if .securityContext }}
+            securityContext:
+              runAsUser: {{ .securityContext.runAsUser }}
+              runAsGroup: {{ .securityContext.runAsGroup }}
+              privileged: {{ .securityContext.privileged }}
+              allowPrivilegeEscalation: {{ .securityContext.allowPrivilegeEscalation }}
+              # ...add more fields as needed...
+            {{- end }}
+            {{- if .targetContainerName }}
+            targetContainerName: {{ .targetContainerName }}
+            {{- end }}
+            {{- if .resources }}
+            resources:
+              limits:
+                {{- range $k, $v := .resources.limits }}
+                {{ $k }}: {{ $v }}
+                {{- end }}
+              requests:
+                {{- range $k, $v := .resources.requests }}
+                {{ $k }}: {{ $v }}
+                {{- end }}
+            {{- end }}
+            {{- if .volumeMounts }}
+            volumeMounts:
+              {{- range .volumeMounts }}
+              - name: {{ .name }}
+                mountPath: {{ .mountPath }}
+              {{- end }}
+            {{- end }}
+        {{- end }}
+        {{- end }}
       {{- end -}}
 
   - path: .helmignore
