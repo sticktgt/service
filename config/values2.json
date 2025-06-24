@@ -94,6 +94,7 @@
             "image": "seldonio/mlserver:1.23.0",
             "ports": [
               {
+                "name": "http",
                 "containerPort": 8080
               }
             ],
@@ -118,7 +119,9 @@
         "volumes": [
           {
             "name": "model-data",
-            "emptyDir": {}
+            "emptyDir": {
+              "medium": "Memory"
+            }
           }
         ]
       },

@@ -299,6 +299,440 @@ files:
               terminationMessagePolicy: {{ .terminationMessagePolicy }}
               {{- end -}}  
       {{ end }}
+      {{- define "l_volume" -}}
+            - name: {{ .name }}
+              {{- if .configMap }}
+              configMap:
+                name: {{ .configMap.name }}
+                {{- if .configMap.items }}
+                items:
+                  {{- range .configMap.items }}
+                  - key: {{ .key }}
+                    path: {{ .path }}
+                    {{- if .mode }} mode: {{ .mode }}{{- end }}
+                  {{- end }}
+                {{- end }}
+                {{- if .configMap.defaultMode }}
+                defaultMode: {{ .configMap.defaultMode }}
+                {{- end }}
+                {{- if .configMap.optional }}
+                optional: {{ .configMap.optional }}
+                {{- end }}
+              {{- end }}
+              {{- if .secret }}
+              secret:
+                secretName: {{ .secret.secretName }}
+                {{- if .secret.items }}
+                items:
+                  {{- range .secret.items }}
+                  - key: {{ .key }}
+                    path: {{ .path }}
+                    {{- if .mode }} mode: {{ .mode }}{{- end }}
+                  {{- end }}
+                {{- end }}
+                {{- if .secret.defaultMode }}
+                defaultMode: {{ .secret.defaultMode }}
+                {{- end }}
+                {{- if .secret.optional }}
+                optional: {{ .secret.optional }}
+                {{- end }}
+              {{- end }}
+              {{- if .emptyDir }}
+              emptyDir:
+                {{- if .emptyDir.medium }}
+                medium: {{ .emptyDir.medium }}
+                {{- end }}
+                {{- if .emptyDir.sizeLimit }}
+                sizeLimit: {{ .emptyDir.sizeLimit }}
+                {{- end }}
+              {{- end }}
+              {{- if .hostPath }}
+              hostPath:
+                path: {{ .hostPath.path }}
+                {{- if .hostPath.type }}type: {{ .hostPath.type }}{{- end }}
+              {{- end }}
+              {{- if .persistentVolumeClaim }}
+              persistentVolumeClaim:
+                claimName: {{ .persistentVolumeClaim.claimName }}
+                {{- if .persistentVolumeClaim.readOnly }}readOnly: {{ .persistentVolumeClaim.readOnly }}{{- end }}
+              {{- end }}
+              {{- if .projected }}
+              projected:
+                {{- if .projected.sources }}
+                sources:
+                  {{- range .projected.sources }}
+                  - {{- if .secret }}
+                      secret:
+                        name: {{ .secret.name }}
+                        {{- if .secret.items }}
+                        items:
+                          {{- range .secret.items }}
+                          - key: {{ .key }}
+                            path: {{ .path }}
+                            {{- if .mode }} mode: {{ .mode }}{{- end }}
+                          {{- end }}
+                        {{- end }}
+                        {{- if .secret.optional }}optional: {{ .secret.optional }}{{- end }}
+                      {{- end }}
+                    {{- if .configMap }}
+                      configMap:
+                        name: {{ .configMap.name }}
+                        {{- if .configMap.items }}
+                        items:
+                          {{- range .configMap.items }}
+                          - key: {{ .key }}
+                            path: {{ .path }}
+                            {{- if .mode }} mode: {{ .mode }}{{- end }}
+                          {{- end }}
+                        {{- end }}
+                        {{- if .configMap.optional }}optional: {{ .configMap.optional }}{{- end }}
+                      {{- end }}
+                    {{- if .downwardAPI }}
+                      downwardAPI:
+                        items:
+                          {{- range .downwardAPI.items }}
+                          - path: {{ .path }}
+                            fieldRef:
+                              fieldPath: {{ .fieldRef.fieldPath }}
+                            {{- if .mode }}mode: {{ .mode }}{{- end }}
+                          {{- end }}
+                      {{- end }}
+                    {{- if .serviceAccountToken }}
+                      serviceAccountToken:
+                        audience: {{ .serviceAccountToken.audience }}
+                        expirationSeconds: {{ .serviceAccountToken.expirationSeconds }}
+                        path: {{ .serviceAccountToken.path }}
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
+                {{- if .projected.defaultMode }}defaultMode: {{ .projected.defaultMode }}{{- end }}
+              {{- end }}
+              {{- if .downwardAPI }}
+              downwardAPI:
+                items:
+                  {{- range .downwardAPI.items }}
+                  - path: {{ .path }}
+                    fieldRef:
+                      fieldPath: {{ .fieldRef.fieldPath }}
+                    {{- if .mode }}mode: {{ .mode }}{{- end }}
+                  {{- end }}
+              {{- end }}
+              {{- if .nfs }}
+              nfs:
+                server: {{ .nfs.server }}
+                path: {{ .nfs.path }}
+                {{- if .nfs.readOnly }}readOnly: {{ .nfs.readOnly }}{{- end }}
+              {{- end }}
+              {{- if .csi }}
+              csi:
+                driver: {{ .csi.driver }}
+                {{- if .csi.volumeHandle }}volumeHandle: {{ .csi.volumeHandle }}{{- end }}
+                {{- if .csi.fsType }}fsType: {{ .csi.fsType }}{{- end }}
+                {{- if .csi.readOnly }}readOnly: {{ .csi.readOnly }}{{- end }}
+                {{- if .csi.volumeAttributes }}
+                volumeAttributes:
+                  {{- range $k, $v := .csi.volumeAttributes }}
+                  {{ $k }}: {{ $v }}
+                  {{- end }}
+                {{- end }}
+                {{- if .csi.nodePublishSecretRef }}
+                nodePublishSecretRef:
+                  name: {{ .csi.nodePublishSecretRef.name }}
+                {{- end }}
+              {{- end }}
+              {{- if .iscsi }}
+              iscsi:
+                targetPortal: {{ .iscsi.targetPortal }}
+                iqn: {{ .iscsi.iqn }}
+                lun: {{ .iscsi.lun }}
+                {{- if .iscsi.fsType }}fsType: {{ .iscsi.fsType }}{{- end }}
+                {{- if .iscsi.readOnly }}readOnly: {{ .iscsi.readOnly }}{{- end }}
+                {{- if .iscsi.portals }}
+                portals:
+                  {{- range .iscsi.portals }}
+                  - {{ . }}
+                  {{- end }}
+                {{- end }}
+                {{- if .iscsi.chapAuthDiscovery }}chapAuthDiscovery: {{ .iscsi.chapAuthDiscovery }}{{- end }}
+                {{- if .iscsi.chapAuthSession }}chapAuthSession: {{ .iscsi.chapAuthSession }}{{- end }}
+                {{- if .iscsi.secretRef }}
+                secretRef:
+                  name: {{ .iscsi.secretRef.name }}
+                {{- end }}
+                initiatorName: {{ .iscsi.initiatorName }}
+              {{- end }}
+              {{- if .azureDisk }}
+              azureDisk:
+                diskName: {{ .azureDisk.diskName }}
+                diskURI: {{ .azureDisk.diskURI }}
+                cachingMode: {{ .azureDisk.cachingMode }}
+                fsType: {{ .azureDisk.fsType }}
+                kind: {{ .azureDisk.kind }}
+                readOnly: {{ .azureDisk.readOnly }}
+              {{- end }}
+              {{- if .azureFile }}
+              azureFile:
+                secretName: {{ .azureFile.secretName }}
+                shareName: {{ .azureFile.shareName }}
+                readOnly: {{ .azureFile.readOnly }}
+              {{- end }}
+              {{- if .gcePersistentDisk }}
+              gcePersistentDisk:
+                pdName: {{ .gcePersistentDisk.pdName }}
+                fsType: {{ .gcePersistentDisk.fsType }}
+                partition: {{ .gcePersistentDisk.partition }}
+                readOnly: {{ .gcePersistentDisk.readOnly }}
+              {{- end }}
+              {{- if .fc }}
+              fc:
+                targetWWNs:
+                  {{- range .fc.targetWWNs }}
+                  - {{ . }}
+                  {{- end }}
+                lun: {{ .fc.lun }}
+                fsType: {{ .fc.fsType }}
+                readOnly: {{ .fc.readOnly }}
+              {{- end }}
+              {{- if .flexVolume }}
+              flexVolume:
+                driver: {{ .flexVolume.driver }}
+                fsType: {{ .flexVolume.fsType }}
+                options:
+                  {{- range $k, $v := .flexVolume.options }}
+                  {{ $k }}: {{ $v }}
+                  {{- end }}
+                readOnly: {{ .flexVolume.readOnly }}
+                secretRef:
+                  name: {{ .flexVolume.secretRef.name }}
+              {{- end }}
+              {{- if .flocker }}
+              flocker:
+                datasetName: {{ .flocker.datasetName }}
+                datasetUUID: {{ .flocker.datasetUUID }}
+              {{- end }}
+              {{- if .photonPersistentDisk }}
+              photonPersistentDisk:
+                pdID: {{ .photonPersistentDisk.pdID }}
+                fsType: {{ .photonPersistentDisk.fsType }}
+              {{- end }}
+              {{- if .portworxVolume }}
+              portworxVolume:
+                volumeID: {{ .portworxVolume.volumeID }}
+                fsType: {{ .portworxVolume.fsType }}
+                readOnly: {{ .portworxVolume.readOnly }}
+              {{- end }}
+              {{- if .quobyte }}
+              quobyte:
+                registry: {{ .quobyte.registry }}
+                volume: {{ .quobyte.volume }}
+                readOnly: {{ .quobyte.readOnly }}
+                user: {{ .quobyte.user }}
+                group: {{ .quobyte.group }}
+                tenant: {{ .quobyte.tenant }}
+              {{- end }}
+              {{- if .scaleIO }}
+              scaleIO:
+                gateway: {{ .scaleIO.gateway }}
+                system: {{ .scaleIO.system }}
+                secretRef:
+                  name: {{ .scaleIO.secretRef.name }}
+                sslEnabled: {{ .scaleIO.sslEnabled }}
+                protectionDomain: {{ .scaleIO.protectionDomain }}
+                storagePool: {{ .scaleIO.storagePool }}
+                storageMode: {{ .scaleIO.storageMode }}
+                volumeName: {{ .scaleIO.volumeName }}
+                fsType: {{ .scaleIO.fsType }}
+                readOnly: {{ .scaleIO.readOnly }}
+              {{- end }}
+              {{- if .storageos }}
+              storageos:
+                volumeName: {{ .storageos.volumeName }}
+                volumeNamespace: {{ .storageos.volumeNamespace }}
+                fsType: {{ .storageos.fsType }}
+                readOnly: {{ .storageos.readOnly }}
+                secretRef:
+                  name: {{ .storageos.secretRef.name }}
+              {{- end }}
+              {{- if .vsphereVolume }}
+              vsphereVolume:
+                volumePath: {{ .vsphereVolume.volumePath }}
+                fsType: {{ .vsphereVolume.fsType }}
+              {{- end }}
+      {{- end -}}
+      {{- define "l_pod" -}}
+            {{- if .serviceAccountName }}
+            serviceAccountName: {{ .serviceAccountName }}
+            {{- end }}
+            {{- if .priorityClassName }}
+            priorityClassName: {{ .priorityClassName }}
+            {{- end }}
+            {{- if .restartPolicy }}
+            restartPolicy: {{ .restartPolicy }}
+            {{- end }}
+            {{- if .dnsPolicy }}
+            dnsPolicy: {{ .dnsPolicy }}
+            {{- end }}
+            {{- if .hostNetwork }}
+            hostNetwork: {{ .hostNetwork }}
+            {{- end }}
+            {{- if .hostPID }}
+            hostPID: {{ .hostPID }}
+            {{- end }}
+            {{- if .hostIPC }}
+            hostIPC: {{ .hostIPC }}
+            {{- end }}
+            {{- if .securityContext }}
+            securityContext:
+              {{- if .securityContext.runAsUser }}
+              runAsUser: {{ .securityContext.runAsUser }}
+              {{- end }}
+              {{- if .securityContext.runAsGroup }}
+              runAsGroup: {{ .securityContext.runAsGroup }}
+              {{- end }}
+              {{- if .securityContext.fsGroup }}
+              fsGroup: {{ .securityContext.fsGroup }}
+              {{- end }}
+              {{- if .securityContext.runAsNonRoot }}
+              runAsNonRoot: {{ .securityContext.runAsNonRoot }}
+              {{- end }}
+              {{- if .securityContext.supplementalGroups }}
+              supplementalGroups:
+                {{- range .securityContext.supplementalGroups }}
+                - {{ . }}
+                {{- end }}
+              {{- end }}
+              {{- if .securityContext.seLinuxOptions }}
+              seLinuxOptions:
+                {{- if .securityContext.seLinuxOptions.level }}
+                level: {{ .securityContext.seLinuxOptions.level }}
+                {{- end }}
+                {{- if .securityContext.seLinuxOptions.role }}
+                role: {{ .securityContext.seLinuxOptions.role }}
+                {{- end }}
+                {{- if .securityContext.seLinuxOptions.type }}
+                type: {{ .securityContext.seLinuxOptions.type }}
+                {{- end }}
+                {{- if .securityContext.seLinuxOptions.user }}
+                user: {{ .securityContext.seLinuxOptions.user }}
+                {{- end }}
+              {{- end }}
+              {{- if .securityContext.sysctls }}
+              sysctls:
+                {{- range .securityContext.sysctls }}
+                - name: {{ .name }}
+                  value: {{ .value }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+            {{- if .initContainers }}
+            initContainers:
+              {{- range .initContainers }}
+            - {{ template "l_container" . }}
+              {{- end }}
+            {{- end }}
+            {{- if .containers }}
+            containers:
+              {{- range .containers }}
+            - {{ template "l_container" . }}
+              {{- end }}
+            {{- end }}
+            {{- if .volumes }}
+            volumes:
+              {{- range .volumes }}
+            {{ template "l_volume" . }}
+              {{- end }}
+            {{- end }}
+            {{- if .affinity }}
+              # expand all fields for affinity (nodeAffinity, podAffinity, podAntiAffinity)
+              # ... (add nodeAffinity, podAffinity, podAntiAffinity, preferred fields)
+            {{- end }}
+            {{- if .nodeSelector }}
+            nodeSelector:
+              {{- range $k, $v := .nodeSelector }}
+              {{ $k }}: {{ $v }}
+              {{- end }}
+            {{- end }}
+            {{- if .tolerations }}
+            tolerations:
+              {{- range .tolerations }}
+              - key: {{ .key }}
+                {{- if .operator }}
+                operator: {{ .operator }}
+                {{- end }}
+                {{- if .value }}
+                value: {{ .value }}
+                {{- end }}
+                {{- if .effect }}
+                effect: {{ .effect }}
+                {{- end }}
+                {{- if .tolerationSeconds }}
+                tolerationSeconds: {{ .tolerationSeconds }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+            {{- if .imagePullSecrets }}
+            imagePullSecrets:
+              {{- range .imagePullSecrets }}
+              - name: {{ .name }}
+              {{- end }}
+            {{- end }}
+            {{- if .hostAliases }}
+            hostAliases:
+              {{- range .hostAliases }}
+              - ip: {{ .ip }}
+                hostnames:
+                  {{- range .hostnames }}
+                  - {{ . }}
+                  {{- end }}
+              {{- end }}
+            {{- end }}
+            {{- if .readinessGates  }}
+            readinessGates:
+              {{- range .readinessGates }}
+              - conditionType: {{ .conditionType }}
+              {{- end }}
+            {{- end }}
+            {{- if .schedulerName }}
+            schedulerName: {{ .schedulerName }}
+            {{- end }}
+            {{- if .subdomain }}
+            subdomain: {{ .subdomain }}
+            {{- end }}
+            {{- if .shareProcessNamespace }}
+            shareProcessNamespace: {{ .shareProcessNamespace }}
+            {{- end }}
+            {{- if .terminationGracePeriodSeconds }}
+            terminationGracePeriodSeconds: {{ .terminationGracePeriodSeconds }}
+            {{- end }}
+            {{- if .automountServiceAccountToken }}
+            automountServiceAccountToken: {{ .automountServiceAccountToken }}
+            {{- end }}
+            {{- if .setHostnameAsFQDN }}
+            setHostnameAsFQDN: {{ .setHostnameAsFQDN }}
+            {{- end }}
+            {{- if .dnsConfig }}
+            dnsConfig:
+              {{- if .dnsConfig.nameservers }}
+              nameservers:
+                {{- range .dnsConfig.nameservers }}
+                - {{ . }}
+                {{- end }}
+              {{- end }}
+              {{- if .dnsConfig.options }}  
+              options:
+                {{- range .dnsConfig.options }}
+                - name: {{ .name }}
+                  value: {{ .value }}
+                {{- end }}
+              {{- end }}
+              {{- if .dnsConfig.searches }}
+              searches:
+                {{- range .dnsConfig.searches }}
+                - {{ . }}
+                {{- end }}
+              {{- end }}  
+            {{- end -}}
+      {{- end -}}
       subjectArea: {{ .Values.subjectArea }}
       {{- if .Values.apiVersion }}
       apiVersion: {{ .Values.apiVersion }}
@@ -366,7 +800,7 @@ files:
           {{- end }}
           {{- if .podSpec }}
           podSpec:
-            # expand all K8s podSpec fields in camelCase (e.g., containers, volumes, nodeSelector, affinity, serviceAccountName, etc.)
+            {{- template "l_pod" .podSpec }}
           {{- end }}
           {{- if .statefulSetPersistentVolumeClaimRetentionPolicy }}
           statefulSetPersistentVolumeClaimRetentionPolicy:
@@ -680,7 +1114,7 @@ files:
         {{- end }}
         {{- if .podSpec }}
         podSpec:
-          {{- "\n" }}{{ include "pod" .podSpec | indent 8 }}
+          {{- "\n    " }}{{- include "pod" .podSpec | indent 2 | trim }}
         {{- end }}
         {{- if .statefulSetPersistentVolumeClaimRetentionPolicy }}
         statefulSetPersistentVolumeClaimRetentionPolicy:
@@ -1273,8 +1707,12 @@ files:
               {{- if .mode }} mode: {{ .mode }}{{- end }}
             {{- end }}
           {{- end }}
-          {{- if .configMap.defaultMode }}defaultMode: {{ .configMap.defaultMode }}{{- end }}
-          {{- if .configMap.optional }}optional: {{ .configMap.optional }}{{- end }}
+          {{- if .configMap.defaultMode }}
+          defaultMode: {{ .configMap.defaultMode }}
+          {{- end }}
+          {{- if .configMap.optional }}
+          optional: {{ .configMap.optional }}
+          {{- end }}
         {{- end }}
         {{- if .secret }}
         secret:
@@ -1287,13 +1725,21 @@ files:
               {{- if .mode }} mode: {{ .mode }}{{- end }}
             {{- end }}
           {{- end }}
-          {{- if .secret.defaultMode }}defaultMode: {{ .secret.defaultMode }}{{- end }}
-          {{- if .secret.optional }}optional: {{ .secret.optional }}{{- end }}
+          {{- if .secret.defaultMode }}
+          defaultMode: {{ .secret.defaultMode }}
+          {{- end }}
+          {{- if .secret.optional }}
+          optional: {{ .secret.optional }}
+          {{- end }}
         {{- end }}
         {{- if .emptyDir }}
         emptyDir:
-          {{- if .emptyDir.medium }}medium: {{ .emptyDir.medium }}{{- end }}
-          {{- if .emptyDir.sizeLimit }}sizeLimit: {{ .emptyDir.sizeLimit }}{{- end }}
+          {{- if .emptyDir.medium }}
+          medium: {{ .emptyDir.medium }}
+          {{- end }}
+          {{- if .emptyDir.sizeLimit }}
+          sizeLimit: {{ .emptyDir.sizeLimit }}
+          {{- end }}
         {{- end }}
         {{- if .hostPath }}
         hostPath:
@@ -1509,178 +1955,178 @@ files:
         {{- end }}
       {{- end -}}
       {{- define "pod" -}}
-      {{- if .serviceAccountName }}
-      serviceAccountName: {{ .serviceAccountName }}
-      {{- end }}
-      {{- if .priorityClassName }}
-      priorityClassName: {{ .priorityClassName }}
-      {{- end }}
-      {{- if .restartPolicy }}
-      restartPolicy: {{ .restartPolicy }}
-      {{- end }}
-      {{- if .dnsPolicy }}
-      dnsPolicy: {{ .dnsPolicy }}
-      {{- end }}
-      {{- if .hostNetwork }}
-      hostNetwork: {{ .hostNetwork }}
-      {{- end }}
-      {{- if .hostPID }}
-      hostPID: {{ .hostPID }}
-      {{- end }}
-      {{- if .hostIPC }}
-      hostIPC: {{ .hostIPC }}
-      {{- end }}
-      {{- if .securityContext }}
-      securityContext:
-        {{- if .securityContext.runAsUser }}
-        runAsUser: {{ .securityContext.runAsUser }}
+        {{- if .serviceAccountName }}
+        serviceAccountName: {{ .serviceAccountName }}
         {{- end }}
-        {{- if .securityContext.runAsGroup }}
-        runAsGroup: {{ .securityContext.runAsGroup }}
+        {{- if .priorityClassName }}
+        priorityClassName: {{ .priorityClassName }}
         {{- end }}
-        {{- if .securityContext.fsGroup }}
-        fsGroup: {{ .securityContext.fsGroup }}
+        {{- if .restartPolicy }}
+        restartPolicy: {{ .restartPolicy }}
         {{- end }}
-        {{- if .securityContext.runAsNonRoot }}
-        runAsNonRoot: {{ .securityContext.runAsNonRoot }}
+        {{- if .dnsPolicy }}
+        dnsPolicy: {{ .dnsPolicy }}
         {{- end }}
-        {{- if .securityContext.supplementalGroups }}
-        supplementalGroups:
-          {{- range .securityContext.supplementalGroups }}
-          - {{ . }}
+        {{- if .hostNetwork }}
+        hostNetwork: {{ .hostNetwork }}
+        {{- end }}
+        {{- if .hostPID }}
+        hostPID: {{ .hostPID }}
+        {{- end }}
+        {{- if .hostIPC }}
+        hostIPC: {{ .hostIPC }}
+        {{- end }}
+        {{- if .securityContext }}
+        securityContext:
+          {{- if .securityContext.runAsUser }}
+          runAsUser: {{ .securityContext.runAsUser }}
           {{- end }}
-        {{- end }}
-        {{- if .securityContext.seLinuxOptions }}
-        seLinuxOptions:
-          {{- if .securityContext.seLinuxOptions.level }}
-          level: {{ .securityContext.seLinuxOptions.level }}
+          {{- if .securityContext.runAsGroup }}
+          runAsGroup: {{ .securityContext.runAsGroup }}
           {{- end }}
-          {{- if .securityContext.seLinuxOptions.role }}
-          role: {{ .securityContext.seLinuxOptions.role }}
+          {{- if .securityContext.fsGroup }}
+          fsGroup: {{ .securityContext.fsGroup }}
           {{- end }}
-          {{- if .securityContext.seLinuxOptions.type }}
-          type: {{ .securityContext.seLinuxOptions.type }}
+          {{- if .securityContext.runAsNonRoot }}
+          runAsNonRoot: {{ .securityContext.runAsNonRoot }}
           {{- end }}
-          {{- if .securityContext.seLinuxOptions.user }}
-          user: {{ .securityContext.seLinuxOptions.user }}
-          {{- end }}
-        {{- end }}
-        {{- if .securityContext.sysctls }}
-        sysctls:
-          {{- range .securityContext.sysctls }}
-          - name: {{ .name }}
-            value: {{ .value }}
-          {{- end }}
-        {{- end }}
-      {{- end }}
-      {{- if .initContainers }}
-      initContainers:
-        {{- range .initContainers }}
-        - {{ include "container" . | indent 12 | trim }}
-        {{- end }}
-      {{- end }}
-      {{- if .containers }}
-      containers:
-        {{- range .containers }}
-        - {{ include "container" . | indent 12 | trim }}
-        {{- end }}
-      {{- end }}
-      {{- if .volumes }}
-      volumes:
-        {{- range .volumes }}
-        - {{- include "volume" . | indent 12 | trim }}
-        {{- end }}
-      {{- end }}
-      {{- if .affinity }}
-        # expand all fields for affinity (nodeAffinity, podAffinity, podAntiAffinity)
-        # ... (add nodeAffinity, podAffinity, podAntiAffinity, preferred fields)
-      {{- end }}
-      {{- if .nodeSelector }}
-      nodeSelector:
-        {{- range $k, $v := .nodeSelector }}
-        {{ $k }}: {{ $v }}
-        {{- end }}
-      {{- end }}
-      {{- if .tolerations }}
-      tolerations:
-        {{- range .tolerations }}
-        - key: {{ .key }}
-          {{- if .operator }}
-          operator: {{ .operator }}
-          {{- end }}
-          {{- if .value }}
-          value: {{ .value }}
-          {{- end }}
-          {{- if .effect }}
-          effect: {{ .effect }}
-          {{- end }}
-          {{- if .tolerationSeconds }}
-          tolerationSeconds: {{ .tolerationSeconds }}
-          {{- end }}
-        {{- end }}
-      {{- end }}
-      {{- if .imagePullSecrets }}
-      imagePullSecrets:
-        {{- range .imagePullSecrets }}
-        - name: {{ .name }}
-        {{- end }}
-      {{- end }}
-      {{- if .hostAliases }}
-      hostAliases:
-        {{- range .hostAliases }}
-        - ip: {{ .ip }}
-          hostnames:
-            {{- range .hostnames }}
+          {{- if .securityContext.supplementalGroups }}
+          supplementalGroups:
+            {{- range .securityContext.supplementalGroups }}
             - {{ . }}
             {{- end }}
-        {{- end }}
-      {{- end }}
-      {{- if .readinessGates  }}
-      readinessGates:
-        {{- range .readinessGates }}
-        - conditionType: {{ .conditionType }}
-        {{- end }}
-      {{- end }}
-      {{- if .schedulerName }}
-      schedulerName: {{ .schedulerName }}
-      {{- end }}
-      {{- if .subdomain }}
-      subdomain: {{ .subdomain }}
-      {{- end }}
-      {{- if .shareProcessNamespace }}
-      shareProcessNamespace: {{ .shareProcessNamespace }}
-      {{- end }}
-      {{- if .terminationGracePeriodSeconds }}
-      terminationGracePeriodSeconds: {{ .terminationGracePeriodSeconds }}
-      {{- end }}
-      {{- if .automountServiceAccountToken }}
-      automountServiceAccountToken: {{ .automountServiceAccountToken }}
-      {{- end }}
-      {{- if .setHostnameAsFQDN }}
-      setHostnameAsFQDN: {{ .setHostnameAsFQDN }}
-      {{- end }}
-      {{- if .dnsConfig }}
-      dnsConfig:
-        {{- if .dnsConfig.nameservers }}
-        nameservers:
-          {{- range .dnsConfig.nameservers }}
-          - {{ . }}
+          {{- end }}
+          {{- if .securityContext.seLinuxOptions }}
+          seLinuxOptions:
+            {{- if .securityContext.seLinuxOptions.level }}
+            level: {{ .securityContext.seLinuxOptions.level }}
+            {{- end }}
+            {{- if .securityContext.seLinuxOptions.role }}
+            role: {{ .securityContext.seLinuxOptions.role }}
+            {{- end }}
+            {{- if .securityContext.seLinuxOptions.type }}
+            type: {{ .securityContext.seLinuxOptions.type }}
+            {{- end }}
+            {{- if .securityContext.seLinuxOptions.user }}
+            user: {{ .securityContext.seLinuxOptions.user }}
+            {{- end }}
+          {{- end }}
+          {{- if .securityContext.sysctls }}
+          sysctls:
+            {{- range .securityContext.sysctls }}
+            - name: {{ .name }}
+              value: {{ .value }}
+            {{- end }}
           {{- end }}
         {{- end }}
-        {{- if .dnsConfig.options }}  
-        options:
-          {{- range .dnsConfig.options }}
-          - name: {{ .name }}
+        {{- if .initContainers }}
+        initContainers:
+          {{- range .initContainers }}
+          - {{ include "container" . | indent 4 | trim }}
+          {{- end }}
+        {{- end }}
+        {{- if .containers }}
+        containers:
+          {{- range .containers }}
+          - {{ include "container" . | indent 4 | trim }}
+          {{- end }}
+        {{- end }}
+        {{- if .volumes }}
+        volumes:
+          {{- range .volumes }}
+          {{ include "volume" . | indent 4 | trim }}
+          {{- end }}
+        {{- end }}
+        {{- if .affinity }}
+          # expand all fields for affinity (nodeAffinity, podAffinity, podAntiAffinity)
+          # ... (add nodeAffinity, podAffinity, podAntiAffinity, preferred fields)
+        {{- end }}
+        {{- if .nodeSelector }}
+        nodeSelector:
+          {{- range $k, $v := .nodeSelector }}
+          {{ $k }}: {{ $v }}
+          {{- end }}
+        {{- end }}
+        {{- if .tolerations }}
+        tolerations:
+          {{- range .tolerations }}
+          - key: {{ .key }}
+            {{- if .operator }}
+            operator: {{ .operator }}
+            {{- end }}
+            {{- if .value }}
             value: {{ .value }}
+            {{- end }}
+            {{- if .effect }}
+            effect: {{ .effect }}
+            {{- end }}
+            {{- if .tolerationSeconds }}
+            tolerationSeconds: {{ .tolerationSeconds }}
+            {{- end }}
           {{- end }}
         {{- end }}
-        {{- if .dnsConfig.searches }}
-        searches:
-          {{- range .dnsConfig.searches }}
-          - {{ . }}
+        {{- if .imagePullSecrets }}
+        imagePullSecrets:
+          {{- range .imagePullSecrets }}
+          - name: {{ .name }}
           {{- end }}
-        {{- end }}  
-      {{- end -}}
+        {{- end }}
+        {{- if .hostAliases }}
+        hostAliases:
+          {{- range .hostAliases }}
+          - ip: {{ .ip }}
+            hostnames:
+              {{- range .hostnames }}
+              - {{ . }}
+              {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- if .readinessGates  }}
+        readinessGates:
+          {{- range .readinessGates }}
+          - conditionType: {{ .conditionType }}
+          {{- end }}
+        {{- end }}
+        {{- if .schedulerName }}
+        schedulerName: {{ .schedulerName }}
+        {{- end }}
+        {{- if .subdomain }}
+        subdomain: {{ .subdomain }}
+        {{- end }}
+        {{- if .shareProcessNamespace }}
+        shareProcessNamespace: {{ .shareProcessNamespace }}
+        {{- end }}
+        {{- if .terminationGracePeriodSeconds }}
+        terminationGracePeriodSeconds: {{ .terminationGracePeriodSeconds }}
+        {{- end }}
+        {{- if .automountServiceAccountToken }}
+        automountServiceAccountToken: {{ .automountServiceAccountToken }}
+        {{- end }}
+        {{- if .setHostnameAsFQDN }}
+        setHostnameAsFQDN: {{ .setHostnameAsFQDN }}
+        {{- end }}
+        {{- if .dnsConfig }}
+        dnsConfig:
+          {{- if .dnsConfig.nameservers }}
+          nameservers:
+            {{- range .dnsConfig.nameservers }}
+            - {{ . }}
+            {{- end }}
+          {{- end }}
+          {{- if .dnsConfig.options }}  
+          options:
+            {{- range .dnsConfig.options }}
+            - name: {{ .name }}
+              value: {{ .value }}
+            {{- end }}
+          {{- end }}
+          {{- if .dnsConfig.searches }}
+          searches:
+            {{- range .dnsConfig.searches }}
+            - {{ . }}
+            {{- end }}
+          {{- end }}  
+        {{- end -}}
       {{- end -}}
 
   - path: .helmignore
