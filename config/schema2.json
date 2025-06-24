@@ -30,6 +30,12 @@
                 "$ref": "#/definitions/Pipeline"
             }
         },
+        "servers": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Server"
+            }
+        },
         "subjectArea": {
             "type": "string"
         },
@@ -379,6 +385,95 @@
                     "type": "boolean"
                 }
             }
+        },
+        "Server": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "labels": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "annotations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "serverConfig": {
+                    "type": "string"
+                },
+                "extraCapabilities": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "capabilities": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "imageOverrides": {
+                    "type": "object",
+                    "properties": {
+                        "agent": {
+                            "type": "object",
+                            "additionalProperties": true
+                        },
+                        "rclone": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "podSpec": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "statefulSetPersistentVolumeClaimRetentionPolicy": {
+                    "type": "object",
+                    "properties": {
+                        "whenDeleted": {
+                            "type": "string",
+                            "enum": [
+                                "Delete",
+                                "Retain"
+                            ]
+                        },
+                        "whenScaled": {
+                            "type": "string",
+                            "enum": [
+                                "Delete",
+                                "Retain"
+                            ]
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "replicas": {
+                    "type": "integer"
+                },
+                "minReplicas": {
+                    "type": "integer"
+                },
+                "maxReplicas": {
+                    "type": "integer"
+                },
+                "disableAutoUpdate": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "name",
+                "serverConfig"
+            ]
         }
     }
 }

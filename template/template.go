@@ -145,14 +145,21 @@ type ParameterSpec struct {
 }
 
 type ServerInput struct {
-	Name              string                 `json:"name" yaml:"name"`
-	Labels            map[string]string      `json:"labels,omitempty" yaml:"labels,omitempty"`
-	Annotations       map[string]string      `json:"annotations,omitempty" yaml:"annotations,omitempty"`
-	ServerConfig      string                 `json:"serverConfig" yaml:"serverConfig"`
-	ExtraCapabilities []string               `json:"extraCapabilities,omitempty" yaml:"extraCapabilities,omitempty"`
-	ImageOverrides    *ContainerOverrideSpec `json:"imageOverrides,omitempty" yaml:"imageOverrides,omitempty"`
-	PodSpec           *corev1.PodSpec        `json:"podSpec,omitempty" yaml:"podSpec,omitempty"`
-	ScalingSpec       `yaml:",inline"`
+	Name                                            string                                           `json:"name" yaml:"name"`
+	Labels                                          map[string]string                                `json:"labels,omitempty" yaml:"labels,omitempty"`
+	Annotations                                     map[string]string                                `json:"annotations,omitempty" yaml:"annotations,omitempty"`
+	ServerConfig                                    string                                           `json:"serverConfig" yaml:"serverConfig"`
+	ExtraCapabilities                               []string                                         `json:"extraCapabilities,omitempty" yaml:"extraCapabilities,omitempty"`
+	ImageOverrides                                  *ContainerOverrideSpec                           `json:"imageOverrides,omitempty" yaml:"imageOverrides,omitempty"`
+	PodSpec                                         *corev1.PodSpec                                  `json:"podSpec,omitempty" yaml:"podSpec,omitempty"`
+	StatefulSetPersistentVolumeClaimRetentionPolicy *StatefulSetPersistentVolumeClaimRetentionPolicy `json:"statefulSetPersistentVolumeClaimRetentionPolicy,omitempty"`
+	ScalingSpec                                     `yaml:",inline"`
+	DisableAutoUpdate                               bool `json:"disableAutoUpdate,omitempty"`
+}
+
+type StatefulSetPersistentVolumeClaimRetentionPolicy struct {
+	WhenDeleted string `json:"whenDeleted" yaml:"name"`
+	WhenScaled  string `json:"whenScaled" yaml:"version"`
 }
 
 type ContainerOverrideSpec struct {
