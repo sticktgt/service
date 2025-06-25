@@ -147,9 +147,15 @@ files:
                     {{- end }}
                     {{- if .valueFrom.resourceFieldRef }}
                     resourceFieldRef:
+                      {{- if .valueFrom.resourceFieldRef.containerName }}
                       containerName: {{ .valueFrom.resourceFieldRef.containerName }}
+                      {{- end }}
+                      {{- if .valueFrom.resourceFieldRef.resource }}
                       resource: {{ .valueFrom.resourceFieldRef.resource }}
+                      {{- end }}
+                      {{- if .valueFrom.resourceFieldRef.divisor }}
                       divisor: {{ .valueFrom.resourceFieldRef.divisor }}
+                      {{- end }}
                     {{- end }}    
                   {{- end }}  
                 {{- end }}
@@ -881,26 +887,6 @@ files:
             {{- if .shareProcessNamespace }}
             shareProcessNamespace: {{ .shareProcessNamespace }}
             {{- end }}
-            {{- if .securityContext }}
-            securityContext:
-              {{- if .securityContext.runAsUser }}
-              runAsUser: {{ .securityContext.runAsUser }}
-              {{- end }}
-              {{- if .securityContext.runAsGroup }}
-              runAsGroup: {{ .securityContext.runAsGroup }}
-              {{- end }}
-              {{- if .securityContext.fsGroup }}
-              fsGroup: {{ .securityContext.fsGroup }}
-              {{- end }}
-              {{- if .securityContext.seLinuxOptions }}
-              seLinuxOptions:
-                level: {{ .securityContext.seLinuxOptions.level }}
-                role: {{ .securityContext.seLinuxOptions.role }}
-                type: {{ .securityContext.seLinuxOptions.type }}
-                user: {{ .securityContext.seLinuxOptions.user }}
-              {{- end }}
-              # add other securityContext fields as needed
-            {{- end }}
             {{- if .imagePullSecrets }}
             imagePullSecrets:
             {{- range .imagePullSecrets }}
@@ -1333,8 +1319,100 @@ files:
           {{- end }}
       {{- end }}
       {{- end }}
+      {{- if .Values.serverConfigs }}
+      serverConfigs:
+      {{- range .Values.serverConfigs }}
+        {{ .name }}:
+          name: {{ .name }}
+          {{- if .labels }}
+          labels:
+            {{- range $k, $v := .labels }}
+            {{ $k }}: {{ $v }}
+            {{- end }}
+          {{- end }}
+          {{- if .annotations }}
+          annotations:
+            {{- range $k, $v := .annotations }}
+            {{ $k }}: {{ $v }}
+            {{- end }}
+          {{- end }}
+          {{- if .podSpec }}
+          podSpec:
+            {{- template "l_pod" .podSpec }}
+          {{- end }}
+          {{- if .volumeClaimTemplates }}
+          volumeClaimTemplates:
+            {{- range $vct := .volumeClaimTemplates }}
+            - name: {{ $vct.name }}
+              spec:
+                {{- if $vct.spec.accessModes }}
+                accessModes:
+                  {{- range $mode := $vct.spec.accessModes }}
+                  - {{ $mode }}
+                  {{- end }}
+                {{- end }}
+                {{- if $vct.spec.resources }}
+                resources:
+                  {{- if $vct.spec.resources.requests }}
+                  requests:
+                    {{- range $k, $v := $vct.spec.resources.requests }}
+                    {{ $k }}: {{ $v }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if $vct.spec.resources.limits }}
+                  limits:
+                    {{- range $k, $v := $vct.spec.resources.limits }}
+                    {{ $k }}: {{ $v }}
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
+                {{- if $vct.spec.selector }}
+                selector:
+                  {{- if $vct.spec.selector.matchLabels }}
+                  matchLabels:
+                    {{- range $k, $v := $vct.spec.selector.matchLabels }}
+                    {{ $k }}: {{ $v }}
+                    {{- end }}
+                  {{- end }}
+                  {{- if $vct.spec.selector.matchExpressions }}
+                  matchExpressions:
+                    {{- range $me := $vct.spec.selector.matchExpressions }}
+                    - key: {{ $me.key }}
+                      operator: {{ $me.operator }}
+                      values:
+                        {{- range $val := $me.values }}
+                        - {{ $val }}
+                        {{- end }}
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
+                {{- if $vct.spec.storageClassName }}
+                storageClassName: {{ $vct.spec.storageClassName }}
+                {{- end }}
+                {{- if $vct.spec.volumeMode }}
+                volumeMode: {{ $vct.spec.volumeMode }}
+                {{- end }}
+                {{- if $vct.spec.dataSource }}
+                dataSource:
+                  name: {{ $vct.spec.dataSource.name }}
+                  kind: {{ $vct.spec.dataSource.kind }}
+                  apiGroup: {{ $vct.spec.dataSource.apiGroup }}
+                {{- end }}
+                {{- if $vct.spec.dataSourceRef }}
+                dataSourceRef:
+                  name: {{ $vct.spec.dataSourceRef.name }}
+                  kind: {{ $vct.spec.dataSourceRef.kind }}
+                  apiGroup: {{ $vct.spec.dataSourceRef.apiGroup }}
+                {{- end }}
+                {{- if $vct.spec.volumeName }}
+                volumeName: {{ $vct.spec.volumeName }}
+                {{- end }}
+            {{- end }}
+          {{- end }}
+      {{- end }}
+      {{- end }}
 
-  - path: templates/01_servers.yaml
+  - path: templates/servers.yaml
     template: false
     content: |
       {{- if .Values.servers }}
@@ -1431,7 +1509,7 @@ files:
       {{- end }}
       {{- end }}
 
-  - path: templates/02_models.yaml
+  - path: templates/models.yaml
     template: false
     content: |
       {{- if .Values.models }}
@@ -1551,7 +1629,7 @@ files:
       {{- end }}
       {{- end }}
 
-  - path: templates/03_pipelines.yaml
+  - path: templates/pipelines.yaml
     template: false
     content: |
       {{- if .Values.pipelines }}
@@ -1701,8 +1779,127 @@ files:
         {{- end }}
       {{- end }}
       {{- end }}
-      {{- end }}      
+      {{- end }}
       
+  - path: templates/serverConfigs.yaml
+    template: false
+    content: |
+      {{- if .Values.serverConfigs }}
+      {{- range $name, $serverConfig := .Values.serverConfigs }}
+      {{- with $serverConfig }}
+      ---
+      apiVersion: {{ $.Values.apiVersion }}
+      kind: ServerConfig
+      metadata:
+        name: {{ .name }}
+        namespace: {{ $.Values.namespace }}
+        labels:
+          {{- include "common.helm-labels" $ | nindent 4 }}
+        {{- if $.Values.metadata }}
+        {{- if $.Values.metadata.labels }}
+        {{- range $k, $v :=$.Values.metadata.labels }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .labels }}
+        {{- range $k, $v :=.labels }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- if or (and $.Values.metadata $.Values.metadata.annotations) .annotations }}
+        annotations:
+        {{- end }}
+        {{- if $.Values.metadata }}
+        {{- if $.Values.metadata.annotations }}
+        {{- range $k, $v := $.Values.metadata.annotations }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .annotations }}
+        {{- range $k, $v := .annotations }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+      spec:
+        {{- if .podSpec }}
+        podSpec:
+          {{- "\n    " }}{{- include "pod" .podSpec | indent 2 | trim }}
+        {{- end }}
+        {{- if .volumeClaimTemplates }}
+        volumeClaimTemplates:
+          {{- range $vct := .volumeClaimTemplates }}
+          - name: {{ $vct.name }}
+            spec:
+              {{- if $vct.spec.accessModes }}
+              accessModes:
+                {{- range $mode := $vct.spec.accessModes }}
+                - {{ $mode }}
+                {{- end }}
+              {{- end }}
+              {{- if $vct.spec.resources }}
+              resources:
+                {{- if $vct.spec.resources.requests }}
+                requests:
+                  {{- range $k, $v := $vct.spec.resources.requests }}
+                  {{ $k }}: {{ $v }}
+                  {{- end }}
+                {{- end }}
+                {{- if $vct.spec.resources.limits }}
+                limits:
+                  {{- range $k, $v := $vct.spec.resources.limits }}
+                  {{ $k }}: {{ $v }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+              {{- if $vct.spec.selector }}
+              selector:
+                {{- if $vct.spec.selector.matchLabels }}
+                matchLabels:
+                  {{- range $k, $v := $vct.spec.selector.matchLabels }}
+                  {{ $k }}: {{ $v }}
+                  {{- end }}
+                {{- end }}
+                {{- if $vct.spec.selector.matchExpressions }}
+                matchExpressions:
+                  {{- range $me := $vct.spec.selector.matchExpressions }}
+                  - key: {{ $me.key }}
+                    operator: {{ $me.operator }}
+                    values:
+                      {{- range $val := $me.values }}
+                      - {{ $val }}
+                      {{- end }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+              {{- if $vct.spec.storageClassName }}
+              storageClassName: {{ $vct.spec.storageClassName }}
+              {{- end }}
+              {{- if $vct.spec.volumeMode }}
+              volumeMode: {{ $vct.spec.volumeMode }}
+              {{- end }}
+              {{- if $vct.spec.dataSource }}
+              dataSource:
+                name: {{ $vct.spec.dataSource.name }}
+                kind: {{ $vct.spec.dataSource.kind }}
+                apiGroup: {{ $vct.spec.dataSource.apiGroup }}
+              {{- end }}
+              {{- if $vct.spec.dataSourceRef }}
+              dataSourceRef:
+                name: {{ $vct.spec.dataSourceRef.name }}
+                kind: {{ $vct.spec.dataSourceRef.kind }}
+                apiGroup: {{ $vct.spec.dataSourceRef.apiGroup }}
+              {{- end }}
+              {{- if $vct.spec.volumeName }}
+              volumeName: {{ $vct.spec.volumeName }}
+              {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+
   - path: templates/_helpers.tpl
     template: false
     content: |
@@ -1835,9 +2032,15 @@ files:
               {{- end }}
               {{- if .valueFrom.resourceFieldRef }}
               resourceFieldRef:
+                {{- if .valueFrom.resourceFieldRef.containerName }}
                 containerName: {{ .valueFrom.resourceFieldRef.containerName }}
+                {{- end }}
+                {{- if .valueFrom.resourceFieldRef.resource }}
                 resource: {{ .valueFrom.resourceFieldRef.resource }}
+                {{- end }}
+                {{- if .valueFrom.resourceFieldRef.divisor }}
                 divisor: {{ .valueFrom.resourceFieldRef.divisor }}
+                {{- end }}
               {{- end }}    
             {{- end }}  
           {{- end }}
@@ -2566,26 +2769,6 @@ files:
         {{- if .shareProcessNamespace }}
         shareProcessNamespace: {{ .shareProcessNamespace }}
         {{- end }}
-        {{- if .securityContext }}
-        securityContext:
-          {{- if .securityContext.runAsUser }}
-          runAsUser: {{ .securityContext.runAsUser }}
-          {{- end }}
-          {{- if .securityContext.runAsGroup }}
-          runAsGroup: {{ .securityContext.runAsGroup }}
-          {{- end }}
-          {{- if .securityContext.fsGroup }}
-          fsGroup: {{ .securityContext.fsGroup }}
-          {{- end }}
-          {{- if .securityContext.seLinuxOptions }}
-          seLinuxOptions:
-            level: {{ .securityContext.seLinuxOptions.level }}
-            role: {{ .securityContext.seLinuxOptions.role }}
-            type: {{ .securityContext.seLinuxOptions.type }}
-            user: {{ .securityContext.seLinuxOptions.user }}
-          {{- end }}
-          # add other securityContext fields as needed
-        {{- end }}
         {{- if .imagePullSecrets }}
         imagePullSecrets:
         {{- range .imagePullSecrets }}
@@ -2986,3 +3169,35 @@ valuesSchema:
     type: integer
     description: 
     required: false
+  serverConfigs:
+    type: list
+    description: List of ServerConfig objects to create in the cluster.
+    required: false
+  serverConfigs.name:
+    type: string
+    description: Name of the ServerConfig object (must be unique in the namespace).
+    required: true
+  serverConfigs.labels:
+    type: map
+    description: Labels to attach to the ServerConfig metadata. Optional.
+    required: false
+  serverConfigs.annotations:
+    type: list
+    description: Annotations applied to the ServerConfig additional metadata for tooling, policies, and configuration
+    required: false
+  serverConfigs.podSpec:
+    type: map
+    description: Full PodSpec structure as defined by Kubernetes v1.PodSpec (see https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#podspec-v1-core). Supports all standard Kubernetes PodSpec fields.
+    required: false
+  serverConfigs.volumeClaimTemplates:
+    type: list
+    description: List of volume claim templates to provision volumes with the ServerConfig. Each entry follows Kubernetes v1.PersistentVolumeClaim structure (see https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#persistentvolumeclaim-v1-core).
+    required: false
+  serverConfigs.volumeClaimTemplates.name:
+    type: string
+    description: Name of the PersistentVolumeClaim template.
+    required: true
+  serverConfigs.volumeClaimTemplates.spec:
+    type: map
+    description: Specification of the PersistentVolumeClaim, following Kubernetes v1.PersistentVolumeClaimSpec.
+    required: true

@@ -36,6 +36,12 @@
                 "$ref": "#/definitions/Server"
             }
         },
+        "serverConfigs": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/ServerConfig"
+            }
+        },
         "subjectArea": {
             "type": "string"
         },
@@ -473,6 +479,39 @@
             "required": [
                 "name",
                 "serverConfig"
+            ]
+        },
+        "ServerConfig": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "podSpec": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "volumeClaimTemplates": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "spec": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "name"
             ]
         }
     }

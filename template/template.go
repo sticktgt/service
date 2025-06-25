@@ -16,6 +16,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 /*
@@ -38,18 +39,29 @@ type Values struct {
 }
 
 type Values2 struct {
-	Environment          string        `json:"environment" yaml:"environment"`
-	ApiVersion           string        `json:"apiVersion" yaml:"apiVersion"`
-	Chart                Chart         `json:"chart" yaml:"chart"`
-	Namespace            string        `json:"namespace" yaml:"namespace"`
-	Metadata             Metadata      `json:"metadata" yaml:"metadata"`
-	Servers              []ServerInput `json:"servers,omitempty" yaml:"servers,omitempty"`
-	Models               []ModelInput  `json:"models,omitempty" yaml:"models,omitempty"`
-	Pipelines            []Pipeline    `json:"pipelines"`
-	SubjectArea          string        `json:"subjectArea,omitempty" yaml:"subjectArea,omitempty"`
-	SourceMetafileName   string        `json:"sourceMetafileName,omitempty" yaml:"sourceMetafileName,omitempty"`
-	SourceMetafileRepo   string        `json:"sourceMetafileRepo,omitempty" yaml:"sourceMetafileRepo,omitempty"`
-	SourceMetafileBranch string        `json:"sourceMetafileBranch,omitempty" yaml:"sourceMetafileBranch,omitempty"`
+	Environment          string         `json:"environment" yaml:"environment"`
+	ApiVersion           string         `json:"apiVersion" yaml:"apiVersion"`
+	Chart                Chart          `json:"chart" yaml:"chart"`
+	Namespace            string         `json:"namespace" yaml:"namespace"`
+	Metadata             Metadata       `json:"metadata" yaml:"metadata"`
+	Servers              []ServerInput  `json:"servers,omitempty" yaml:"servers,omitempty"`
+	ServerConfigs        []ServerConfig `json:"serverConfigs,omitempty" yaml:"servers,omitempty"`
+	Models               []ModelInput   `json:"models,omitempty" yaml:"models,omitempty"`
+	Pipelines            []Pipeline     `json:"pipelines"`
+	SubjectArea          string         `json:"subjectArea,omitempty" yaml:"subjectArea,omitempty"`
+	SourceMetafileName   string         `json:"sourceMetafileName,omitempty" yaml:"sourceMetafileName,omitempty"`
+	SourceMetafileRepo   string         `json:"sourceMetafileRepo,omitempty" yaml:"sourceMetafileRepo,omitempty"`
+	SourceMetafileBranch string         `json:"sourceMetafileBranch,omitempty" yaml:"sourceMetafileBranch,omitempty"`
+}
+
+type ServerConfig struct {
+	PodSpec              v1.PodSpec              `json:"podSpec"`
+	VolumeClaimTemplates []PersistentVolumeClaim `json:"volumeClaimTemplates"`
+}
+
+type PersistentVolumeClaim struct {
+	Name string                       `json:"name"`
+	Spec v1.PersistentVolumeClaimSpec `json:"spec"`
 }
 
 type Pipeline struct {
