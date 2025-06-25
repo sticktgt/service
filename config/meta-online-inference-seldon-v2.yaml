@@ -126,9 +126,6 @@ files:
               env:
                 {{- range .env }}
                 - name: {{ .name }}
-                  {{- if .value }}
-                  value: {{ .value }}
-                  {{- end }}
                   {{- if .valueFrom }}
                   valueFrom:
                     {{- if .valueFrom.configMapKeyRef }}
@@ -157,7 +154,9 @@ files:
                       divisor: {{ .valueFrom.resourceFieldRef.divisor }}
                       {{- end }}
                     {{- end }}    
-                  {{- end }}  
+                  {{- else }}
+                  value: "{{ .value }}"
+                  {{- end }}
                 {{- end }}
               {{- end }}
               {{- if .envFrom }}
@@ -176,16 +175,16 @@ files:
                 {{- if .resources.limits }}
                 limits:
                   {{- range $k, $v := .resources.limits }}
-                  {{ $k }}: {{ $v }}
+                  {{ $k }}: "{{ $v }}"
                   {{- end }}
                 {{- end }}
                 {{- if .resources.requests }}
                 requests:
                   {{- range $k, $v := .resources.requests }}
-                  {{ $k }}: {{ $v }}
+                  {{ $k }}: "{{ $v }}"
                   {{- end }}
                 {{- end }}
-              {{- end }}  
+              {{- end }}
               {{- if .livenessProbe }}
               livenessProbe:
                 {{- template "l_probe" .livenessProbe }}
@@ -202,20 +201,46 @@ files:
               lifecycle:
                 {{- if .lifecycle.postStart }}
                 postStart:
+                  {{- if .lifecycle.postStart.exec }}
                   exec:
                     command:
                       {{- range .lifecycle.postStart.exec.command }}
                       - {{ . }}
                       {{- end }}
+                  {{- end }}
+                  {{- if .lifecycle.postStart.httpGet }}
+                  httpGet:
+                    path: {{ .lifecycle.postStart.httpGet.path }}
+                    port: {{ .lifecycle.postStart.httpGet.port }}
+                    {{- if .lifecycle.postStart.httpGet.scheme }}
+                    scheme: {{ .lifecycle.postStart.httpGet.scheme }}
+                    {{- end }}
+                    {{- if .lifecycle.postStart.httpGet.host }}
+                    host: {{ .lifecycle.postStart.httpGet.host }}
+                    {{- end }}
+                  {{- end }}
                 {{- end }}
                 {{- if .lifecycle.preStop }}
                 preStop:
+                  {{- if .lifecycle.preStop.exec }}
                   exec:
                     command:
                       {{- range .lifecycle.preStop.exec.command }}
                       - {{ . }}
                       {{- end }}
-                {{- end }}      
+                  {{- end }}
+                  {{- if .lifecycle.preStop.httpGet }}
+                  httpGet:
+                    path: {{ .lifecycle.preStop.httpGet.path }}
+                    port: {{ .lifecycle.preStop.httpGet.port }}
+                    {{- if .lifecycle.preStop.httpGet.scheme }}
+                    scheme: {{ .lifecycle.preStop.httpGet.scheme }}
+                    {{- end }}
+                    {{- if .lifecycle.preStop.httpGet.host }}
+                    host: {{ .lifecycle.preStop.httpGet.host }}
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
               {{- end }}
               {{- if .securityContext }}
               securityContext:
@@ -261,9 +286,9 @@ files:
               {{- if .volumeMounts }}
               volumeMounts:
                 {{- range .volumeMounts }}
-                - name: {{ .name }}
-                  {{- if .mountPath }}
-                  mountPath: {{ .mountPath }}
+                - mountPath: {{ .mountPath }}
+                  {{- if .name }}
+                  name: {{ .name }}
                   {{- end }}
                   {{- if .readOnly }}
                   readOnly: {{ .readOnly }}
@@ -960,7 +985,9 @@ files:
                 env:
                   {{- range .env }}
                   - name: {{ .name }}
-                    value: {{ .value }}
+                    {{- if .value }}
+                    value: "{{ .value }}"
+                    {{- end }}
                   {{- end }}
                 {{- end }}
                 {{- if .envFrom }}
@@ -992,18 +1019,20 @@ files:
                 resources:
                   limits:
                     {{- range $k, $v := .resources.limits }}
-                    {{ $k }}: {{ $v }}
+                    {{ $k }}: "{{ $v }}"
                     {{- end }}
                   requests:
                     {{- range $k, $v := .resources.requests }}
-                    {{ $k }}: {{ $v }}
+                    {{ $k }}: "{{ $v }}"
                     {{- end }}
                 {{- end }}
                 {{- if .volumeMounts }}
                 volumeMounts:
                   {{- range .volumeMounts }}
-                  - name: {{ .name }}
-                    mountPath: {{ .mountPath }}
+                  - mountPath: {{ .mountPath }}
+                    {{- if .name }}
+                    name: {{ .name }}
+                    {{- end }}                  
                   {{- end }}
                 {{- end }}
             {{- end }}
@@ -1356,13 +1385,13 @@ files:
                   {{- if $vct.spec.resources.requests }}
                   requests:
                     {{- range $k, $v := $vct.spec.resources.requests }}
-                    {{ $k }}: {{ $v }}
+                    {{ $k }}: "{{ $v }}"
                     {{- end }}
                   {{- end }}
                   {{- if $vct.spec.resources.limits }}
                   limits:
                     {{- range $k, $v := $vct.spec.resources.limits }}
-                    {{ $k }}: {{ $v }}
+                    {{ $k }}: "{{ $v }}"
                     {{- end }}
                   {{- end }}
                 {{- end }}
@@ -1843,13 +1872,13 @@ files:
                 {{- if $vct.spec.resources.requests }}
                 requests:
                   {{- range $k, $v := $vct.spec.resources.requests }}
-                  {{ $k }}: {{ $v }}
+                  {{ $k }}: "{{ $v }}"
                   {{- end }}
                 {{- end }}
                 {{- if $vct.spec.resources.limits }}
                 limits:
                   {{- range $k, $v := $vct.spec.resources.limits }}
-                  {{ $k }}: {{ $v }}
+                  {{ $k }}: "{{ $v }}"
                   {{- end }}
                 {{- end }}
               {{- end }}
@@ -2011,8 +2040,8 @@ files:
         env:
           {{- range .env }}
           - name: {{ .name }}
-            {{- if .value }}
-            value: {{ .value }}
+            {{- if hasKey . "value" }}
+            value: "{{ .value }}"
             {{- end }}
             {{- if .valueFrom }}
             valueFrom:
@@ -2061,13 +2090,13 @@ files:
           {{- if .resources.limits }}
           limits:
             {{- range $k, $v := .resources.limits }}
-            {{ $k }}: {{ $v }}
+            {{ $k }}: "{{ $v }}"
             {{- end }}
           {{- end }}
           {{- if .resources.requests }}
           requests:
             {{- range $k, $v := .resources.requests }}
-            {{ $k }}: {{ $v }}
+            {{ $k }}: "{{ $v }}"
             {{- end }}
           {{- end }}
         {{- end }}  
@@ -2084,20 +2113,46 @@ files:
         lifecycle:
           {{- if .lifecycle.postStart }}
           postStart:
+            {{- if .lifecycle.postStart.exec }}
             exec:
               command:
                 {{- range .lifecycle.postStart.exec.command }}
                 - {{ . }}
                 {{- end }}
+            {{- end }}
+            {{- if .lifecycle.postStart.httpGet }}
+            httpGet:
+              path: {{ .lifecycle.postStart.httpGet.path }}
+              port: {{ .lifecycle.postStart.httpGet.port }}
+              {{- if .lifecycle.postStart.httpGet.scheme }}
+              scheme: {{ .lifecycle.postStart.httpGet.scheme }}
+              {{- end }}
+              {{- if .lifecycle.postStart.httpGet.host }}
+              host: {{ .lifecycle.postStart.httpGet.host }}
+              {{- end }}
+            {{- end }}
           {{- end }}
           {{- if .lifecycle.preStop }}
           preStop:
+            {{- if .lifecycle.preStop.exec }}
             exec:
               command:
                 {{- range .lifecycle.preStop.exec.command }}
                 - {{ . }}
                 {{- end }}
-          {{- end }}      
+            {{- end }}
+            {{- if .lifecycle.preStop.httpGet }}
+            httpGet:
+              path: {{ .lifecycle.preStop.httpGet.path }}
+              port: {{ .lifecycle.preStop.httpGet.port }}
+              {{- if .lifecycle.preStop.httpGet.scheme }}
+              scheme: {{ .lifecycle.preStop.httpGet.scheme }}
+              {{- end }}
+              {{- if .lifecycle.preStop.httpGet.host }}
+              host: {{ .lifecycle.preStop.httpGet.host }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
         {{- end }}
         {{- if .securityContext }}
         securityContext:
@@ -2143,9 +2198,9 @@ files:
         {{- if .volumeMounts }}
         volumeMounts:
           {{- range .volumeMounts }}
-          - name: {{ .name }}
-            {{- if .mountPath }}
-            mountPath: {{ .mountPath }}
+          - mountPath: {{ .mountPath }}
+            {{- if .name }}
+            name: {{ .name }}
             {{- end }}
             {{- if .readOnly }}
             readOnly: {{ .readOnly }}
@@ -2842,7 +2897,9 @@ files:
             env:
               {{- range .env }}
               - name: {{ .name }}
-                value: {{ .value }}
+                {{- if hasKey . "value" }}
+                value: "{{ .value }}"
+                {{- end }}
               {{- end }}
             {{- end }}
             {{- if .envFrom }}
@@ -2874,18 +2931,20 @@ files:
             resources:
               limits:
                 {{- range $k, $v := .resources.limits }}
-                {{ $k }}: {{ $v }}
+                {{ $k }}: "{{ $v }}"
                 {{- end }}
               requests:
                 {{- range $k, $v := .resources.requests }}
-                {{ $k }}: {{ $v }}
+                {{ $k }}: "{{ $v }}"
                 {{- end }}
             {{- end }}
             {{- if .volumeMounts }}
             volumeMounts:
               {{- range .volumeMounts }}
-              - name: {{ .name }}
-                mountPath: {{ .mountPath }}
+              - mountPath: {{ .mountPath }}
+                {{- if .name }}
+                name: {{ .name }}
+                {{- end }}
               {{- end }}
             {{- end }}
         {{- end }}
