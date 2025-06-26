@@ -50,10 +50,28 @@ type Values2 struct {
 	Models               []ModelInput    `json:"models,omitempty" yaml:"models,omitempty"`
 	Pipelines            []Pipeline      `json:"pipelines"`
 	SeldonRuntimes       []SeldonRuntime `json:"seldonRuntimes"`
+	Experiments          []Experiment    `json:"experiment"`
 	SubjectArea          string          `json:"subjectArea,omitempty" yaml:"subjectArea,omitempty"`
 	SourceMetafileName   string          `json:"sourceMetafileName,omitempty" yaml:"sourceMetafileName,omitempty"`
 	SourceMetafileRepo   string          `json:"sourceMetafileRepo,omitempty" yaml:"sourceMetafileRepo,omitempty"`
 	SourceMetafileBranch string          `json:"sourceMetafileBranch,omitempty" yaml:"sourceMetafileBranch,omitempty"`
+}
+
+type Experiment struct {
+	Default      *string               `json:"default,omitempty"`
+	Candidates   []ExperimentCandidate `json:"candidates"`
+	Mirror       *ExperimentMirror     `json:"mirror,omitempty"`
+	ResourceType string                `json:"resourceType,omitempty"` // "model" or "pipeline"
+}
+
+type ExperimentCandidate struct {
+	Name   string `json:"name"`
+	Weight uint32 `json:"weight"`
+}
+
+type ExperimentMirror struct {
+	Name    string `json:"name"`
+	Percent uint32 `json:"percent"`
 }
 
 type SeldonRuntime struct {

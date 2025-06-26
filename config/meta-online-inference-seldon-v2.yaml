@@ -2397,8 +2397,8 @@ files:
       {{- if .Values.seldonRuntimes }}
       seldonRuntimes:
       {{- range .Values.seldonRuntimes }}
-        {{ .seldonConfig }}:
-          seldonConfig: {{ .seldonConfig }}
+        {{ .name }}:
+          name: {{ .name }}
           {{- if .labels }}
           labels:
             {{- range $k, $v := .labels }}
@@ -2411,6 +2411,7 @@ files:
             {{ $k }}: {{ $v }}
             {{- end }}
           {{- end }}
+          seldonConfig: {{ .seldonConfig }}
           {{- if .disableAutoUpdate }}
           disableAutoUpdate: {{ .disableAutoUpdate }}
           {{- end }}
@@ -2510,6 +2511,41 @@ files:
                 {{- end }}
               {{- end }}
             {{- end }}
+          {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.experiments }}
+      experiments:
+      {{- range .Values.experiments }}
+        {{ .name }}:
+          name: {{ .name }}
+          {{- if .labels }}
+          labels:
+            {{- range $k, $v := .labels }}
+            {{ $k }}: {{ $v }}
+            {{- end }}
+          {{- end }}
+          {{- if .annotations }}
+          annotations:
+            {{- range $k, $v := .annotations }}
+            {{ $k }}: {{ $v }}
+            {{- end }}
+          {{- end }}
+          {{- if .default }}
+          default: {{ .default }}
+          {{- end }}
+          candidates:
+            {{- range .candidates }}
+            - name: {{ .name }}
+              weight: {{ .weight }}
+            {{- end }}
+          {{- if .mirror }}
+          mirror:
+            name: {{ .mirror.name }}
+            percent: {{ .mirror.percent }}
+          {{- end }}
+          {{- if .resourceType }}
+          resourceType: {{ .resourceType }}
           {{- end }}
       {{- end }}
       {{- end }}
@@ -3007,12 +3043,13 @@ files:
     template: false
     content: |
       {{- if .Values.seldonRuntimes }}
-      {{- range $seldonConfig, $seldonRuntime := .Values.seldonRuntimes }}
+      {{- range $name, $seldonRuntime := .Values.seldonRuntimes }}
       {{- with $seldonRuntime }}
       ---
       apiVersion: {{ $.Values.apiVersion }}
       kind: SeldonRuntime
       metadata:
+        name: {{ .name }}
         namespace: {{ $.Values.namespace }}
         labels:
           {{- include "common.helm-labels" $ | nindent 4 }}
@@ -3144,6 +3181,68 @@ files:
               {{- end }}
             {{- end }}
           {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+
+  - path: templates/experiments.yaml
+    template: false
+    content: |
+      {{- if .Values.experiments }}
+      {{- range $name, $experiment := .Values.experiments }}
+      {{- with $experiment }}
+      ---
+      apiVersion: {{ $.Values.apiVersion }}
+      kind: Experiment
+      metadata:
+        name: {{ .name }}
+        namespace: {{ $.Values.namespace }}
+        labels:
+          {{- include "common.helm-labels" $ | nindent 4 }}
+        {{- if $.Values.metadata }}
+        {{- if $.Values.metadata.labels }}
+        {{- range $k, $v :=$.Values.metadata.labels }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .labels }}
+        {{- range $k, $v :=.labels }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- if or (and $.Values.metadata $.Values.metadata.annotations) .annotations }}
+        annotations:
+        {{- end }}
+        {{- if $.Values.metadata }}
+        {{- if $.Values.metadata.annotations }}
+        {{- range $k, $v := $.Values.metadata.annotations }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .annotations }}
+        {{- range $k, $v := .annotations }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+      spec:
+        {{- if .default }}
+        default: {{ .default }}
+        {{- end }}
+        candidates:
+          {{- range .candidates }}
+          - name: {{ .name }}
+            weight: {{ .weight }}
+          {{- end }}
+        {{- if .mirror }}
+        mirror:
+          name: {{ .mirror.name }}
+          percent: {{ .mirror.percent }}
+        {{- end }}
+        {{- if .resourceType }}
+        resourceType: {{ .resourceType }}
         {{- end }}
       {{- end }}
       {{- end }}
@@ -4575,4 +4674,40 @@ valuesSchema:
   seldonRuntimes.config.serviceConfig.serviceType:
     type: string
     description: The Kubernetes Service type. Allowed values- ClusterIP, NodePort, LoadBalancer, ExternalName.
+    required: false
+  experiments:
+    type: list
+    description: List of Experiment objects to deploy.
+    required: false
+  experiments.name:
+    type: string
+    description: Name of the Experiment.
+    required: true
+  experiments.default:
+    type: string
+    description: Name of the default candidate.
+    required: false
+  experiments.candidates:
+    type: list
+    description: List of candidates (each with a name and weight).
+    required: true
+  experiments.candidates.name:
+    type: string
+    description: Candidate name.
+    required: true
+  experiments.candidates.weight:
+    type: integer
+    description: Candidate weight (used for traffic split).
+    required: true
+  experiments.mirror.name:
+    type: string
+    description: Name of the mirror candidate.
+    required: false
+  experiments.mirror.percent:
+    type: integer
+    description: Traffic percentage to mirror to this candidate.
+    required: false
+  experiments.resourceType:
+    type: string
+    description: Type of resource to experiment on. Allowed values- "model", "pipeline".
     required: false

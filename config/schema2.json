@@ -48,6 +48,12 @@
                 "$ref": "#/definitions/SeldonRuntime"
             }
         },
+        "experiments": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Experiment"
+            }
+        },
         "subjectArea": {
             "type": "string"
         },
@@ -523,6 +529,9 @@
         "SeldonRuntime": {
             "type": "object",
             "properties": {
+                "name": {
+                    "type": "string"
+                },
                 "seldonConfig": {
                     "type": "string"
                 },
@@ -682,6 +691,56 @@
             },
             "required": [
                 "seldonConfig"
+            ]
+        },
+        "Experiment": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "default": {
+                    "type": "string"
+                },
+                "candidates": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "weight": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "weight"
+                        ]
+                    }
+                },
+                "mirror": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "percent": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "resourceType": {
+                    "type": "string",
+                    "enum": [
+                        "model",
+                        "pipeline"
+                    ]
+                }
+            },
+            "required": [
+                "candidates"
             ]
         }
     }

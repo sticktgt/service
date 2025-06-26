@@ -371,6 +371,7 @@
   ],
   "seldonRuntimes": [
     {
+      "name": "default",
       "seldonConfig": "default-seldon-config",
       "disableAutoUpdate": false,
       "overrides": [
@@ -459,6 +460,27 @@
           "serviceType": "ClusterIP"
         }
       }
+    }
+  ],
+  "experiments": [
+    {
+      "name": "seldon-experiment",
+      "default": "candidate-a",
+      "candidates": [
+        {
+          "name": "candidate-a",
+          "weight": 70
+        },
+        {
+          "name": "candidate-b",
+          "weight": 30
+        }
+      ],
+      "mirror": {
+        "name": "candidate-c",
+        "percent": 10
+      },
+      "resourceType": "model"
     }
   ]
 }
