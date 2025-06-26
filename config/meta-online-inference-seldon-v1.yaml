@@ -1543,7 +1543,7 @@ files:
                 name: {{ .valueFrom.secretKeyRef.name }}
                 key: {{ .valueFrom.secretKeyRef.key }}
             {{- else }}
-            value: "{{ .value -}}""
+            value: "{{ .value -}}"
             {{- end }}
           {{- end }}
         {{- end }}
