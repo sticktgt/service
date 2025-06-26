@@ -17,6 +17,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 /*
@@ -39,19 +40,73 @@ type Values struct {
 }
 
 type Values2 struct {
-	Environment          string         `json:"environment" yaml:"environment"`
-	ApiVersion           string         `json:"apiVersion" yaml:"apiVersion"`
-	Chart                Chart          `json:"chart" yaml:"chart"`
-	Namespace            string         `json:"namespace" yaml:"namespace"`
-	Metadata             Metadata       `json:"metadata" yaml:"metadata"`
-	Servers              []ServerInput  `json:"servers,omitempty" yaml:"servers,omitempty"`
-	ServerConfigs        []ServerConfig `json:"serverConfigs,omitempty" yaml:"servers,omitempty"`
-	Models               []ModelInput   `json:"models,omitempty" yaml:"models,omitempty"`
-	Pipelines            []Pipeline     `json:"pipelines"`
-	SubjectArea          string         `json:"subjectArea,omitempty" yaml:"subjectArea,omitempty"`
-	SourceMetafileName   string         `json:"sourceMetafileName,omitempty" yaml:"sourceMetafileName,omitempty"`
-	SourceMetafileRepo   string         `json:"sourceMetafileRepo,omitempty" yaml:"sourceMetafileRepo,omitempty"`
-	SourceMetafileBranch string         `json:"sourceMetafileBranch,omitempty" yaml:"sourceMetafileBranch,omitempty"`
+	Environment          string          `json:"environment" yaml:"environment"`
+	ApiVersion           string          `json:"apiVersion" yaml:"apiVersion"`
+	Chart                Chart           `json:"chart" yaml:"chart"`
+	Namespace            string          `json:"namespace" yaml:"namespace"`
+	Metadata             Metadata        `json:"metadata" yaml:"metadata"`
+	Servers              []ServerInput   `json:"servers,omitempty" yaml:"servers,omitempty"`
+	ServerConfigs        []ServerConfig  `json:"serverConfigs,omitempty" yaml:"servers,omitempty"`
+	Models               []ModelInput    `json:"models,omitempty" yaml:"models,omitempty"`
+	Pipelines            []Pipeline      `json:"pipelines"`
+	SeldonRuntimes       []SeldonRuntime `json:"seldonRuntimes"`
+	SubjectArea          string          `json:"subjectArea,omitempty" yaml:"subjectArea,omitempty"`
+	SourceMetafileName   string          `json:"sourceMetafileName,omitempty" yaml:"sourceMetafileName,omitempty"`
+	SourceMetafileRepo   string          `json:"sourceMetafileRepo,omitempty" yaml:"sourceMetafileRepo,omitempty"`
+	SourceMetafileBranch string          `json:"sourceMetafileBranch,omitempty" yaml:"sourceMetafileBranch,omitempty"`
+}
+
+type SeldonRuntime struct {
+	SeldonConfig      string              `json:"seldonConfig"`
+	Overrides         []OverrideSpec      `json:"overrides,omitempty"`
+	Config            SeldonConfiguration `json:"config,omitempty"`
+	DisableAutoUpdate bool                `json:"disableAutoUpdate,omitempty"`
+}
+
+type OverrideSpec struct {
+	Name        string         `json:"name"`
+	Disable     bool           `json:"disable,omitempty"`
+	Replicas    *int32         `json:"replicas,omitempty"`
+	ServiceType v1.ServiceType `json:"serviceType,omitempty"`
+	PodSpec     *v1.PodSpec    `json:"podSpec,omitempty"`
+}
+
+type SeldonConfiguration struct {
+	TracingConfig TracingConfig      `json:"tracingConfig,omitempty"`
+	KafkaConfig   KafkaConfig        `json:"kafkaConfig,omitempty"`
+	AgentConfig   AgentConfiguration `json:"agentConfig,omitempty"`
+	ServiceConfig ServiceConfig      `json:"serviceConfig,omitempty"`
+}
+
+type ServiceConfig struct {
+	GrpcServicePrefix string         `json:"grpcServicePrefix,omitempty"`
+	ServiceType       v1.ServiceType `json:"serviceType,omitempty"`
+}
+
+type KafkaConfig struct {
+	BootstrapServers      string                        `json:"bootstrap.servers,omitempty"`
+	ConsumerGroupIdPrefix string                        `json:"consumerGroupIdPrefix,omitempty"`
+	Debug                 string                        `json:"debug,omitempty"`
+	Consumer              map[string]intstr.IntOrString `json:"consumer,omitempty"`
+	Producer              map[string]intstr.IntOrString `json:"producer,omitempty"`
+	Streams               map[string]intstr.IntOrString `json:"streams,omitempty"`
+	TopicPrefix           string                        `json:"topicPrefix,omitempty"`
+}
+
+type TracingConfig struct {
+	Disable              bool   `json:"disable,omitempty"`
+	OtelExporterEndpoint string `json:"otelExporterEndpoint,omitempty"`
+	OtelExporterProtocol string `json:"otelExporterProtocol,omitempty"`
+	Ratio                string `json:"ratio,omitempty"`
+}
+
+type AgentConfiguration struct {
+	Rclone RcloneConfiguration `json:"rclone,omitempty" yaml:"rclone,omitempty"`
+}
+
+type RcloneConfiguration struct {
+	ConfigSecrets []string `json:"config_secrets,omitempty" yaml:"config_secrets,omitempty"`
+	Config        []string `json:"config,omitempty" yaml:"config,omitempty"`
 }
 
 type ServerConfig struct {

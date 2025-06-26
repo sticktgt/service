@@ -17,212 +17,6 @@
       "platform": "dognauts"
     }
   },
-  "servers": [
-    {
-      "name": "example-server",
-      "serverConfig": "mlserver",
-      "extraCapabilities": [
-        "async",
-        "explain"
-      ],
-      "imageOverrides": {
-        "agent": {
-          "name": "my-agent",
-          "image": "myorg/myagent:latest",
-          "env": [
-            {
-              "name": "AGENT_MODE",
-              "value": "sidecar"
-            }
-          ],
-          "resources": {
-            "limits": {
-              "cpu": "500m",
-              "memory": "256Mi"
-            },
-            "requests": {
-              "cpu": "100m",
-              "memory": "128Mi"
-            }
-          }
-        },
-        "rclone": {
-          "name": "my-rclone",
-          "image": "rclone/rclone:1.58",
-          "env": [
-            {
-              "name": "RCLONE_CONFIG_PATH",
-              "value": "/etc/rclone/rclone.conf"
-            }
-          ],
-          "command": [
-            "rclone",
-            "serve",
-            "http"
-          ],
-          "args": [
-            "--addr",
-            ":5572",
-            "--config",
-            "/etc/rclone/rclone.conf"
-          ],
-          "resources": {
-            "limits": {
-              "cpu": "200m",
-              "memory": "128Mi"
-            },
-            "requests": {
-              "cpu": "50m",
-              "memory": "64Mi"
-            }
-          },
-          "livenessProbe": {
-            "httpGet": {
-              "path": "/healthz",
-              "port": 8080
-            },
-            "initialDelaySeconds": 5,
-            "timeoutSeconds": 2
-          }
-        }
-      },
-      "podSpec": {
-        "affinity": {
-          "nodeAffinity": {
-            "requiredDuringSchedulingIgnoredDuringExecution": {
-              "nodeSelectorTerms": [
-                {
-                  "matchExpressions": [
-                    {
-                      "key": "kubernetes.io/e2e-az-name",
-                      "operator": "In",
-                      "values": [
-                        "e2e-az1",
-                        "e2e-az2"
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            "preferredDuringSchedulingIgnoredDuringExecution": [
-              {
-                "weight": 1,
-                "preference": {
-                  "matchExpressions": [
-                    {
-                      "key": "another-node-label-key",
-                      "operator": "In",
-                      "values": [
-                        "another-node-label-value"
-                      ]
-                    }
-                  ]
-                }
-              }
-            ]
-          },
-          "podAffinity": {
-            "requiredDuringSchedulingIgnoredDuringExecution": [
-              {
-                "labelSelector": {
-                  "matchExpressions": [
-                    {
-                      "key": "security",
-                      "operator": "In",
-                      "values": [
-                        "S1"
-                      ]
-                    }
-                  ]
-                },
-                "topologyKey": "failure-domain.beta.kubernetes.io/zone"
-              }
-            ]
-          },
-          "podAntiAffinity": {
-            "preferredDuringSchedulingIgnoredDuringExecution": [
-              {
-                "weight": 1,
-                "podAffinityTerm": {
-                  "labelSelector": {
-                    "matchExpressions": [
-                      {
-                        "key": "security",
-                        "operator": "In",
-                        "values": [
-                          "S2"
-                        ]
-                      }
-                    ]
-                  },
-                  "topologyKey": "kubernetes.io/hostname"
-                }
-              }
-            ]
-          }
-        },
-        "containers": [
-          {
-            "name": "custom-container",
-            "image": "busybox:1.35",
-            "command": [
-              "/bin/sh",
-              "-c"
-            ],
-            "args": [
-              "echo",
-              "hello world"
-            ],
-            "env": [
-              {
-                "name": "DEMO_ENV",
-                "value": "demo"
-              }
-            ],
-            "resources": {
-              "limits": {
-                "cpu": "100m",
-                "memory": "64Mi"
-              },
-              "requests": {
-                "cpu": "50m",
-                "memory": "32Mi"
-              }
-            }
-          }
-        ],
-        "ephemeralContainers": [
-          {
-            "name": "debugger",
-            "image": "busybox:1.35",
-            "command": [
-              "sh"
-            ],
-            "args": [
-              "-c",
-              "sleep 1000"
-            ],
-            "env": [
-              {
-                "name": "DEBUG",
-                "value": "true"
-              }
-            ],
-            "stdin": true,
-            "tty": true,
-            "targetContainerName": "custom-container"
-          }
-        ],
-        "nodeSelector": {
-          "disktype": "ssd"
-        },
-        "priorityClassName": "high-priority",
-        "hostNetwork": false,
-        "dnsPolicy": "ClusterFirst"
-      }
-    }
-  ],
   "serverConfigs": [
     {
       "name": "mlserver",
@@ -573,6 +367,98 @@
           }
         }
       ]
+    }
+  ],
+  "seldonRuntimes": [
+    {
+      "seldonConfig": "default-seldon-config",
+      "disableAutoUpdate": false,
+      "overrides": [
+        {
+          "name": "runtime-override",
+          "disable": false,
+          "replicas": 3,
+          "serviceType": "ClusterIP",
+          "podSpec": {
+            "containers": [
+              {
+                "name": "my-container",
+                "image": "myorg/seldon-runtime:latest",
+                "resources": {
+                  "requests": {
+                    "cpu": "500m",
+                    "memory": "512Mi"
+                  },
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "1Gi"
+                  }
+                },
+                "env": [
+                  {
+                    "name": "LOG_LEVEL",
+                    "value": "info"
+                  }
+                ]
+              }
+            ],
+            "volumes": [
+              {
+                "name": "model-data",
+                "emptyDir": {}
+              }
+            ],
+            "nodeSelector": {
+              "disktype": "ssd"
+            },
+            "restartPolicy": "Always",
+            "serviceAccountName": "default"
+          }
+        }
+      ],
+      "config": {
+        "tracingConfig": {
+          "disable": false,
+          "otelExporterEndpoint": "http://otel-collector:4317",
+          "otelExporterProtocol": "grpc",
+          "ratio": "1"
+        },
+        "kafkaConfig": {
+          "bootstrapServers": "kafka1:9092,kafka2:9092",
+          "consumerGroupIdPrefix": "my-consumer",
+          "debug": "all",
+          "topicPrefix": "my-app",
+          "consumer": {
+            "sessionTimeoutMs": 10000,
+            "heartbeatIntervalMs": "3000"
+          },
+          "producer": {
+            "acks": "all",
+            "retries": 3
+          },
+          "streams": {
+            "replicationFactor": 3,
+            "partitions": "12"
+          }
+        },
+        "agentConfig": {
+          "rclone": {
+            "config": [
+              "--vfs-cache-mode",
+              "writes",
+              "--transfers",
+              "4"
+            ],
+            "config_secrets": [
+              "my-rclone-secret"
+            ]
+          }
+        },
+        "serviceConfig": {
+          "grpcServicePrefix": "/myteam/proto",
+          "serviceType": "ClusterIP"
+        }
+      }
     }
   ]
 }

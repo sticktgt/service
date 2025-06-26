@@ -115,13 +115,13 @@ files:
             env:
               {{- range .svcOrchSpec.env }}
               - name: {{ .name }}
-                {{- if .value }}
-                value: {{ .value }}
-                {{- else if .valueFrom }}
+                {{- if .valueFrom }}
                 valueFrom:
                   secretKeyRef:
                     name: {{ .valueFrom.secretKeyRef.name }}
                     key: {{ .valueFrom.secretKeyRef.key }}
+                {{- else }}
+                value: "{{ .value }}"
                 {{- end }}
               {{- end }}
           {{- end }}
@@ -216,13 +216,13 @@ files:
                         {{- end }}
                       {{- end }}
                     {{- end }}
-                    {{- else if .value }}
-                    value: {{ .value -}}
                     {{- else if .valueFrom }}
                     valueFrom:
                       secretKeyRef:
                         name: {{ .valueFrom.secretKeyRef.name }}
                         key: {{ .valueFrom.secretKeyRef.key }}
+                    {{- else }}
+                    value: "{{ .value -}}"
                     {{- end }}
                   {{- end }}
                 {{- end }}
@@ -419,13 +419,13 @@ files:
                 env:
                   {{- range .env }}
                   - name: {{ .name }}
-                    {{- if .value }}
-                    value: {{ .value -}}
-                    {{- else if .valueFrom }}
+                    {{- if .valueFrom }}
                     valueFrom:
                       secretKeyRef:
                         name: {{ .valueFrom.secretKeyRef.name }}
                         key: {{ .valueFrom.secretKeyRef.key }}
+                    {{- else }}
+                    value: "{{ .value }}"
                     {{- end }}
                   {{- end }}
                 {{- end }}
@@ -768,19 +768,19 @@ files:
             {{- if .engineResources.requests }}
             requests:
               {{- if .engineResources.requests.cpu }}
-              cpu: {{ .engineResources.requests.cpu }}
+              cpu: "{{ .engineResources.requests.cpu }}"
               {{- end }}
               {{- if .engineResources.requests.memory }}
-              memory: {{ .engineResources.requests.memory }}
+              memory: "{{ .engineResources.requests.memory }}"
               {{- end }}
             {{- end }}
             {{- if .engineResources.limits }}
             limits:
               {{- if .engineResources.limits.cpu }}
-              cpu: {{ .engineResources.limits.cpu }}
+              cpu: "{{ .engineResources.limits.cpu }}"
               {{- end }}
               {{- if .engineResources.limits.memory }}
-              memory: {{ .engineResources.limits.memory }}
+              memory: "{{ .engineResources.limits.memory }}"
               {{- end }}
             {{- end }}
           {{- end }}
@@ -813,19 +813,19 @@ files:
               {{- if .svcOrchSpec.resources.requests }}
               requests:
                 {{- if .svcOrchSpec.resources.requests.cpu }}
-                cpu: {{ .svcOrchSpec.resources.requests.cpu }}
+                cpu: "{{ .svcOrchSpec.resources.requests.cpu }}"
                 {{- end }}
                 {{- if .svcOrchSpec.resources.requests.memory }}
-                memory: {{ .svcOrchSpec.resources.requests.memory }}
+                memory: "{{ .svcOrchSpec.resources.requests.memory }}"
                 {{- end }}
               {{- end }}
               {{- if .svcOrchSpec.resources.limits }}
               limits:
                 {{- if .svcOrchSpec.resources.limits.cpu }}
-                cpu: {{ .svcOrchSpec.resources.limits.cpu }}
+                cpu: "{{ .svcOrchSpec.resources.limits.cpu }}"
                 {{- end }}
                 {{- if .svcOrchSpec.resources.limits.memory }}
-                memory: {{ .svcOrchSpec.resources.limits.memory }}
+                memory: "{{ .svcOrchSpec.resources.limits.memory }}"
                 {{- end }}
               {{- end }}
           {{- end }}
@@ -1236,19 +1236,19 @@ files:
                   {{- if .resources.requests }}
                   requests:
                     {{- if .resources.requests.cpu }}
-                    cpu: {{ .resources.requests.cpu }}
+                    cpu: "{{ .resources.requests.cpu }}"
                     {{- end }}
                     {{- if .resources.requests.memory }}
-                    memory: {{ .resources.requests.memory }}
+                    memory: "{{ .resources.requests.memory }}"
                     {{- end }}
                   {{- end }}
                   {{- if .resources.limits }}
                   limits:
                     {{- if .resources.limits.cpu }}
-                    cpu: {{ .resources.limits.cpu }}
+                    cpu: "{{ .resources.limits.cpu }}"
                     {{- end }}
                     {{- if .resources.limits.memory }}
-                    memory: {{ .resources.limits.memory }}
+                    memory: "{{ .resources.limits.memory }}"
                     {{- end }}
                   {{- end }}
                 {{- end }}
@@ -1277,19 +1277,19 @@ files:
                   {{- if .resources.requests }}
                   requests:
                     {{- if .resources.requests.cpu }}
-                    cpu: {{ .resources.requests.cpu }}
+                    cpu: "{{ .resources.requests.cpu }}"
                     {{- end }}
                     {{- if .resources.requests.memory }}
-                    memory: {{ .resources.requests.memory }}
+                    memory: "{{ .resources.requests.memory }}"
                     {{- end }}
                   {{- end }}
                   {{- if .resources.limits }}
                   limits:
                     {{- if .resources.limits.cpu }}
-                    cpu: {{ .resources.limits.cpu }}
+                    cpu: "{{ .resources.limits.cpu }}"
                     {{- end }}
                     {{- if .resources.limits.memory }}
-                    memory: {{ .resources.limits.memory }}
+                    memory: "{{ .resources.limits.memory }}"
                     {{- end }}
                   {{- end }}
                 {{- end }}
@@ -1537,13 +1537,13 @@ files:
                 {{- end }}
               {{- end }}
             {{- end }}
-            {{- else if .value }}
-            value: {{ .value -}}
             {{- else if .valueFrom }}
             valueFrom:
               secretKeyRef:
                 name: {{ .valueFrom.secretKeyRef.name }}
                 key: {{ .valueFrom.secretKeyRef.key }}
+            {{- else }}
+            value: "{{ .value -}}""
             {{- end }}
           {{- end }}
         {{- end }}
@@ -1577,19 +1577,19 @@ files:
           {{- if .resources.requests }}
           requests:
             {{- if .resources.requests.cpu }}
-            cpu: {{ .resources.requests.cpu }}
+            cpu: "{{ .resources.requests.cpu }}"
             {{- end }}
             {{- if .resources.requests.memory }}
-            memory: {{ .resources.requests.memory }}
+            memory: "{{ .resources.requests.memory }}"
             {{- end }}
           {{- end }}
           {{- if .resources.limits }}
           limits:
             {{- if .resources.limits.cpu }}
-            cpu: {{ .resources.limits.cpu }}
+            cpu: "{{ .resources.limits.cpu }}"
             {{- end }}
             {{- if .resources.limits.memory }}
-            memory: {{ .resources.limits.memory }}
+            memory: "{{ .resources.limits.memory }}"
             {{- end }}
           {{- end }}
         {{- end }}
@@ -1771,13 +1771,13 @@ files:
         env:
           {{- range .env }}
           - name: {{ .name }}
-            {{- if .value }}
-            value: {{ .value -}}
-            {{- else if .valueFrom }}
+            {{- if .valueFrom }}
             valueFrom:
               secretKeyRef:
                 name: {{ .valueFrom.secretKeyRef.name }}
                 key: {{ .valueFrom.secretKeyRef.key }}
+            {{- else }}
+            value: "{{ .value }}"
             {{- end }}
           {{- end }}
         {{- end }}
@@ -1811,19 +1811,19 @@ files:
           {{- if .resources.requests }}
           requests:
             {{- if .resources.requests.cpu }}
-            cpu: {{ .resources.requests.cpu }}
+            cpu: "{{ .resources.requests.cpu }}"
             {{- end }}
             {{- if .resources.requests.memory }}
-            memory: {{ .resources.requests.memory }}
+            memory: "{{ .resources.requests.memory }}"
             {{- end }}
           {{- end }}
           {{- if .resources.limits }}
           limits:
             {{- if .resources.limits.cpu }}
-            cpu: {{ .resources.limits.cpu }}
+            cpu: "{{ .resources.limits.cpu }}"
             {{- end }}
             {{- if .resources.limits.memory }}
-            memory: {{ .resources.limits.memory }}
+            memory: "{{ .resources.limits.memory }}"
             {{- end }}
           {{- end }}
         {{- end }}
@@ -2053,19 +2053,19 @@ files:
               {{- if .engineResources.requests }}
               requests:
                 {{- if .engineResources.requests.cpu }}
-                cpu: {{ .engineResources.requests.cpu }}
+                cpu: "{{ .engineResources.requests.cpu }}"
                 {{- end }}
                 {{- if .engineResources.requests.memory }}
-                memory: {{ .engineResources.requests.memory }}
+                memory: "{{ .engineResources.requests.memory }}"
                 {{- end }}
               {{- end }}
               {{- if .engineResources.limits }}
               limits:
                 {{- if .engineResources.limits.cpu }}
-                cpu: {{ .engineResources.limits.cpu }}
+                cpu: "{{ .engineResources.limits.cpu }}"
                 {{- end }}
                 {{- if .engineResources.limits.memory }}
-                memory: {{ .engineResources.limits.memory }}
+                memory: "{{ .engineResources.limits.memory }}"
                 {{- end }}
               {{- end }}
             {{- end }}
@@ -2130,19 +2130,19 @@ files:
                 {{- if .svcOrchSpec.resources.requests }}
                 requests:
                   {{- if .svcOrchSpec.resources.requests.cpu }}
-                  cpu: {{ .svcOrchSpec.resources.requests.cpu }}
+                  cpu: "{{ .svcOrchSpec.resources.requests.cpu }}"
                   {{- end }}
                   {{- if .svcOrchSpec.resources.requests.memory }}
-                  memory: {{ .svcOrchSpec.resources.requests.memory }}
+                  memory: "{{ .svcOrchSpec.resources.requests.memory }}"
                   {{- end }}
                 {{- end }}
                 {{- if .svcOrchSpec.resources.limits }}
                 limits:
                   {{- if .svcOrchSpec.resources.limits.cpu }}
-                  cpu: {{ .svcOrchSpec.resources.limits.cpu }}
+                  cpu: "{{ .svcOrchSpec.resources.limits.cpu }}"
                   {{- end }}
                   {{- if .svcOrchSpec.resources.limits.memory }}
-                  memory: {{ .svcOrchSpec.resources.limits.memory }}
+                  memory: "{{ .svcOrchSpec.resources.limits.memory }}"
                   {{- end }}
                 {{- end }}
               {{- end }}
@@ -2150,13 +2150,13 @@ files:
               env:
                 {{- range .svcOrchSpec.env }}
                 - name: {{ .name }}
-                  {{- if .value }}
-                  value: {{ .value }}
-                  {{- else if .valueFrom }}
+                  {{- if .valueFrom }}
                   valueFrom:
                     secretKeyRef:
                       name: {{ .valueFrom.secretKeyRef.name }}
                       key: {{ .valueFrom.secretKeyRef.key }}
+                  {{- else }}
+                  value: "{{ .value }}"
                   {{- end }}
                 {{- end }}
               {{- end }}

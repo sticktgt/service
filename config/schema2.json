@@ -42,6 +42,12 @@
                 "$ref": "#/definitions/ServerConfig"
             }
         },
+        "seldonRuntimes": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/SeldonRuntime"
+            }
+        },
         "subjectArea": {
             "type": "string"
         },
@@ -512,6 +518,170 @@
             },
             "required": [
                 "name"
+            ]
+        },
+        "SeldonRuntime": {
+            "type": "object",
+            "properties": {
+                "seldonConfig": {
+                    "type": "string"
+                },
+                "disableAutoUpdate": {
+                    "type": "boolean"
+                },
+                "overrides": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "disable": {
+                                "type": "boolean"
+                            },
+                            "replicas": {
+                                "type": "integer"
+                            },
+                            "serviceType": {
+                                "type": "string",
+                                "enum": [
+                                    "ClusterIP",
+                                    "NodePort",
+                                    "LoadBalancer",
+                                    "ExternalName"
+                                ]
+                            },
+                            "podSpec": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ]
+                    }
+                },
+                "config": {
+                    "type": "object",
+                    "properties": {
+                        "tracingConfig": {
+                            "type": "object",
+                            "properties": {
+                                "disable": {
+                                    "type": "boolean"
+                                },
+                                "otelExporterEndpoint": {
+                                    "type": "string"
+                                },
+                                "otelExporterProtocol": {
+                                    "type": "string"
+                                },
+                                "ratio": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "kafkaConfig": {
+                            "type": "object",
+                            "properties": {
+                                "bootstrapServers": {
+                                    "type": "string"
+                                },
+                                "consumerGroupIdPrefix": {
+                                    "type": "string"
+                                },
+                                "debug": {
+                                    "type": "string"
+                                },
+                                "topicPrefix": {
+                                    "type": "string"
+                                },
+                                "consumer": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "integer"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "producer": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "integer"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "streams": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "integer"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "agentConfig": {
+                            "type": "object",
+                            "properties": {
+                                "rclone": {
+                                    "type": "object",
+                                    "properties": {
+                                        "config": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "config_secrets": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "serviceConfig": {
+                            "type": "object",
+                            "properties": {
+                                "grpcServicePrefix": {
+                                    "type": "string"
+                                },
+                                "serviceType": {
+                                    "type": "string",
+                                    "enum": [
+                                        "ClusterIP",
+                                        "NodePort",
+                                        "LoadBalancer",
+                                        "ExternalName"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "required": [
+                "seldonConfig"
             ]
         }
     }
