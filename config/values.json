@@ -4,6 +4,8 @@
   "deploymentName": "mlflow-deployment",
   "namespace": "default",
   "subjectArea": "seldon-test-project",
+  "serverType": "kafka",
+  "replicas": 1,
   "chart": {
     "name": "test-model",
     "version": "0.1.0",
@@ -25,6 +27,13 @@
         "name": "classifier",
         "implementation": "SKLEARN_SERVER",
         "modelUri": "gs://seldon-models/v1.19.0-dev/sklearn/iris",
+        "endpoint": {
+          "type": "REST",
+          "serviceHost": "localhost",
+          "servicePort": 8081,
+          "httpPort": 8080,
+          "grpcPort": 5000
+        },
         "children": []
       }
     }

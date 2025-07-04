@@ -34,6 +34,9 @@ files:
       {{- if .Values.transport }}
       transport: {{ .Values.transport }}
       {{- end }}
+      {{- if .Values.serverType }}
+      serverType: {{ .Values.serverType }}
+      {{- end }}
       {{- if .Values.annotations }}
       specAnnotations:
         {{- range $k, $v := .Values.annotations }}
@@ -85,6 +88,18 @@ files:
             {{- if .explainer.endpoint }}
             endpoint:
               type: {{ .explainer.endpoint.type }}
+              {{- if .explainer.endpoint.serviceHost }}
+              serviceHost: {{ .explainer.endpoint.serviceHost }}
+              {{- end }}
+              {{- if .explainer.endpoint.servicePort }}
+              servicePort: {{ .explainer.endpoint.servicePort }}
+              {{- end }}
+              {{- if .explainer.endpoint.httpPort }}
+              httpPort: {{ .explainer.endpoint.httpPort }}
+              {{- end }}
+              {{- if .explainer.endpoint.grpcPort }}
+              grpcPort: {{ .explainer.endpoint.grpcPort }}
+              {{- end }}                  
             {{- end }}
             {{- if .explainer.config }}
             config:
@@ -611,6 +626,18 @@ files:
             {{- if .graph.endpoint }}
             endpoint:
               type: {{ .graph.endpoint.type }}
+              {{- if .graph.endpoint.serviceHost }}
+              serviceHost: {{ .graph.endpoint.serviceHost }}
+              {{- end }}
+              {{- if .graph.endpoint.servicePort }}
+              servicePort: {{ .graph.endpoint.servicePort }}
+              {{- end }}
+              {{- if .graph.endpoint.httpPort }}
+              httpPort: {{ .graph.endpoint.httpPort }}
+              {{- end }}
+              {{- if .graph.endpoint.grpcPort }}
+              grpcPort: {{ .graph.endpoint.grpcPort }}
+              {{- end }}
             {{- end }}
             {{- if .graph.storageInitializerImage }}
             storageInitializerImage: {{ .graph.storageInitializerImage }}
@@ -637,6 +664,18 @@ files:
                 {{- if .endpoint }}
                 endpoint:
                   type: {{ .endpoint.type }}
+                  {{- if .endpoint.serviceHost }}
+                  serviceHost: {{ .endpoint.serviceHost }}
+                  {{- end }}
+                  {{- if .endpoint.servicePort }}
+                  servicePort: {{ .endpoint.servicePort }}
+                  {{- end }}
+                  {{- if .endpoint.httpPort }}
+                  httpPort: {{ .endpoint.httpPort }}
+                  {{- end }}
+                  {{- if .endpoint.grpcPort }}
+                  grpcPort: {{ .endpoint.grpcPort }}
+                  {{- end }}
                 {{- end }}
                 {{- if .storageInitializerImage }}
                 storageInitializerImage: {{ .storageInitializerImage }}
@@ -663,6 +702,18 @@ files:
                     {{- if .endpoint }}
                     endpoint:
                       type: {{ .endpoint.type }}
+                      {{- if .endpoint.serviceHost }}
+                      serviceHost: {{ .endpoint.serviceHost }}
+                      {{- end }}
+                      {{- if .endpoint.servicePort }}
+                      servicePort: {{ .endpoint.servicePort }}
+                      {{- end }}
+                      {{- if .endpoint.httpPort }}
+                      httpPort: {{ .endpoint.httpPort }}
+                      {{- end }}
+                      {{- if .endpoint.grpcPort }}
+                      grpcPort: {{ .endpoint.grpcPort }}
+                      {{- end }}
                     {{- end }}
                     {{- if .storageInitializerImage }}
                     storageInitializerImage: {{ .storageInitializerImage }}
@@ -689,6 +740,18 @@ files:
                         {{- if .endpoint }}
                         endpoint:
                           type: {{ .endpoint.type }}
+                          {{- if .endpoint.serviceHost }}
+                          serviceHost: {{ .endpoint.serviceHost }}
+                          {{- end }}
+                          {{- if .endpoint.servicePort }}
+                          servicePort: {{ .endpoint.servicePort }}
+                          {{- end }}
+                          {{- if .endpoint.httpPort }}
+                          httpPort: {{ .endpoint.httpPort }}
+                          {{- end }}
+                          {{- if .endpoint.grpcPort }}
+                          grpcPort: {{ .endpoint.grpcPort }}
+                          {{- end }}
                         {{- end }}
                         {{- if .storageInitializerImage }}
                         storageInitializerImage: {{ .storageInitializerImage }}
@@ -715,6 +778,18 @@ files:
                             {{- if .endpoint }}
                             endpoint:
                               type: {{ .endpoint.Type }}
+                              {{- if .endpoint.serviceHost }}
+                              serviceHost: {{ .endpoint.serviceHost }}
+                              {{- end }}
+                              {{- if .endpoint.servicePort }}
+                              servicePort: {{ .endpoint.servicePort }}
+                              {{- end }}
+                              {{- if .endpoint.httpPort }}
+                              httpPort: {{ .endpoint.httpPort }}
+                              {{- end }}
+                              {{- if .endpoint.grpcPort }}
+                              grpcPort: {{ .endpoint.grpcPort }}
+                              {{- end }}
                             {{- end }}
                             {{- if .storageInitializerImage }}
                             storageInitializerImage: {{ .storageInitializerImage }}
@@ -752,6 +827,9 @@ files:
     content: |
       {{- if .Values.namespace }}
       namespace: {{ .Values.namespace }}
+      {{- end }}
+      {{- if .Values.replicas }}
+      replicas: {{ .Values.replicas }}
       {{- end }}
       predictors:
       {{- range .Values.predictors }}
@@ -1436,6 +1514,18 @@ files:
       {{- if .endpoint }}
       endpoint:
         type: {{ .endpoint.type }}
+        {{- if .endpoint.serviceHost }}
+        serviceHost: {{ .endpoint.serviceHost }}
+        {{- end }}
+        {{- if .endpoint.servicePort }}
+        servicePort: {{ .endpoint.servicePort }}
+        {{- end }}
+        {{- if .endpoint.httpPort }}
+        httpPort: {{ .endpoint.httpPort }}
+        {{- end }}
+        {{- if .endpoint.grpcPort }}
+        grpcPort: {{ .endpoint.grpcPort }}
+        {{- end }}
       {{- end }}
       {{- if .logger }}
       logger:
@@ -2026,6 +2116,12 @@ files:
         {{- if .Values.transport }}
         transport: {{ .Values.transport }}
         {{- end }}
+        {{- if .Values.serverType }}
+        serverType: {{ .Values.serverType }}
+        {{- end }}
+        {{- if .Values.replicas }}
+        replicas: {{ .Values.replicas }}
+        {{- end }}
         {{- if .Values.specAnnotations }}
         annotations:
           {{- range $k, $v := .Values.specAnnotations }}
@@ -2111,6 +2207,18 @@ files:
               {{- if .explainer.endpoint }}
               endpoint:
                 type: {{ .explainer.endpoint.type }}
+                {{- if .explainer.endpoint.serviceHost }}
+                serviceHost: {{ .explainer.endpoint.serviceHost }}
+                {{- end }}
+                {{- if .explainer.endpoint.servicePort }}
+                servicePort: {{ .explainer.endpoint.servicePort }}
+                {{- end }}
+                {{- if .explainer.endpoint.httpPort }}
+                httpPort: {{ .explainer.endpoint.httpPort }}
+                {{- end }}
+                {{- if .explainer.endpoint.grpcPort }}
+                grpcPort: {{ .explainer.endpoint.grpcPort }}
+                {{- end }}                
               {{- end }}
               {{- if .explainer.config }}
               config:
@@ -2659,6 +2767,14 @@ valuesSchema:
     type: string
     description: Transport mechanism to use. Allowed values- rest, grpc
     required: false
+  serverType:
+    type: string
+    description: Transport mechanism to use. Allowed values- rpc, kafka
+    required: false
+  replicas:
+    type: integer
+    description: Number of replicas to deploy
+    required: false
   annotations:
     type: list
     description: Annotations added to the SeldonDeployment spec
@@ -2742,6 +2858,22 @@ valuesSchema:
   predictors.graph.endpoint.type:
     type: string
     description: Type of endpoint exposed by the graph. Allowed values- REST, GRPC
+    required: false
+  predictors.graph.endpoint.serviceHost:
+    type: string
+    description: 
+    required: false
+  predictors.graph.endpoint.servicePort:
+    type: integer
+    description:
+    required: false
+  predictors.graph.endpoint.httpPort:
+    type: integer
+    description:
+    required: false
+  predictors.graph.endpoint.grpcPort:
+    type: integer
+    description:
     required: false
   predictors.graph.envSecretRefName:
     type: string
@@ -3767,6 +3899,22 @@ valuesSchema:
     type: string
     description: Type of the endpoint protocol. Allowed values- REST, GRPC
     required: false
+  ppredictors.explainer.endpoint.serviceHost:
+    type: string
+    description: 
+    required: false
+  predictors.explainer.endpoint.servicePort:
+    type: integer
+    description:
+    required: false
+  predictors.explainer.endpoint.httpPort:
+    type: integer
+    description:
+    required: false
+  predictors.explainer.endpoint.grpcPort:
+    type: integer
+    description:
+    required: false    
   predictors.explainer.envSecretRefName:
     type: string
     description: Name of the secret containing environment variables for the explainer
@@ -3850,6 +3998,16 @@ setupValuesSchema: |
           "grpc"
         ]
       },
+      "serverType": {
+        "type": "string",
+        "enum": [
+          "rpc",
+          "kafka"
+        ]
+      },
+      "replicas": {
+        "type": "integer"
+      },      
       "subjectArea": {
         "type": "string"
       },
@@ -4105,6 +4263,18 @@ setupValuesSchema: |
                   "REST",
                   "GRPC"
                 ]
+              },
+              "serviceHost": {
+                "type": "string"
+              },
+              "servicePort": {
+                "type": "integer"
+              },
+              "httpPort": {
+                "type": "integer"
+              },
+              "grpcPort": {
+                "type": "integer"
               }
             },
             "required": [
@@ -5114,7 +5284,19 @@ setupValuesSchema: |
             "properties": {
               "type": {
                 "type": "string"
-              }
+              },
+              "serviceHost": {
+                "type": "string"
+              },
+              "servicePort": {
+                "type": "integer"
+              },
+              "httpPort": {
+                "type": "integer"
+              },
+              "grpcPort": {
+                "type": "integer"
+              }              
             }
           },
           "config": {

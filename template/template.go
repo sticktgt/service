@@ -37,6 +37,9 @@ type Values struct {
 	SourceMetafileName   string            `json:"sourceMetafileName,omitempty" yaml:"sourceMetafileName,omitempty"`
 	SourceMetafileRepo   string            `json:"sourceMetafileRepo,omitempty" yaml:"sourceMetafileRepo,omitempty"`
 	SourceMetafileBranch string            `json:"sourceMetafileBranch,omitempty" yaml:"sourceMetafileBranch,omitempty"`
+	//  Replicas & ServerType
+	Replicas   *int32 `json:"replicas,omitempty" yaml:"replicas,omitempty"`
+	ServerType string `json:"serverType,omitempty" yaml:"serverType,omitempty"`
 }
 
 type Values2 struct {
@@ -508,7 +511,11 @@ type ConfigMapRef struct {
 }
 
 type Endpoint struct {
-	Type string `json:"type,omitempty" yaml:"type,omitempty"`
+	Type        string `json:"type,omitempty" yaml:"type,omitempty"`
+	ServiceHost string `json:"service_host,omitempty" yaml:"service_host,omitempty"`
+	ServicePort int32  `json:"service_port,omitempty" yaml:"service_port,omitempty"`
+	HttpPort    int32  `json:"httpPort,omitempty" yaml:"httpPort,omitempty"`
+	GrpcPort    int32  `json:"grpcPort,omitempty" yaml:"grpcPort,omitempty"`
 }
 
 type HPASpec struct {
@@ -662,12 +669,12 @@ var log = logrus.New()
 func main() {
 	var valuesCheck Values2
 	log.Printf("Reading values file")
-	valData, err := os.ReadFile("../config/values2.json")
+	valData, err := os.ReadFile("../config/values.json")
 	check(err)
 
 	log.Printf("Loading schema file")
-	schemaLoader := gojsonschema.NewReferenceLoader("file://../config/schema2.json")
-	documentLoader := gojsonschema.NewReferenceLoader("file://../config/values2.json")
+	schemaLoader := gojsonschema.NewReferenceLoader("file://../config/schema.json")
+	documentLoader := gojsonschema.NewReferenceLoader("file://../config/values.json")
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
 	check(err)
 	if result.Valid() {
@@ -685,7 +692,7 @@ func main() {
 
 	var meta ChartTemplate
 	log.Printf("Reading template file")
-	tmplData, err := os.ReadFile("../config/meta-online-inference-seldon-v2.yaml")
+	tmplData, err := os.ReadFile("../config/meta-online-inference-seldon-v1.yaml")
 	check(err)
 	check(yaml.Unmarshal(tmplData, &meta))
 	/*
