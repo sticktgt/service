@@ -1,16 +1,23 @@
 {
   "environment": "TEST",
   "apiVersion": "machinelearning.seldon.io/v1alpha2",
-  "deploymentName": "mlflow-deployment",
-  "namespace": "default",
-  "subjectArea": "seldon-test-project",
-  "serverType": "kafka",
-  "replicas": 1,
   "chart": {
-    "name": "test-model",
+    "name": "sklearn",
     "version": "0.1.0",
     "description": "Test Seldon deployment chart"
   },
+  "deploymentName": "test-explainer-model",
+  "namespace": "default",
+  "metadata": {
+    "labels": {
+      "components": "seldon-core",
+      "entity": "online-model"
+    }
+  },
+  "subjectArea": "seldon-test-project",
+  "sourceMetafileName": "seldon.meta.yaml",
+  "sourceMetafileRepo": "https://neogit.neoflex.ru/vsemenov/tservice/",
+  "sourceMetafileBranch": "main",
   "predictors": [
     {
       "name": "default",
@@ -25,15 +32,9 @@
       },
       "graph": {
         "name": "classifier",
-        "implementation": "SKLEARN_SERVER",
+        "type": "MODEL",
         "modelUri": "gs://seldon-models/v1.19.0-dev/sklearn/iris",
-        "endpoint": {
-          "type": "REST",
-          "serviceHost": "localhost",
-          "servicePort": 8081,
-          "httpPort": 8080,
-          "grpcPort": 5000
-        },
+        "implementation": "SKLEARN_SERVER",
         "children": []
       }
     }

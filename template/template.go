@@ -669,12 +669,12 @@ var log = logrus.New()
 func main() {
 	var valuesCheck Values2
 	log.Printf("Reading values file")
-	valData, err := os.ReadFile("../config/values.json")
+	valData, err := os.ReadFile("../config/values2.json")
 	check(err)
 
 	log.Printf("Loading schema file")
-	schemaLoader := gojsonschema.NewReferenceLoader("file://../config/schema.json")
-	documentLoader := gojsonschema.NewReferenceLoader("file://../config/values.json")
+	schemaLoader := gojsonschema.NewReferenceLoader("file://../config/schema2.json")
+	documentLoader := gojsonschema.NewReferenceLoader("file://../config/values2.json")
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
 	check(err)
 	if result.Valid() {
@@ -692,7 +692,7 @@ func main() {
 
 	var meta ChartTemplate
 	log.Printf("Reading template file")
-	tmplData, err := os.ReadFile("../config/meta-online-inference-seldon-v1.yaml")
+	tmplData, err := os.ReadFile("../config/meta-online-inference-seldon-v2.yaml")
 	check(err)
 	check(yaml.Unmarshal(tmplData, &meta))
 	/*

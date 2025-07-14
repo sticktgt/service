@@ -4711,3 +4711,753 @@ valuesSchema:
     type: string
     description: Type of resource to experiment on. Allowed values- "model", "pipeline".
     required: false
+
+setupValuesSchema: |
+  ---
+  {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Seldon Core V2 Values",
+    "type": "object",
+    "properties": {
+        "environment": {
+            "type": "string"
+        },
+        "apiVersion": {
+            "type": "string"
+        },
+        "chart": {
+            "$ref": "#/definitions/Chart"
+        },
+        "namespace": {
+            "type": "string"
+        },
+        "metadata": {
+            "$ref": "#/definitions/Metadata"
+        },
+        "models": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/ModelInput"
+            }
+        },
+        "pipelines": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Pipeline"
+            }
+        },
+        "servers": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Server"
+            }
+        },
+        "serverConfigs": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/ServerConfig"
+            }
+        },
+        "seldonRuntimes": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/SeldonRuntime"
+            }
+        },
+        "experiments": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Experiment"
+            }
+        },
+        "subjectArea": {
+            "type": "string"
+        },
+        "sourceMetafileName": {
+            "type": "string"
+        },
+        "sourceMetafileRepo": {
+            "type": "string"
+        },
+        "sourceMetafileBranch": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "environment",
+        "chart",
+        "namespace"
+    ],
+    "definitions": {
+        "ModelInput": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "labels": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "annotations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "storageUri": {
+                    "type": "string"
+                },
+                "artifactVersion": {
+                    "type": "integer"
+                },
+                "modelType": {
+                    "type": "string"
+                },
+                "schemaUri": {
+                    "type": "string"
+                },
+                "secretName": {
+                    "type": "string"
+                },
+                "requirements": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "memory": {
+                    "type": "string"
+                },
+                "replicas": {
+                    "type": "integer"
+                },
+                "minReplicas": {
+                    "type": "integer"
+                },
+                "maxReplicas": {
+                    "type": "integer"
+                },
+                "server": {
+                    "type": "string"
+                },
+                "preloaded": {
+                    "type": "boolean"
+                },
+                "dedicated": {
+                    "type": "boolean"
+                },
+                "logger": {
+                    "$ref": "#/definitions/LoggingSpec"
+                },
+                "explainer": {
+                    "$ref": "#/definitions/ExplainerSpec"
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ParameterSpec"
+                    }
+                },
+                "llm": {
+                    "$ref": "#/definitions/LlmSpec"
+                }
+            },
+            "required": [
+                "name",
+                "storageUri"
+            ]
+        },
+        "LoggingSpec": {
+            "type": "object",
+            "properties": {
+                "percent": {
+                    "type": "integer"
+                }
+            }
+        },
+        "ExplainerSpec": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "modelRef": {
+                    "type": "string"
+                },
+                "pipelineRef": {
+                    "type": "string"
+                }
+            }
+        },
+        "LlmSpec": {
+            "type": "object",
+            "properties": {
+                "modelRef": {
+                    "type": "string"
+                },
+                "pipelineRef": {
+                    "type": "string"
+                }
+            }
+        },
+        "ParameterSpec": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "value"
+            ]
+        },
+        "Chart": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "version",
+                "description"
+            ]
+        },
+        "Metadata": {
+            "type": "object",
+            "properties": {
+                "labels": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "annotations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "Pipeline": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "labels": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "annotations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "input": {
+                    "$ref": "#/definitions/PipelineInput"
+                },
+                "steps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PipelineStep"
+                    }
+                },
+                "output": {
+                    "$ref": "#/definitions/PipelineOutput"
+                },
+                "dataflow": {
+                    "$ref": "#/definitions/DataflowSpec"
+                },
+                "allowCycles": {
+                    "type": "boolean"
+                },
+                "maxStepRevisits": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "name",
+                "steps"
+            ]
+        },
+        "PipelineInput": {
+            "type": "object",
+            "properties": {
+                "externalInputs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "externalTriggers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "joinWindowMs": {
+                    "type": "integer"
+                },
+                "joinType": {
+                    "type": "string"
+                },
+                "triggersJoinType": {
+                    "type": "string"
+                },
+                "tensorMap": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "PipelineStep": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "inputs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "joinWindowMs": {
+                    "type": "integer"
+                },
+                "tensorMap": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "triggers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "inputsJoinType": {
+                    "type": "string"
+                },
+                "triggersJoinType": {
+                    "type": "string"
+                },
+                "batch": {
+                    "$ref": "#/definitions/PipelineBatch"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "PipelineBatch": {
+            "type": "object",
+            "properties": {
+                "size": {
+                    "type": "integer"
+                },
+                "windowMs": {
+                    "type": "integer"
+                },
+                "rolling": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "PipelineOutput": {
+            "type": "object",
+            "properties": {
+                "steps": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "joinWindowMs": {
+                    "type": "integer"
+                },
+                "stepsJoin": {
+                    "type": "string"
+                },
+                "tensorMap": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "DataflowSpec": {
+            "type": "object",
+            "properties": {
+                "cleanTopicsOnDelete": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "Server": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "labels": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "annotations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "serverConfig": {
+                    "type": "string"
+                },
+                "extraCapabilities": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "capabilities": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "imageOverrides": {
+                    "type": "object",
+                    "properties": {
+                        "agent": {
+                            "type": "object",
+                            "additionalProperties": true
+                        },
+                        "rclone": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "podSpec": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "statefulSetPersistentVolumeClaimRetentionPolicy": {
+                    "type": "object",
+                    "properties": {
+                        "whenDeleted": {
+                            "type": "string",
+                            "enum": [
+                                "Delete",
+                                "Retain"
+                            ]
+                        },
+                        "whenScaled": {
+                            "type": "string",
+                            "enum": [
+                                "Delete",
+                                "Retain"
+                            ]
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "replicas": {
+                    "type": "integer"
+                },
+                "minReplicas": {
+                    "type": "integer"
+                },
+                "maxReplicas": {
+                    "type": "integer"
+                },
+                "disableAutoUpdate": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "name",
+                "serverConfig"
+            ]
+        },
+        "ServerConfig": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "podSpec": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "volumeClaimTemplates": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "spec": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "SeldonRuntime": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "seldonConfig": {
+                    "type": "string"
+                },
+                "disableAutoUpdate": {
+                    "type": "boolean"
+                },
+                "overrides": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "disable": {
+                                "type": "boolean"
+                            },
+                            "replicas": {
+                                "type": "integer"
+                            },
+                            "serviceType": {
+                                "type": "string",
+                                "enum": [
+                                    "ClusterIP",
+                                    "NodePort",
+                                    "LoadBalancer",
+                                    "ExternalName"
+                                ]
+                            },
+                            "podSpec": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ]
+                    }
+                },
+                "config": {
+                    "type": "object",
+                    "properties": {
+                        "tracingConfig": {
+                            "type": "object",
+                            "properties": {
+                                "disable": {
+                                    "type": "boolean"
+                                },
+                                "otelExporterEndpoint": {
+                                    "type": "string"
+                                },
+                                "otelExporterProtocol": {
+                                    "type": "string"
+                                },
+                                "ratio": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "kafkaConfig": {
+                            "type": "object",
+                            "properties": {
+                                "bootstrapServers": {
+                                    "type": "string"
+                                },
+                                "consumerGroupIdPrefix": {
+                                    "type": "string"
+                                },
+                                "debug": {
+                                    "type": "string"
+                                },
+                                "topicPrefix": {
+                                    "type": "string"
+                                },
+                                "consumer": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "integer"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "producer": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "integer"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "streams": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "integer"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "agentConfig": {
+                            "type": "object",
+                            "properties": {
+                                "rclone": {
+                                    "type": "object",
+                                    "properties": {
+                                        "config": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "config_secrets": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "serviceConfig": {
+                            "type": "object",
+                            "properties": {
+                                "grpcServicePrefix": {
+                                    "type": "string"
+                                },
+                                "serviceType": {
+                                    "type": "string",
+                                    "enum": [
+                                        "ClusterIP",
+                                        "NodePort",
+                                        "LoadBalancer",
+                                        "ExternalName"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "required": [
+                "seldonConfig"
+            ]
+        },
+        "Experiment": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "default": {
+                    "type": "string"
+                },
+                "candidates": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "weight": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "weight"
+                        ]
+                    }
+                },
+                "mirror": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "percent": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "resourceType": {
+                    "type": "string",
+                    "enum": [
+                        "model",
+                        "pipeline"
+                    ]
+                }
+            },
+            "required": [
+                "candidates"
+            ]
+        }
+    }
+  }
