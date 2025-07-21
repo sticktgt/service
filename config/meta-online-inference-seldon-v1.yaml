@@ -802,7 +802,217 @@ files:
                                 value: {{ .value }}
                               {{- end }}
                             {{- end }}
+                            {{- if .children }}
+                            children:
+                              {{- range .children }}
+                              {{ .name }}:
+                                name: {{ .name }}
+                                {{- if .type }}
+                                type: {{ .type }}
+                                {{- end }}
+                                {{- if .implementation }}
+                                implementation: {{ .implementation }}
+                                {{- end }}
+                                {{- if .endpoint }}
+                                endpoint:
+                                  type: {{ .endpoint.Type }}
+                                  {{- if .endpoint.serviceHost }}
+                                  serviceHost: {{ .endpoint.serviceHost }}
+                                  {{- end }}
+                                  {{- if .endpoint.servicePort }}
+                                  servicePort: {{ .endpoint.servicePort }}
+                                  {{- end }}
+                                  {{- if .endpoint.httpPort }}
+                                  httpPort: {{ .endpoint.httpPort }}
+                                  {{- end }}
+                                  {{- if .endpoint.grpcPort }}
+                                  grpcPort: {{ .endpoint.grpcPort }}
+                                  {{- end }}
+                                {{- end }}
+                                {{- if .storageInitializerImage }}
+                                storageInitializerImage: {{ .storageInitializerImage }}
+                                {{- end }}                                 
+                                {{- if .parameters }}
+                                parameters:
+                                  {{- range .parameters }}
+                                  - name: {{ .name }}
+                                    type: {{ .type }}
+                                    value: {{ .value }}
+                                  {{- end }}
+                                {{- end }}
+                                {{- if .children }}
+                                children:
+                                  {{- range .children }}
+                                  {{ .name }}:
+                                    name: {{ .name }}
+                                    {{- if .type }}
+                                    type: {{ .type }}
+                                    {{- end }}
+                                    {{- if .implementation }}
+                                    implementation: {{ .implementation }}
+                                    {{- end }}
+                                    {{- if .endpoint }}
+                                    endpoint:
+                                      type: {{ .endpoint.Type }}
+                                      {{- if .endpoint.serviceHost }}
+                                      serviceHost: {{ .endpoint.serviceHost }}
+                                      {{- end }}
+                                      {{- if .endpoint.servicePort }}
+                                      servicePort: {{ .endpoint.servicePort }}
+                                      {{- end }}
+                                      {{- if .endpoint.httpPort }}
+                                      httpPort: {{ .endpoint.httpPort }}
+                                      {{- end }}
+                                      {{- if .endpoint.grpcPort }}
+                                      grpcPort: {{ .endpoint.grpcPort }}
+                                      {{- end }}
+                                    {{- end }}
+                                    {{- if .storageInitializerImage }}
+                                    storageInitializerImage: {{ .storageInitializerImage }}
+                                    {{- end }}                                 
+                                    {{- if .parameters }}
+                                    parameters:
+                                      {{- range .parameters }}
+                                      - name: {{ .name }}
+                                        type: {{ .type }}
+                                        value: {{ .value }}
+                                      {{- end }}
+                                    {{- end }}
+                                    {{- if .children }}
+                                    children:
+                                      {{- range .children }}
+                                      {{ .name }}:
+                                        name: {{ .name }}
+                                        {{- if .type }}
+                                        type: {{ .type }}
+                                        {{- end }}
+                                        {{- if .implementation }}
+                                        implementation: {{ .implementation }}
+                                        {{- end }}
+                                        {{- if .endpoint }}
+                                        endpoint:
+                                          type: {{ .endpoint.Type }}
+                                          {{- if .endpoint.serviceHost }}
+                                          serviceHost: {{ .endpoint.serviceHost }}
+                                          {{- end }}
+                                          {{- if .endpoint.servicePort }}
+                                          servicePort: {{ .endpoint.servicePort }}
+                                          {{- end }}
+                                          {{- if .endpoint.httpPort }}
+                                          httpPort: {{ .endpoint.httpPort }}
+                                          {{- end }}
+                                          {{- if .endpoint.grpcPort }}
+                                          grpcPort: {{ .endpoint.grpcPort }}
+                                          {{- end }}
+                                        {{- end }}
+                                        {{- if .storageInitializerImage }}
+                                        storageInitializerImage: {{ .storageInitializerImage }}
+                                        {{- end }}                                 
+                                        {{- if .parameters }}
+                                        parameters:
+                                          {{- range .parameters }}
+                                          - name: {{ .name }}
+                                            type: {{ .type }}
+                                            value: {{ .value }}
+                                          {{- end }}
+                                        {{- end }}
+                                        {{- if .children }}
+                                        children:
+                                          {{- range .children }}
+                                          {{ .name }}:
+                                            name: {{ .name }}
+                                            {{- if .type }}
+                                            type: {{ .type }}
+                                            {{- end }}
+                                            {{- if .implementation }}
+                                            implementation: {{ .implementation }}
+                                            {{- end }}
+                                            {{- if .endpoint }}
+                                            endpoint:
+                                              type: {{ .endpoint.Type }}
+                                              {{- if .endpoint.serviceHost }}
+                                              serviceHost: {{ .endpoint.serviceHost }}
+                                              {{- end }}
+                                              {{- if .endpoint.servicePort }}
+                                              servicePort: {{ .endpoint.servicePort }}
+                                              {{- end }}
+                                              {{- if .endpoint.httpPort }}
+                                              httpPort: {{ .endpoint.httpPort }}
+                                              {{- end }}
+                                              {{- if .endpoint.grpcPort }}
+                                              grpcPort: {{ .endpoint.grpcPort }}
+                                              {{- end }}
+                                            {{- end }}
+                                            {{- if .storageInitializerImage }}
+                                            storageInitializerImage: {{ .storageInitializerImage }}
+                                            {{- end }}                                 
+                                            {{- if .parameters }}
+                                            parameters:
+                                              {{- range .parameters }}
+                                              - name: {{ .name }}
+                                                type: {{ .type }}
+                                                value: {{ .value }}
+                                              {{- end }}
+                                            {{- end }}
+                                            {{- if .children }}
+                                            children:
+                                              {{- range .children }}
+                                              {{ .name }}:
+                                                name: {{ .name }}
+                                                {{- if .type }}
+                                                type: {{ .type }}
+                                                {{- end }}
+                                                {{- if .implementation }}
+                                                implementation: {{ .implementation }}
+                                                {{- end }}
+                                                {{- if .endpoint }}
+                                                endpoint:
+                                                  type: {{ .endpoint.Type }}
+                                                  {{- if .endpoint.serviceHost }}
+                                                  serviceHost: {{ .endpoint.serviceHost }}
+                                                  {{- end }}
+                                                  {{- if .endpoint.servicePort }}
+                                                  servicePort: {{ .endpoint.servicePort }}
+                                                  {{- end }}
+                                                  {{- if .endpoint.httpPort }}
+                                                  httpPort: {{ .endpoint.httpPort }}
+                                                  {{- end }}
+                                                  {{- if .endpoint.grpcPort }}
+                                                  grpcPort: {{ .endpoint.grpcPort }}
+                                                  {{- end }}
+                                                {{- end }}
+                                                {{- if .storageInitializerImage }}
+                                                storageInitializerImage: {{ .storageInitializerImage }}
+                                                {{- end }}                                 
+                                                {{- if .parameters }}
+                                                parameters:
+                                                  {{- range .parameters }}
+                                                  - name: {{ .name }}
+                                                    type: {{ .type }}
+                                                    value: {{ .value }}
+                                                  {{- end }}
+                                                {{- end }}
+                                                children: []
+                                              {{- end }}
+                                            {{- else }}
+                                            children: []
+                                            {{- end }}
+                                          {{- end }}
+                                        {{- else }}
+                                        children: []
+                                        {{- end }}
+                                      {{- end }}
+                                    {{- else }}
+                                    children: []
+                                    {{- end }}
+                                  {{- end }}
+                                {{- else }}
+                                children: []
+                                {{- end }}
+                              {{- end }}
+                            {{- else }}
                             children: []
+                            {{- end }}
                           {{- end }}
                         {{- else }}
                         children: []
@@ -1475,7 +1685,132 @@ files:
                             {{- if .serviceAccountName }}
                             serviceAccountName: {{ .serviceAccountName }}
                             {{- end }}
+                            {{- if .children }}
+                            children:
+                              {{- range .children }}
+                              {{ .name }}:
+                                name: {{ .name }}
+                                {{- if .modelUri }}
+                                modelUri: {{ .modelUri }}
+                                {{- end }}
+                                {{- if .envSecretRefName }}
+                                envSecretRefName: {{ .envSecretRefName }}
+                                {{- end }}
+                                {{- if .logger }}
+                                logger:
+                                  mode: {{ .logger.mode }}
+                                  {{- if .logger.url }}
+                                  url: {{ .logger.url }}
+                                  {{- end }}
+                                {{- end }}
+                                {{- if .serviceAccountName }}
+                                serviceAccountName: {{ .serviceAccountName }}
+                                {{- end }}
+                                {{- if .children }}
+                                children:
+                                  {{- range .children }}
+                                  {{ .name }}:
+                                    name: {{ .name }}
+                                    {{- if .modelUri }}
+                                    modelUri: {{ .modelUri }}
+                                    {{- end }}
+                                    {{- if .envSecretRefName }}
+                                    envSecretRefName: {{ .envSecretRefName }}
+                                    {{- end }}
+                                    {{- if .logger }}
+                                    logger:
+                                      mode: {{ .logger.mode }}
+                                      {{- if .logger.url }}
+                                      url: {{ .logger.url }}
+                                      {{- end }}
+                                    {{- end }}
+                                    {{- if .serviceAccountName }}
+                                    serviceAccountName: {{ .serviceAccountName }}
+                                    {{- end }}
+                                    {{- if .children }}
+                                    children:
+                                      {{- range .children }}
+                                      {{ .name }}:
+                                        name: {{ .name }}
+                                        {{- if .modelUri }}
+                                        modelUri: {{ .modelUri }}
+                                        {{- end }}
+                                        {{- if .envSecretRefName }}
+                                        envSecretRefName: {{ .envSecretRefName }}
+                                        {{- end }}
+                                        {{- if .logger }}
+                                        logger:
+                                          mode: {{ .logger.mode }}
+                                          {{- if .logger.url }}
+                                          url: {{ .logger.url }}
+                                          {{- end }}
+                                        {{- end }}
+                                        {{- if .serviceAccountName }}
+                                        serviceAccountName: {{ .serviceAccountName }}
+                                        {{- end }}
+                                        {{- if .children }}
+                                        children:
+                                          {{- range .children }}
+                                          {{ .name }}:
+                                            name: {{ .name }}
+                                            {{- if .modelUri }}
+                                            modelUri: {{ .modelUri }}
+                                            {{- end }}
+                                            {{- if .envSecretRefName }}
+                                            envSecretRefName: {{ .envSecretRefName }}
+                                            {{- end }}
+                                            {{- if .logger }}
+                                            logger:
+                                              mode: {{ .logger.mode }}
+                                              {{- if .logger.url }}
+                                              url: {{ .logger.url }}
+                                              {{- end }}
+                                            {{- end }}
+                                            {{- if .serviceAccountName }}
+                                            serviceAccountName: {{ .serviceAccountName }}
+                                            {{- end }}
+                                            {{- if .children }}
+                                            children:
+                                              {{- range .children }}
+                                              {{ .name }}:
+                                                name: {{ .name }}
+                                                {{- if .modelUri }}
+                                                modelUri: {{ .modelUri }}
+                                                {{- end }}
+                                                {{- if .envSecretRefName }}
+                                                envSecretRefName: {{ .envSecretRefName }}
+                                                {{- end }}
+                                                {{- if .logger }}
+                                                logger:
+                                                  mode: {{ .logger.mode }}
+                                                  {{- if .logger.url }}
+                                                  url: {{ .logger.url }}
+                                                  {{- end }}
+                                                {{- end }}
+                                                {{- if .serviceAccountName }}
+                                                serviceAccountName: {{ .serviceAccountName }}
+                                                {{- end }}
+                                                children: []
+                                              {{- end }}
+                                            {{- else }}
+                                            children: []
+                                            {{- end }}
+                                          {{- end }}
+                                        {{- else }}
+                                        children: []
+                                        {{- end }}
+                                      {{- end }}
+                                    {{- else }}
+                                    children: []
+                                    {{- end }}
+                                  {{- end }}
+                                {{- else }}
+                                children: []
+                                {{- end }}
+                              {{- end }}
+                            {{- else }}
                             children: []
+                            {{- end }}
                           {{- end }}
                         {{- else }}
                         children: []

@@ -6,7 +6,7 @@
     "version": "0.1.0",
     "description": "Test Seldon deployment chart"
   },
-  "deploymentName": "test-explainer-model",
+  "deploymentName": "graph-metadata-router",
   "namespace": "default",
   "metadata": {
     "labels": {
@@ -20,22 +20,185 @@
   "sourceMetafileBranch": "main",
   "predictors": [
     {
-      "name": "default",
+      "name": "example",
       "replicas": 1,
-      "svcOrchSpec": {
-        "env": [
+      "componentSpec": {
+        "containers": [
           {
-            "name": "SELDON_LOG_LEVEL",
-            "value": "DEBUG"
+            "name": "node-router",
+            "image": "seldonio/metadata-generic-node:0.4"
+          },
+          {
+            "name": "node-one",
+            "image": "seldonio/metadata-generic-node:0.4",
+            "env": [
+              {
+                "name": "MODEL_METADATA",
+                "value": {
+                  "name": "node-one",
+                  "versions": "[ generic-node/v0.4 ]",
+                  "platform": "seldon",
+                  "inputs": {
+                    "messagetype": "tensor",
+                    "schema": {
+                      "names": "[ a, b ]",
+                      "shape": "[ 2 ]"
+                    }
+                  },
+                  "outputs": {
+                    "messagetype": "tensor",
+                    "schema": {
+                      "names": "[ node-output ]",
+                      "shape": "[ 1 ]"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "name": "node-two",
+            "image": "seldonio/metadata-generic-node:0.4",
+            "env": [
+              {
+                "name": "MODEL_METADATA",
+                "value": {
+                  "name": "node-two",
+                  "versions": "[ generic-node/v0.4 ]",
+                  "platform": "seldon",
+                  "inputs": {
+                    "messagetype": "tensor",
+                    "schema": {
+                      "names": "[ a, b ]",
+                      "shape": "[ 2 ]"
+                    }
+                  },
+                  "outputs": {
+                    "messagetype": "tensor",
+                    "schema": {
+                      "names": "[ node-output ]",
+                      "shape": "[ 1 ]"
+                    }
+                  }
+                }
+              }
+            ]
           }
         ]
       },
       "graph": {
-        "name": "classifier",
-        "type": "MODEL",
-        "modelUri": "gs://seldon-models/v1.19.0-dev/sklearn/iris",
-        "implementation": "SKLEARN_SERVER",
-        "children": []
+        "name": "node-router",
+        "type": "ROUTER",
+        "children": [
+          {
+            "name": "node-one",
+            "type": "MODEL",
+            "logger": {
+              "mode": "response"
+            },
+            "modelUri": "gs://seldon-models/v1.19.0-dev/sklearn/iris",
+            "implementation": "SKLEARN_SERVER",
+            "children": []
+          },
+          {
+            "name": "node-two",
+            "type": "MODEL",
+            "logger": {
+              "mode": "response"
+            },
+            "modelUri": "gs://seldon-models/v1.19.0-dev/sklearn/iris",
+            "implementation": "SKLEARN_SERVER",
+            "children": [
+              {
+                "name": "level-3",
+                "type": "MODEL",
+                "logger": {
+                  "mode": "response"
+                },
+                "modelUri": "gs://seldon-models/v1.19.0-dev/sklearn/iris3",
+                "implementation": "SKLEARN_SERVER",
+                "children": [
+                  {
+                    "name": "level-4",
+                    "type": "MODEL",
+                    "logger": {
+                      "mode": "response"
+                    },
+                    "modelUri": "gs://seldon-models/v1.19.0-dev/sklearn/iris4",
+                    "implementation": "SKLEARN_SERVER",
+                    "children": [
+                      {
+                        "name": "level-5",
+                        "type": "MODEL",
+                        "logger": {
+                          "mode": "response"
+                        },
+                        "modelUri": "gs://seldon-models/v1.19.0-dev/sklearn/iris5",
+                        "implementation": "SKLEARN_SERVER",
+                        "children": [
+                          {
+                            "name": "level-6",
+                            "type": "MODEL",
+                            "logger": {
+                              "mode": "response"
+                            },
+                            "modelUri": "gs://seldon-models/v1.19.0-dev/sklearn/iris6",
+                            "implementation": "SKLEARN_SERVER",
+                            "children": [
+                              {
+                                "name": "level-7",
+                                "type": "MODEL",
+                                "logger": {
+                                  "mode": "response"
+                                },
+                                "modelUri": "gs://seldon-models/v1.19.0-dev/sklearn/iris7",
+                                "implementation": "SKLEARN_SERVER",
+                                "children": [
+                                  {
+                                    "name": "level-8",
+                                    "type": "MODEL",
+                                    "logger": {
+                                      "mode": "response"
+                                    },
+                                    "modelUri": "gs://seldon-models/v1.19.0-dev/sklearn/iris8",
+                                    "implementation": "SKLEARN_SERVER",
+                                    "children": [
+                                      {
+                                        "name": "level-9",
+                                        "type": "MODEL",
+                                        "logger": {
+                                          "mode": "response"
+                                        },
+                                        "modelUri": "gs://seldon-models/v1.19.0-dev/sklearn/iris9",
+                                        "implementation": "SKLEARN_SERVER",
+                                        "children": [
+                                          {
+                                            "name": "level-10",
+                                            "type": "MODEL",
+                                            "logger": {
+                                              "mode": "response"
+                                            },
+                                            "modelUri": "gs://seldon-models/v1.19.0-dev/sklearn/iris10",
+                                            "implementation": "SKLEARN_SERVER",
+                                            "children": []
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     }
   ]
