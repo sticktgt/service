@@ -692,7 +692,7 @@ func main() {
 	check(err)
 
 	log.Printf("Loading schema file")
-	schemaLoader := gojsonschema.NewReferenceLoader("file://../config/schema.json")
+	schemaLoader := gojsonschema.NewReferenceLoader("file://../config/schema3.json")
 	documentLoader := gojsonschema.NewReferenceLoader("file://../config/values3.json")
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
 	check(err)
@@ -733,11 +733,7 @@ func main() {
 			ProcessID:          "12345", // Example process ID
 			CreateNewEnvValues: false,   // Example value
 		}
-		//*****
-		valuesStr, err := json.Marshal(params.MergedSetupValues)
-		check(err)
-		log.Printf("%s", valuesStr)
-		//*****
+
 		//func GenerateChart(meta utils.MetaStructure, setupValues map[string]interface{}, outputDir string, cliEnv string, processID string, createEnvValues bool) error {
 		log.Printf("ValidateMetafile")
 		err = validation.ValidateMetafile(tmplData, params.ProcessID)
