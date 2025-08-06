@@ -423,12 +423,12 @@ valuesSchema:
     required: false
     default: Forbid
   successfulJobsHistoryLimit:
-    type: string
+    type: integer
     description: successful jobs history limit
     required: false
     default: 1
   failedJobsHistoryLimit:
-    type: string
+    type: integer
     description: failed jobs history limit
     required: false
     default: 1
@@ -438,14 +438,10 @@ valuesSchema:
     required: false
     default: OnFailure
   startingDeadlineSeconds:
-    type: string
+    type: integer
     description: job starting deadline in seconds
     required: false
-    default: 45
-  env:
-    type: map
-    description: job environment variables
-    required: true
+    default: 30
   volumeMounts:
     type: list
     description: volume mounts for the job
@@ -507,3 +503,351 @@ valuesSchema:
     type: string
     description: arguments to pass to the command
     required: true
+  code.env:
+    type: map
+    description: job environment variables for all environments
+    required: true
+  code.env.splitters:
+    type: map
+    description: list of text splitters to use for document processing
+    required: false
+  code.env.splitters.RecursiveCharacterTextSplitter:
+    type: map
+    description: RecursiveCharacterTextSplitter configuration
+    required: false
+  code.env.splitters.RecursiveCharacterTextSplitter.chunk_size:
+    type: integer
+    description: Size of each chunk in characters
+    required: false
+  code.env.splitters.RecursiveCharacterTextSplitter.chunk_overlap:
+    type: integer
+    description: Number of overlapping characters between chunks
+    required: false
+  code.env.splitters.RecursiveCharacterTextSplitter.separators:
+    type: string
+    description: Separators used to split the text into chunks
+    required: false
+  code.env.splitters.RecursiveCharacterTextSplitter.keep_separator:
+    type: boolean
+    description: Whether to keep the separator in the chunks
+    required: false
+  code.env.splitters.TokenTextSplitter:
+    type: map
+    description: TokenTextSplitter configuration
+    required: false
+  code.env.splitters.TokenTextSplitter.chunk_size:
+    type: integer
+    description: Size of each chunk in tokens
+    required: false
+  code.env.splitters.TokenTextSplitter.chunk_overlap:
+    type: integer
+    description: Number of overlapping tokens between chunks
+    required: false
+  code.env.splitters.TokenTextSplitter.encoding_name:
+    type: string
+    description: Encoding name for the text splitter (e.g., "cl100k_base")
+    required: false
+  code.env.splitters.TokenTextSplitter.model_name:
+    type: string
+    description: Model name for the text splitter (e.g., "gpt-3.5-turbo")
+    required: false
+  code.env.splitters.NLTKTextSplitter:
+    type: map
+    description: NLTKTextSplitter configuration
+    required: false
+  code.env.splitters.NLTKTextSplitter.chunk_size:
+    type: integer
+    description: Size of each chunk in characters
+    required: false
+  code.env.splitters.NLTKTextSplitter.chunk_overlap:
+    type: integer
+    description: Number of overlapping characters between chunks
+    required: false
+  code.env.splitters.NLTKTextSplitter.language:
+    type: string
+    description: Language used for tokenization (e.g., "english")
+    required: false
+  code.env.splitters.SpacyTextSplitter:
+    type: map
+    description: SpacyTextSplitter configuration
+    required: false
+  code.env.splitters.SpacyTextSplitter.chunk_size:
+    type: integer
+    description: Size of each chunk in characters
+    required: false
+  code.env.splitters.SpacyTextSplitter.chunk_overlap:
+    type: integer
+    description: Number of overlapping characters between chunks
+    required: false
+  code.env.splitters.SpacyTextSplitter.pipeline:
+    type: string
+    description: Spacy pipeline to use for text splitting (e.g., "en_core_web_sm")
+    required: false
+  code.env.file_types:
+    type: map
+    description: File types and their associated loaders and splitters
+    required: false
+  code.env.file_types..txt:
+    type: map
+    description: .txt file type configuration
+    required: false
+  code.env.file_types..txt.loader:
+    type: string
+    description: loader for .txt files (e.g., "TextLoader")
+    required: false
+  code.env.file_types..txt.splitter:
+    type: string
+    description: Text splitter for .txt files (e.g., "RecursiveCharacterTextSplitter")
+    required: false
+  code.env.file_types..csv:
+    type: map
+    description: .csv file type configuration
+    required: false
+  code.env.file_types..csv.loader:
+    type: string
+    description: Loader for .csv files (e.g., "UnstructuredCSVLoader")
+    required: false
+  code.env.file_types..csv.splitter:
+    type: string
+    description: Text splitter for .csv files (e.g., "NLTKTextSplitter")
+    required: false
+  code.env.file_types..pdf:
+    type: map
+    description: .pdf file type configuration
+    required: false
+  code.env.file_types..pdf.loader:
+    type: string
+    description: Loader for .pdf files (e.g., "UnstructuredPDFLoader")
+    required: false
+  code.env.file_types..pdf.splitter:
+    type: string
+    description: Text splitter for .pdf files (e.g., "NLTKTextSplitter")
+    required: false
+  code.env.file_types..docx:
+    type: map
+    description: .docx file type configuration
+    required: false
+  code.env.file_types..docx.loader:
+    type: string
+    description: Loader for .docx files (e.g., "UnstructuredWordDocumentLoader")
+    required: false
+  code.env.file_types..docx.splitter:
+    type: string
+    description: Text splitter for .docx files (e.g., "NLTKTextSplitter")
+    required: false
+  code.env.file_types..xlsx:
+    type: map
+    description: .xlsx file type configuration
+    required: false
+  code.env.file_types..xlsx.loader:
+    type: string
+    description: Loader for .xlsx files (e.g., "UnstructuredExcelLoader")
+    required: false
+  code.env.file_types..xlsx.splitter:
+    type: string
+    description: Text splitter for .xlsx files (e.g., "NLTKTextSplitter")
+    required: false
+  code.env.file_types..html:
+    type: map
+    description: .html file type configuration
+    required: false
+  code.env.file_types..html.loader:
+    type: string
+    description: Loader for .html files (e.g., "UnstructuredHTMLLoader")
+    required: false
+  code.env.file_types..html.splitter:
+    type: string
+    description: Text splitter for .html files (e.g., "NLTKTextSplitter")
+    required: false
+  code.env.file_types..pptx:
+    type: map
+    description: .pptx file type configuration
+    required: false
+  code.env.file_types..pptx.loader:
+    type: string
+    description: Loader for .pptx files (e.g., "UnstructuredPowerPointLoader")
+    required: false
+  code.env.file_types..pptx.splitter:
+    type: string
+    description: Text splitter for .pptx files (e.g., "NLTKTextSplitter")
+    required: false
+  code.env.embedding:
+    type: map
+    description: Embedding configuration for document processing
+    required: false
+  code.env.embedding.provider:
+    type: string
+    description: Provider for the embedding service (e.g., "liteLLM", "yandexGPT")
+    required: false
+  code.env.embedding.dim:
+    type: integer
+    description: Dimension of the embedding vectors (fake value for testing)
+    required: false
+  code.env.embedding.liteLLM:
+    type: map
+    description: LiteLLM embedding configuration
+    required: false
+  code.env.embedding.liteLLM.model:
+    type: string
+    description: Model name for LiteLLM (e.g., "text-embedding-3-small")
+    required: false
+  code.env.embedding.yandexGPT:
+    type: map
+    description: YandexGPT embedding configuration
+    required: false
+  code.env.embedding.yandexGPT.doc_model_name:
+    type: string
+    description: Name of the document model for YandexGPT (e.g., "text-embedding-3-small")
+    required: false
+  code.env.embedding.yandexGPT.model_version:
+    type: string
+    description: Version of the model for YandexGPT (e.g., "v1")
+    required: false
+  code.env.embedding.yandexGPT.sleep_interval:
+    type: string
+    description: Sleep interval between requests to YandexGPT (e.g., "0.1")
+    required: false
+  code.env.embedding.yandexGPT.disable_request_logging:
+    type: boolean
+    description: Disable request logging for YandexGPT
+    required: false
+  code.env.sources:
+    type: map
+    description: Sources for document loading and processing
+    required: false
+  code.env.sources.use_local:
+    type: boolean
+    description: 
+    required: false
+  code.env.sources.use_s3:
+    type: boolean
+    description: Use S3 for document storage and processing
+    required: false
+  code.env.sources.local_path:
+    type: string
+    description: Local path for document storage
+    required: false
+  code.env.storage:
+    type: map
+    description: Storage configuration for document vectors
+    required: false
+  code.env.storage.store_type:
+    type: string
+    description: Type of storage to use for document vectors (e.g., "milvus", "pgvector")
+    required: false
+  code.env.output_dir:
+    type: string
+    description: Directory where processed documents and metadata will be stored
+    required: false
+  deploy.env:
+    type: map
+    description: job environment variables for the specific environment
+    required: true
+  deploy.env.embedding.liteLLM.api_base:
+    type: string
+    description: Base URL for the LiteLLM API (e.g., "http://
+    required: false
+  deploy.env.embedding.liteLLM.api_key:
+    type: string
+    description:  API key for LiteLLM authentication "yandexGPT"
+    required: false
+  deploy.env.embedding.liteLLM.folder_id:
+    type: string
+    description: Folder ID for LiteLLM (e.g., "default") "yandexGPT
+    required: false
+  deploy.env.embedding.yandexGPT.api_key:
+    type: string
+    description: API key for YandexGPT authentication
+    required: false
+  deploy.env.embedding.yandexGPT.folder_id:
+    type: string
+    description: Folder ID for YandexGPT (e.g., "default")
+    required: false
+  deploy.env.sources.s3:
+    type: map
+    description: S3 configuration for document storage
+    required: false
+  deploy.env.sources.s3.s3_bucket:
+    type: string
+    description: Name of the S3 bucket
+    required: false
+  deploy.env.sources.s3.s3_prefix:
+    type: string
+    description: Prefix for S3 objects
+    required: false
+  deploy.env.sources.s3.endpoint_url:
+    type: string
+    description: S3 endpoint URL (e.g., "http://localhost:9000")
+    required: false
+  deploy.env.sources.s3.aws_access_key_id:
+    type: string
+    description:  AWS access key ID for S3 authentication
+    required: false
+  deploy.env.sources.s3.aws_secret_access_key:
+    type: string
+    description: AWS secret access key for S3 authentication
+    required: false
+  deploy.env.sources.s3.use_ssl:
+    type: boolean
+    description: Whether to use SSL for S3 connections
+    required: false
+  deploy.env.sources.s3.signature_version:
+    type: string
+    description: Signature version for S3 requests (e.g., "s3v4")
+    required: false
+  deploy.env.storage.milvus:
+    type: map
+    description: Milvus storage configuration
+    required: false
+  deploy.env.storage.milvus.uri:
+    type: string
+    description: URI for the Milvus server (e.g., "tcp://localhost:19530")
+    required: false
+  deploy.env.storage.milvus.collection:
+    type: string
+    description: Name of the Milvus collection for document vectors
+    required: false
+  deploy.env.storage.milvus.drop_old:
+    type: boolean
+    description: Whether to drop the old collection if it exists
+    required: false
+  deploy.env.storage.milvus.auto_id:
+    type: boolean
+    description: Whether to use auto-generated IDs for Milvus documents
+    required: false
+  deploy.env.storage.milvus.alias:
+    type: string
+    description: Alias for the Milvus collection
+    required: false
+  deploy.env.storage.pgvector:
+    type: map
+    description: PostgreSQL vector storage configuration
+    required: false
+  deploy.env.storage.pgvector.host:
+    type: string
+    description: Hostname or IP address of the PostgreSQL server (e.g., "localhost")
+    required: false
+  deploy.env.storage.pgvector.port:
+    type: integer
+    description: Port number of the PostgreSQL server (e.g., 5432)
+    required: false
+  deploy.env.storage.pgvector.user:
+    type: string
+    description: Username for PostgreSQL authentication (e.g., "postgres")
+    required: false
+  deploy.env.storage.pgvector.password:
+    type: string
+    description: Password for PostgreSQL authentication (e.g., "password")
+    required: false
+  deploy.env.storage.pgvector.database:
+    type: string
+    description: Name of the PostgreSQL database to use (e.g., "documents")
+    required: false
+  deploy.env.storage.pgvector.collection:
+    type: string
+    description: Name of the PostgreSQL table for document vectors (e.g., "document_vectors")
+    required: false
+  deploy.env.storage.pgvector.use_jsonb:
+    type: boolean
+    description: Whether to use JSONB for storing document metadata in PostgreSQL
+    required: false
