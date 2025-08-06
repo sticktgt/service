@@ -1,0 +1,100 @@
+{
+    "environment": "TEST",
+    "chart": {
+        "name": "test-cron-job",
+        "version": "0.1.0",
+        "description": "Test cronJob deployment chart"
+    },
+    "deploymentName": "test-cron-job",
+    "namespace": "app-fdd",
+    "metadata": {
+        "labels": {
+            "components": "cronjob-readservice",
+            "entity": "readservice"
+        }
+    },
+    "subjectArea": "readservice-test-project",
+    "sourceMetafileName": "meta-job-document-loader",
+    "sourceMetafileRepo": "https://neogit.neoflex.ru/vsemenov/tservice/",
+    "sourceMetafileBranch": "main",
+    "startingDeadlineSeconds": 30,
+    "image": "readservice:latest",
+    "schedule": "*/10 * * * *",
+    "command": "[\"/bin/bash\"]",
+    "args": "[\"-c\", \"python -m readservice.main\"]",
+    "successfulJobsHistoryLimit": 2,
+    "failedJobsHistoryLimit": 2,
+    "concurrencyPolicy": "Forbid",
+    "backoffLimit": 1,
+    "code": {
+        "env": {
+            "embedding": {
+                "provider": {
+                    "value": "yandexGPT"
+                }
+            },
+            "sources": {
+                "use_local": {
+                    "value": "true"
+                },
+                "use_s3": {
+                    "value": "true"
+                }
+            },
+            "storage": {
+                "store_type": {
+                    "value": "milvus"
+                }
+            },
+            "delete_old_vectors": {
+                "value": "true"
+            }
+        }
+    },
+    "deploy": {
+        "env": {
+            "embedding": {
+                "yandexGPT": {
+                    "api_key": {
+                        "valueFrom": {
+                            "secretKeyRef": {
+                                "name": "readservice-secrets",
+                                "key": "yandex-api-key"
+                            }
+                        }
+                    },
+                    "folder_id": {
+                        "valueFrom": {
+                            "secretKeyRef": {
+                                "name": "readservice-secrets",
+                                "key": "yandex-folder-id"
+                            }
+                        }
+                    }
+                }
+            },
+            "storage": {
+                "milvus": {
+                    "url": {
+                        "value": "http://172.17.0.1:19530"
+                    }
+                }
+            }
+        }
+    },
+    "volumeMounts": [
+        {
+            "name": "local-docs",
+            "mountPath": "/app/local_docs"
+        }
+    ],
+    "volumes": [
+        {
+            "name": "local-docs",
+            "hostPath": {
+                "path": "/home/stickt/python/local_docs",
+                "type": "Directory"
+            }
+        }
+    ]
+}

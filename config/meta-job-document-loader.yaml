@@ -1,0 +1,509 @@
+chart:
+  name: cron-job-readservice
+  version: 1.0.0
+  description: A Helm chart for Kubernetes CronJob for ReadService
+
+files:
+  - path: Chart.yaml
+    template: true
+    content: |
+      apiVersion: v2
+      name: {{ .Values.chart.name }}
+      version: {{ .Values.chart.version }}
+      description: {{ .Values.chart.description }}
+      type: application
+      app.dognauts:
+        subjectArea: {{ .Values.subjectArea }}
+        sourceMetafileRepo: {{ .Values.sourceMetafileRepo }}
+        sourceMetafileBranch: {{ .Values.sourceMetafileBranch }}
+        sourceMetafileName: {{ .Values.sourceMetafileName }}
+      annotations:
+        app.dognauts/platform-generated: true
+        app.dognauts/subjectArea: {{ .Values.subjectArea }}
+
+  - path: values.yaml
+    template: true
+    content: |
+      subjectArea: {{ .Values.subjectArea }}
+      {{- if .Values.metadata }}
+      metadata:
+        {{- if .Values.metadata.labels }}
+        labels:
+          {{- range $k, $v := .Values.metadata.labels }}
+          {{ $k }}: {{ $v }}
+          {{- end }}
+        {{- end }}
+        {{- if .Values.metadata.annotations }}
+        annotations:
+          {{- range $k, $v := .Values.metadata.annotations }}
+          {{ $k }}: {{ $v }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      command: {{ .Values.command }}
+      args: {{ .Values.args }}
+      {{- if .Values.code.env }}
+      env:
+      {{- range $k1, $v1 := .Values.code.env }}
+        {{ $k1 }}:
+        {{- if eq (printf "%T" $v1) "map[string]interface {}" }}
+          {{- range $k2, $v2 := $v1 }}
+            {{- if eq (printf "%T" $v2) "map[string]interface {}" }}
+              {{- if eq (printf "%T" (index $v2 "value")) "string" }}
+          {{ $k2 }}:
+            value: {{ index $v2 "value" }}
+              {{- else if eq (printf "%T" (index $v2 "value")) "bool" }}
+          {{ $k2 }}:
+            value: {{ index $v2 "value" }}
+              {{- else if eq (printf "%T" (index $v2 "valueFrom")) "map[string]interface {}" }}
+          {{ $k2 }}:
+            valueFrom:
+              secretKeyRef:
+                name: {{ index (index $v2 "valueFrom").secretKeyRef "name" }}
+                key: {{ index (index $v2 "valueFrom").secretKeyRef "key" }}
+              {{- else }}
+          {{ $k2 }}:
+                {{- range $k3, $v3 := $v2 }}
+                  {{- if eq (printf "%T" $v3) "map[string]interface {}" }}
+                    {{- if index $v3 "value" }}
+            {{ $k3 }}:
+              value: {{ index $v3 "value" }}
+                    {{- else if index $v3 "valueFrom" }}
+            {{ $k3 }}:
+              valueFrom:
+                secretKeyRef:
+                  name: {{ index (index $v3 "valueFrom").secretKeyRef "name" }}
+                  key: {{ index (index $v3 "valueFrom").secretKeyRef "key" }}
+                    {{- else }}
+            {{ $k3 }}: {{ $v3 }}
+                    {{- end }}
+                  {{- else }}
+            {{ $k3 }}: {{ $v3 }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+            {{- else }}
+          {{ $k2 }}: {{ $v2 }}
+            {{- end }}
+          {{- end }}
+        {{- else }}
+          value: {{ $v1 }}
+        {{- end }}
+      {{- end }}
+      {{- else }}
+      # env: {}
+      {{- end }}
+
+  - path: values-ENV.yaml
+    outputFilename: values-{{ .Values.environment }}.yaml
+    template: true
+    content: |
+      {{- if .Values.namespace }}
+      namespace: {{ .Values.namespace }}
+      {{- end }}      
+      image: {{ .Values.image }}
+      {{- if .Values.pullPolicy }}
+      pullPolicy: {{ .Values.pullPolicy }}
+      {{- end }}
+      schedule: "{{ .Values.schedule }}"
+      {{- if .Values.concurrencyPolicy }}
+      concurrencyPolicy: {{ .Values.concurrencyPolicy }}
+      {{- end }}
+      {{- if .Values.successfulJobsHistoryLimit }}
+      successfulJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit }}
+      {{- end }}
+      {{- if .Values.failedJobsHistoryLimit }}
+      failedJobsHistoryLimit: {{ .Values.failedJobsHistoryLimit }}
+      {{- end }}
+      {{- if .Values.restartPolicy }}
+      restartPolicy: {{ .Values.restartPolicy }}
+      {{- end }}
+      {{- if .Values.backoffLimit }}
+      backoffLimit: {{ .Values.backoffLimit }}
+      {{- end }}
+      {{- if .Values.startingDeadlineSeconds }}
+      startingDeadlineSeconds: {{ .Values.startingDeadlineSeconds }}
+      {{- end }}
+      {{- if .Values.deploy.env }}
+      env:
+      {{- range $k1, $v1 := .Values.deploy.env }}
+        {{ $k1 }}:
+        {{- if eq (printf "%T" $v1) "map[string]interface {}" }}
+          {{- range $k2, $v2 := $v1 }}
+            {{- if eq (printf "%T" $v2) "map[string]interface {}" }}
+              {{- if eq (printf "%T" (index $v2 "value")) "string" }}
+          {{ $k2 }}:
+            value: {{ index $v2 "value" }}
+              {{- else if eq (printf "%T" (index $v2 "value")) "bool" }}
+          {{ $k2 }}:
+            value: {{ index $v2 "value" }}
+              {{- else if eq (printf "%T" (index $v2 "valueFrom")) "map[string]interface {}" }}
+          {{ $k2 }}:
+            valueFrom:
+              secretKeyRef:
+                name: {{ index (index $v2 "valueFrom").secretKeyRef "name" }}
+                key: {{ index (index $v2 "valueFrom").secretKeyRef "key" }}
+              {{- else }}
+          {{ $k2 }}:
+                {{- range $k3, $v3 := $v2 }}
+                  {{- if eq (printf "%T" $v3) "map[string]interface {}" }}
+                    {{- if index $v3 "value" }}
+            {{ $k3 }}:
+              value: {{ index $v3 "value" }}
+                    {{- else if index $v3 "valueFrom" }}
+            {{ $k3 }}:
+              valueFrom:
+                secretKeyRef:
+                  name: {{ index (index $v3 "valueFrom").secretKeyRef "name" }}
+                  key: {{ index (index $v3 "valueFrom").secretKeyRef "key" }}
+                    {{- else }}
+            {{ $k3 }}: {{ $v3 }}
+                    {{- end }}
+                  {{- else }}
+            {{ $k3 }}: {{ $v3 }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+            {{- else }}
+          {{ $k2 }}: {{ $v2 }}
+            {{- end }}
+          {{- end }}
+        {{- else }}
+          value: {{ $v1 }}
+        {{- end }}
+      {{- end }}
+      {{- else }}
+      # env: {}
+      {{- end }}
+      {{- if .Values.volumeMounts }}
+      volumeMounts:
+        {{- range .Values.volumeMounts }}
+         - name: {{ .name }}
+           mountPath: {{ .mountPath }}
+           {{- if .readOnly }}
+           readOnly: {{ .readOnly }}
+           {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- if .Values.volumes }}
+      volumes:
+        {{- range .Values.volumes }}
+        - name: {{ .name }}
+          {{- if .emptyDir }}
+          emptyDir:
+            {{- if .emptyDir.medium }}
+            medium: {{ .emptyDir.medium }}
+            {{- end }}
+            {{- if .emptyDir.sizeLimit }}
+            sizeLimit: {{ .emptyDir.sizeLimit }}
+            {{- end }}
+          {{- end }}
+          {{- if .hostPath }}
+          hostPath:
+            path: {{ .hostPath.path }}
+            {{- if .hostPath.type }}
+            type: {{ .hostPath.type }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+
+  - path: templates/cronjob.yaml
+    template: false
+    content: |
+      apiVersion: batch/v1
+      kind: CronJob
+      metadata:
+        name: {{ .Release.Name }}-inference
+        namespace: {{ .Values.namespace }}
+        labels:
+          {{- include "common.helm-labels" . | nindent 4 }}
+        {{- if .Values.metadata }}
+        {{- if .Values.metadata.labels }}
+        {{- range $k, $v :=.Values.metadata.labels }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .labels }}
+        {{- range $k, $v :=.labels }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- if or (and .Values.metadata .Values.metadata.annotations) .annotations }}
+        annotations:
+        {{- end }}
+        {{- if .Values.metadata }}
+        {{- if .Values.metadata.annotations }}
+        {{- range $k, $v := .Values.metadata.annotations }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .annotations }}
+        {{- range $k, $v := .annotations }}
+          {{ $k }}: {{ $v }}
+        {{- end }}
+        {{- end }}
+      spec:
+        schedule: "{{ .Values.schedule }}"
+        {{- if .Values.concurrencyPolicy }}
+        concurrencyPolicy: {{ .Values.concurrencyPolicy }}
+        {{- end }}
+        {{- if .Values.successfulJobsHistoryLimit }}
+        successfulJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit }}
+        {{- end }}
+        {{- if .Values.failedJobsHistoryLimit }}
+        failedJobsHistoryLimit: {{ .Values.failedJobsHistoryLimit }}
+        {{- end }}
+        {{- if .Values.startingDeadlineSeconds }}
+        startingDeadlineSeconds: {{ .Values.startingDeadlineSeconds }}
+        {{- end }}
+        jobTemplate:
+          spec:
+            {{- if .Values.backoffLimit }}
+            backoffLimit: {{ .Values.backoffLimit }}
+            {{- end }}
+            template:
+              spec:
+                containers:
+                  - name: readservice
+                    image: "{{ .Values.image }}"
+                    {{- if .Values.pullPolicy }}
+                    imagePullPolicy: {{ .Values.pullPolicy }}
+                    {{- end }}
+                    command: ["/bin/bash"]
+                    args: ["-c", "python -m readservice.main"]
+                    env:
+                      {{ "\n" | trim }}{{ include "readservice.flattenEnv" .Values.env | indent 16 | trim }}
+                    {{- if .Values.volumeMounts }}
+                    volumeMounts:
+                    {{- range .Values.volumeMounts }}
+                     - name: {{ .name }}
+                       mountPath: {{ .mountPath }}
+                       {{- if .readOnly }}
+                       readOnly: {{ .readOnly }}
+                       {{- end }}
+                    {{- end }}
+                    {{- end }}
+                {{- if .Values.restartPolicy }}
+                restartPolicy: {{ .Values.restartPolicy }}
+                {{- end }}
+                {{- if .Values.volumes }}
+                volumes:
+                  {{- range .Values.volumes }}
+                  - name: {{ .name }}
+                    {{- if .emptyDir }}
+                    emptyDir:
+                      {{- if .emptyDir.medium }}
+                      medium: {{ .emptyDir.medium }}
+                      {{- end }}
+                      {{- if .emptyDir.sizeLimit }}
+                      sizeLimit: {{ .emptyDir.sizeLimit }}
+                      {{- end }}
+                    {{- end }}
+                    {{- if .hostPath }}
+                    hostPath:
+                      path: {{ .hostPath.path }}
+                      {{- if .hostPath.type }}
+                      type: {{ .hostPath.type }}
+                      {{- end }}
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
+
+  - path: templates/_helpers.tpl
+    template: false
+    content: |
+      {{- define "common.helm-labels" -}}
+      app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+      app.kubernetes.io/revision: {{ .Release.Revision | quote }}
+      app.dognauts/subjectArea: {{ .Values.subjectArea }}
+      {{- end -}}
+      {{- define "readservice.flattenEnv" -}}
+      {{- range $k, $v := . }}
+      {{- include "readservice.flattenEnvItem" (dict "prefix" (upper $k) "value" $v) }}
+      {{- end }}
+      {{- end }}
+      
+      {{- define "readservice.flattenEnvItem" -}}
+      {{- $prefix := .prefix }}
+      {{- $value := .value }}
+      
+      {{- if and (kindIs "map" $value) (or (hasKey $value "value") (hasKey $value "valueFrom")) }}
+      - name: RS__{{ $prefix }}
+      {{- if hasKey $value "value" }}
+        value: {{ $value.value | quote }}
+      {{- else if hasKey $value "valueFrom" }}
+        valueFrom:
+          secretKeyRef:
+            name: {{ $value.valueFrom.secretKeyRef.name }}
+            key: {{ $value.valueFrom.secretKeyRef.key }}
+      {{- end }}
+      {{- else if kindIs "map" $value }}
+      {{- range $k, $v := $value }}
+      {{- include "readservice.flattenEnvItem" (dict "prefix" (printf "%s__%s" $prefix (upper $k)) "value" $v) }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+
+  - path: .helmignore
+    template: false
+    content: |
+      *.tgz
+      .DS_Store
+      .idea/
+      *.swp
+      __pycache__/
+      .ipynb_checkpoints/
+
+valuesSchema:
+  chart.name:
+    type: string
+    description: Name of the Helm chart
+    required: true
+  chart.version:
+    type: string
+    description: Version of the Helm chart
+    required: true
+  chart.description:
+    type: string
+    description: Short description of the chart's purpose
+    required: true
+  namespace:
+    type: string
+    description: Kubernetes namespace to deploy the resources in
+    required: true
+  subjectArea:
+    type: string
+    description: A tag to classify a subject area of the target chart.
+    required: true
+    default: cron-job-readservice
+  sourceMetafileName:
+    type: string
+    description: Source metafile name
+    required: true
+    default: no_data
+  sourceMetafileRepo:
+    type: string
+    description: Source metafile name
+    required: true
+    default: no_data
+  sourceMetafileBranch:
+    type: string
+    description: Source metafile name
+    required: true
+    default: no_data
+  metadata.labels:
+    type: map
+    description: Key-value pairs used to categorize and select Kubernetes objects
+    required: false
+  metadata.annotations:
+    type: list
+    description: Annotations applied to the SeldonDeployment additional metadata for tooling, policies, and configuration
+    required: false
+  image:
+    type: string
+    description: docker image name
+    required: true
+  pullPolicy:
+    type: string
+    description: docker image pullPolicy
+    required: false
+    default: IfNotPresent
+  schedule:
+    type: string
+    description: schedule for the cron job in cron format
+    required: true
+    default: "*/5 * * * *"
+  concurrencyPolicy:
+    type: string
+    description: job concurrency policy
+    required: false
+    default: Forbid
+  successfulJobsHistoryLimit:
+    type: string
+    description: successful jobs history limit
+    required: false
+    default: 1
+  failedJobsHistoryLimit:
+    type: string
+    description: failed jobs history limit
+    required: false
+    default: 1
+  restartPolicy:
+    type: string
+    description: job restart policy
+    required: false
+    default: OnFailure
+  startingDeadlineSeconds:
+    type: string
+    description: job starting deadline in seconds
+    required: false
+    default: 45
+  env:
+    type: map
+    description: job environment variables
+    required: true
+  volumeMounts:
+    type: list
+    description: volume mounts for the job
+    required: false
+  volumeMounts.name:
+    type: string
+    description: Name of the volume mount
+    required: true
+  volumeMounts.mountPath:
+    type: string
+    description: Path where the volume is mounted in the container
+    required: true
+  volumeMounts.readOnly:
+    type: boolean
+    description: Whether the volume mount is read-only
+    required: false
+  volumes:
+    type: list
+    description: volumes for the job
+    required: false
+  volumes.name:
+    type: string
+    description: Name of the volume
+    required: true
+  volumes.emptyDir:
+    type: map
+    description: Empty directory volume configuration
+    required: false
+  volumes.emptyDir.medium:
+    type: string
+    description: Medium type for the empty directory (e.g., "Memory")
+    required: false
+  volumes.emptyDir.sizeLimit:
+    type: string
+    description: Size limit for the empty directory
+    required: false
+  volumes.hostPath:
+    type: map
+    description: Host path volume configuration
+    required: false
+  volumes.hostPath.path:
+    type: string
+    description: Path on the host machine
+    required: true
+  volumes.hostPath.type:
+    type: string
+    description: Type of the host path (e.g., "Directory", "File")
+    required: false
+  backoffLimit:
+    type: integer
+    description: Number of retries before marking the job as failed
+    required: false
+    default: 1
+  command:
+    type: string
+    description: command to run in the container
+    required: true
+  args:
+    type: string
+    description: arguments to pass to the command
+    required: true

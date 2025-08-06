@@ -60,6 +60,25 @@ type Values2 struct {
 	SourceMetafileBranch string          `json:"sourceMetafileBranch,omitempty" yaml:"sourceMetafileBranch,omitempty"`
 }
 
+type Values3 struct {
+	Environment                string                 `json:"environment" yaml:"environment"`
+	Chart                      Chart                  `json:"chart" yaml:"chart"`
+	DeploymentName             string                 `json:"deploymentName"`
+	Namespace                  string                 `json:"namespace" yaml:"namespace"`
+	Metadata                   Metadata               `json:"metadata" yaml:"metadata"`
+	SubjectArea                string                 `json:"subjectArea,omitempty" yaml:"subjectArea,omitempty"`
+	SourceMetafileName         string                 `json:"sourceMetafileName,omitempty" yaml:"sourceMetafileName,omitempty"`
+	SourceMetafileRepo         string                 `json:"sourceMetafileRepo,omitempty" yaml:"sourceMetafileRepo,omitempty"`
+	SourceMetafileBranch       string                 `json:"sourceMetafileBranch,omitempty" yaml:"sourceMetafileBranch,omitempty"`
+	StartingDeadlineSeconds    int                    `json:"startingDeadlineSeconds"`
+	Schedule                   string                 `json:"schedule"`
+	SuccessfulJobsHistoryLimit int                    `json:"successfulJobsHistoryLimit"`
+	FailedJobsHistoryLimit     int                    `json:"failedJobsHistoryLimit"`
+	ConcurrencyPolicy          string                 `json:"concurrencyPolicy"`
+	BackoffLimit               int                    `json:"backoffLimit"`
+	Env                        map[string]interface{} `json:"env"` // Flexible for arbitrary env structure
+}
+
 type Experiment struct {
 	Default      *string               `json:"default,omitempty"`
 	Candidates   []ExperimentCandidate `json:"candidates"`
@@ -667,14 +686,14 @@ type ChartTemplate struct {
 var log = logrus.New()
 
 func main() {
-	var valuesCheck Values2
+	var valuesCheck Values3
 	log.Printf("Reading values file")
-	valData, err := os.ReadFile("../config/values.json")
+	valData, err := os.ReadFile("../config/values3.json")
 	check(err)
 
 	log.Printf("Loading schema file")
 	schemaLoader := gojsonschema.NewReferenceLoader("file://../config/schema.json")
-	documentLoader := gojsonschema.NewReferenceLoader("file://../config/values.json")
+	documentLoader := gojsonschema.NewReferenceLoader("file://../config/values3.json")
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
 	check(err)
 	if result.Valid() {
@@ -692,7 +711,7 @@ func main() {
 
 	var meta ChartTemplate
 	log.Printf("Reading template file")
-	tmplData, err := os.ReadFile("../config/meta-online-inference-seldon-v1.yaml")
+	tmplData, err := os.ReadFile("../config/meta-job-document-loader.yaml")
 	check(err)
 	check(yaml.Unmarshal(tmplData, &meta))
 	/*
@@ -714,6 +733,11 @@ func main() {
 			ProcessID:          "12345", // Example process ID
 			CreateNewEnvValues: false,   // Example value
 		}
+		//*****
+		valuesStr, err := json.Marshal(params.MergedSetupValues)
+		check(err)
+		log.Printf("%s", valuesStr)
+		//*****
 		//func GenerateChart(meta utils.MetaStructure, setupValues map[string]interface{}, outputDir string, cliEnv string, processID string, createEnvValues bool) error {
 		log.Printf("ValidateMetafile")
 		err = validation.ValidateMetafile(tmplData, params.ProcessID)
