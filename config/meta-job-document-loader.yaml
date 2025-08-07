@@ -40,8 +40,12 @@ files:
           {{- end }}
         {{- end }}
       {{- end }}
-      command: {{ .Values.command }}
-      args: {{ .Values.args }}
+      {{- if .Values.code.command }}
+      command: {{ .Values.code.command }}
+      {{- end }}
+      {{- if .Values.code.args }}
+      args: {{ .Values.code.args }}
+      {{- end }}
       {{- if .Values.code.env }}
       env:
       {{- range $k1, $v1 := .Values.code.env }}
@@ -100,29 +104,33 @@ files:
     content: |
       {{- if .Values.namespace }}
       namespace: {{ .Values.namespace }}
-      {{- end }}      
-      image: {{ .Values.image }}
-      {{- if .Values.pullPolicy }}
-      pullPolicy: {{ .Values.pullPolicy }}
+      {{- end }}`
+      {{- if .Values.deploy.image }}
+      image: {{ .Values.deploy.image }}
       {{- end }}
-      schedule: "{{ .Values.schedule }}"
-      {{- if .Values.concurrencyPolicy }}
-      concurrencyPolicy: {{ .Values.concurrencyPolicy }}
+      {{- if .Values.deploy.pullPolicy }}
+      pullPolicy: {{ .Values.deploy.pullPolicy }}
       {{- end }}
-      {{- if .Values.successfulJobsHistoryLimit }}
-      successfulJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit }}
+      {{- if .Values.deploy.schedule }}
+      schedule: "{{ .Values.deploy.schedule }}"
       {{- end }}
-      {{- if .Values.failedJobsHistoryLimit }}
-      failedJobsHistoryLimit: {{ .Values.failedJobsHistoryLimit }}
+      {{- if .Values.deploy.concurrencyPolicy }}
+      concurrencyPolicy: {{ .Values.deploy.concurrencyPolicy }}
       {{- end }}
-      {{- if .Values.restartPolicy }}
-      restartPolicy: {{ .Values.restartPolicy }}
+      {{- if .Values.deploy.successfulJobsHistoryLimit }}
+      successfulJobsHistoryLimit: {{ .Values.deploy.successfulJobsHistoryLimit }}
       {{- end }}
-      {{- if .Values.backoffLimit }}
-      backoffLimit: {{ .Values.backoffLimit }}
+      {{- if .Values.deploy.failedJobsHistoryLimit }}
+      failedJobsHistoryLimit: {{ .Values.deploy.failedJobsHistoryLimit }}
       {{- end }}
-      {{- if .Values.startingDeadlineSeconds }}
-      startingDeadlineSeconds: {{ .Values.startingDeadlineSeconds }}
+      {{- if .Values.deploy.restartPolicy }}
+      restartPolicy: {{ .Values.deploy.restartPolicy }}
+      {{- end }}
+      {{- if .Values.deploy.backoffLimit }}
+      backoffLimit: {{ .Values.deploy.backoffLimit }}
+      {{- end }}
+      {{- if .Values.deploy.startingDeadlineSeconds }}
+      startingDeadlineSeconds: {{ .Values.deploy.startingDeadlineSeconds }}
       {{- end }}
       {{- if .Values.deploy.env }}
       env:
@@ -175,9 +183,9 @@ files:
       {{- else }}
       # env: {}
       {{- end }}
-      {{- if .Values.volumeMounts }}
+      {{- if .Values.deploy.volumeMounts }}
       volumeMounts:
-        {{- range .Values.volumeMounts }}
+        {{- range .Values.deploy.volumeMounts }}
          - name: {{ .name }}
            mountPath: {{ .mountPath }}
            {{- if .readOnly }}
@@ -185,9 +193,9 @@ files:
            {{- end }}
         {{- end }}
       {{- end }}
-      {{- if .Values.volumes }}
+      {{- if .Values.deploy.volumes }}
       volumes:
-        {{- range .Values.volumes }}
+        {{- range .Values.deploy.volumes }}
         - name: {{ .name }}
           {{- if .emptyDir }}
           emptyDir:
@@ -418,106 +426,108 @@ valuesSchema:
     type: list
     description: Annotations applied to the SeldonDeployment additional metadata for tooling, policies, and configuration
     required: false
-  image:
+  deploy.image:
     type: string
     description: docker image name
     required: true
-  pullPolicy:
+  deploy.pullPolicy:
     type: string
     description: docker image pullPolicy
     required: false
     default: IfNotPresent
-  schedule:
+  deploy.schedule:
     type: string
     description: schedule for the cron job in cron format
     required: true
     default: "*/5 * * * *"
-  concurrencyPolicy:
+  deploy.concurrencyPolicy:
     type: string
     description: job concurrency policy
     required: false
     default: Forbid
-  successfulJobsHistoryLimit:
+  deploy.successfulJobsHistoryLimit:
     type: integer
     description: successful jobs history limit
     required: false
     default: 1
-  failedJobsHistoryLimit:
+  deploy.failedJobsHistoryLimit:
     type: integer
     description: failed jobs history limit
     required: false
     default: 1
-  restartPolicy:
+  deploy.restartPolicy:
     type: string
     description: job restart policy
     required: false
     default: OnFailure
-  startingDeadlineSeconds:
+  deploy.startingDeadlineSeconds:
     type: integer
     description: job starting deadline in seconds
     required: false
     default: 30
-  volumeMounts:
+  deploy.volumeMounts:
     type: list
     description: volume mounts for the job
     required: false
-  volumeMounts.name:
+  deploy.volumeMounts.name:
     type: string
     description: Name of the volume mount
     required: true
-  volumeMounts.mountPath:
+  deploy.volumeMounts.mountPath:
     type: string
     description: Path where the volume is mounted in the container
     required: true
-  volumeMounts.readOnly:
+  deploy.volumeMounts.readOnly:
     type: boolean
     description: Whether the volume mount is read-only
     required: false
-  volumes:
+  deploy.volumes:
     type: list
     description: volumes for the job
     required: false
-  volumes.name:
+  deploy.volumes.name:
     type: string
     description: Name of the volume
     required: true
-  volumes.emptyDir:
+  deploy.volumes.emptyDir:
     type: map
     description: Empty directory volume configuration
     required: false
-  volumes.emptyDir.medium:
+  deploy.volumes.emptyDir.medium:
     type: string
     description: Medium type for the empty directory (e.g., "Memory")
     required: false
-  volumes.emptyDir.sizeLimit:
+  deploy.volumes.emptyDir.sizeLimit:
     type: string
     description: Size limit for the empty directory
     required: false
-  volumes.hostPath:
+  deploy.volumes.hostPath:
     type: map
     description: Host path volume configuration
     required: false
-  volumes.hostPath.path:
+  deploy.volumes.hostPath.path:
     type: string
     description: Path on the host machine
     required: true
-  volumes.hostPath.type:
+  deploy.volumes.hostPath.type:
     type: string
     description: Type of the host path (e.g., "Directory", "File")
     required: false
-  backoffLimit:
+  deploy.backoffLimit:
     type: integer
     description: Number of retries before marking the job as failed
     required: false
     default: 1
-  command:
+  code.command:
     type: string
     description: command to run in the container
     required: true
-  args:
+  code.args:
     type: string
     description: arguments to pass to the command
     required: true
+  # code.env is a map of environment variables for the job
+  # deploy.env is a map of environment variables for the specific environment
   code.env:
     type: map
     description: job environment variables for all environments
@@ -866,114 +876,237 @@ valuesSchema:
     type: boolean
     description: Whether to use JSONB for storing document metadata in PostgreSQL
     required: false
+  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  # the rows below are neccessary for compatibility with the template service and are not used in the chart
+  image:
+   type: string
+   description: docker image name
+   required: true
+  pullPolicy:
+    type: string
+    description: docker image pullPolicy
+    required: false
+    default: IfNotPresent
+  schedule:
+    type: string
+    description: schedule for the cron job in cron format
+    required: true
+    default: "*/5 * * * *"
+  concurrencyPolicy:
+    type: string
+    description: job concurrency policy
+    required: false
+    default: Forbid
+  successfulJobsHistoryLimit:
+    type: integer
+    description: successful jobs history limit
+    required: false
+    default: 1
+  failedJobsHistoryLimit:
+    type: integer
+    description: failed jobs history limit
+    required: false
+    default: 1
+  restartPolicy:
+    type: string
+    description: job restart policy
+    required: false
+    default: OnFailure
+  startingDeadlineSeconds:
+    type: integer
+    description: job starting deadline in seconds
+    required: false
+    default: 30
+  backoffLimit:
+    type: integer
+    description: Number of retries before marking the job as failed
+    required: false
+    default: 1
 
 setupValuesSchema: |
   ---
   {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "type": "object",
-    "properties": {
-      "chart": {
-        "type": "object",
-        "properties": {
-          "name": { "type": "string" },
-          "version": { "type": "string" },
-          "description": { "type": "string" }
-        },
-        "required": ["name", "version", "description"]
-      },
-      "subjectArea": { "type": "string" },
-      "sourceMetafileRepo": { "type": "string", "format": "uri" },
-      "sourceMetafileBranch": { "type": "string" },
-      "sourceMetafileName": { "type": "string" },
-      "namespace": { "type": "string" },
-      "environment": { "type": "string" },
-      "image": { "type": "string" },
-      "command": { "type": "string" },
-      "args": { "type": "string" },
-      "schedule": { "type": "string" },
-      "startingDeadlineSeconds": { "type": "integer" },
-      "concurrencyPolicy": {
-        "type": "string",
-        "enum": ["Allow", "Forbid", "Replace"]
-      },
-      "successfulJobsHistoryLimit": { "type": "integer" },
-      "failedJobsHistoryLimit": { "type": "integer" },
-      "backoffLimit": { "type": "integer" },
-      "deploymentName": { "type": "string" },
-      "metadata": {
-        "type": "object",
-        "properties": {
-          "labels": {
-            "type": "object",
-            "additionalProperties": { "type": "string" }
-          }
-        }
-      },
-      "volumeMounts": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "name": { "type": "string" },
-            "mountPath": { "type": "string" }
-          },
-          "required": ["name", "mountPath"]
-        }
-      },
-      "volumes": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "name": { "type": "string" },
-            "emptyDir": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+          "chart": {
               "type": "object",
               "properties": {
-                "medium": { "type": "string" },
-                "sizeLimit": { "type": "string" }
+                  "name": {
+                      "type": "string"
+                  },
+                  "version": {
+                      "type": "string"
+                  },
+                  "description": {
+                      "type": "string"
+                  }
               },
-              "additionalProperties": false
-            }
+              "required": [
+                  "name",
+                  "version",
+                  "description"
+              ]
           },
-          "required": ["name"]
-        }
-      },
-      "deploy": {
-        "type": "object",
-        "properties": {
-          "env": {
-            "type": "object",
-            "additionalProperties": true
+          "subjectArea": {
+              "type": "string"
+          },
+          "sourceMetafileRepo": {
+              "type": "string",
+              "format": "uri"
+          },
+          "sourceMetafileBranch": {
+              "type": "string"
+          },
+          "sourceMetafileName": {
+              "type": "string"
+          },
+          "namespace": {
+              "type": "string"
+          },
+          "environment": {
+              "type": "string"
+          },
+          "deploymentName": {
+              "type": "string"
+          },
+          "metadata": {
+              "type": "object",
+              "properties": {
+                  "labels": {
+                      "type": "object",
+                      "additionalProperties": {
+                          "type": "string"
+                      }
+                  }
+              },
+              "required": [
+                  "labels"
+              ]
+          },
+          "deploy": {
+              "type": "object",
+              "properties": {
+                  "image": {
+                      "type": "string"
+                  },
+                  "pullPolicy": {
+                      "type": "string",
+                      "enum": [
+                          "Always",
+                          "IfNotPresent",
+                          "Never"
+                      ]
+                  },
+                  "schedule": {
+                      "type": "string"
+                  },
+                  "startingDeadlineSeconds": {
+                      "type": "integer"
+                  },
+                  "concurrencyPolicy": {
+                      "type": "string",
+                      "enum": [
+                          "Allow",
+                          "Forbid",
+                          "Replace"
+                      ]
+                  },
+                  "successfulJobsHistoryLimit": {
+                      "type": "integer"
+                  },
+                  "failedJobsHistoryLimit": {
+                      "type": "integer"
+                  },
+                  "backoffLimit": {
+                      "type": "integer"
+                  },
+                  "env": {
+                      "type": "object",
+                      "additionalProperties": true
+                  },
+                  "volumeMounts": {
+                      "type": "array",
+                      "items": {
+                          "type": "object",
+                          "properties": {
+                              "name": {
+                                  "type": "string"
+                              },
+                              "mountPath": {
+                                  "type": "string"
+                              }
+                          },
+                          "required": [
+                              "name",
+                              "mountPath"
+                          ]
+                      }
+                  },
+                  "volumes": {
+                      "type": "array",
+                      "items": {
+                          "type": "object",
+                          "properties": {
+                              "name": {
+                                  "type": "string"
+                              },
+                              "emptyDir": {
+                                  "type": "object",
+                                  "properties": {
+                                      "medium": {
+                                          "type": "string"
+                                      },
+                                      "sizeLimit": {
+                                          "type": "string"
+                                      }
+                                  },
+                                  "additionalProperties": false
+                              }
+                          },
+                          "required": [
+                              "name"
+                          ]
+                      }
+                  }
+              },
+              "required": [
+                  "env",
+                  "schedule",
+                  "image"
+              ]
+          },
+          "code": {
+              "type": "object",
+              "properties": {
+                  "command": {
+                      "type": "string"
+                  },
+                  "args": {
+                      "type": "string"
+                  },
+                  "env": {
+                      "type": "object",
+                      "additionalProperties": true
+                  }
+              },
+              "required": [
+                  "env",
+                  "command",
+                  "args"
+              ]
           }
-        },
-        "required": ["env"]
       },
-      "code": {
-        "type": "object",
-        "properties": {
-          "env": {
-            "type": "object",
-            "additionalProperties": true
-          }
-        },
-        "required": ["env"]
-      }
-    },
-    "required": [
-      "chart",
-      "subjectArea",
-      "sourceMetafileRepo",
-      "sourceMetafileBranch",
-      "sourceMetafileName",
-      "namespace",
-      "environment",
-      "schedule",
-      "image",
-      "command",
-      "args",
-      "deploy",
-      "code"
-    ],
-    "additionalProperties": false
+      "required": [
+          "chart",
+          "subjectArea",
+          "sourceMetafileRepo",
+          "sourceMetafileBranch",
+          "sourceMetafileName",
+          "namespace",
+          "environment",
+          "deploy",
+          "code"
+      ],
+      "additionalProperties": false
   }

@@ -17,16 +17,9 @@
     "sourceMetafileName": "meta-job-document-loader",
     "sourceMetafileRepo": "https://neogit.neoflex.ru/vsemenov/tservice/",
     "sourceMetafileBranch": "main",
-    "startingDeadlineSeconds": 30,
-    "image": "readservice:latest",
-    "schedule": "*/10 * * * *",
-    "command": "[\"/bin/bash\"]",
-    "args": "[\"-c\", \"python -m readservice.main\"]",
-    "successfulJobsHistoryLimit": 2,
-    "failedJobsHistoryLimit": 2,
-    "concurrencyPolicy": "Forbid",
-    "backoffLimit": 1,
     "code": {
+        "command": "[\"/bin/bash\"]",
+        "args": "[\"-c\", \"python -m readservice.main\"]",
         "env": {
             "embedding": {
                 "provider": {
@@ -36,7 +29,7 @@
             "sources": {
                 "use_local": {
                     "value": "true"
-                    },
+                },
                 "use_s3": {
                     "value": "true"
                 }
@@ -52,6 +45,14 @@
         }
     },
     "deploy": {
+        "startingDeadlineSeconds": 30,
+        "image": "readservice:latest",
+        "schedule": "*/10 * * * *",
+        "successfulJobsHistoryLimit": 2,
+        "failedJobsHistoryLimit": 2,
+        "concurrencyPolicy": "Forbid",
+        "pullPolicy": "IfNotPresent",
+        "backoffLimit": 1,
         "env": {
             "embedding": {
                 "yandexGPT": {
@@ -80,21 +81,21 @@
                     }
                 }
             }
-        }
-    },
-    "volumeMounts": [
-        {
-            "name": "local-docs",
-            "mountPath": "/app/local_docs"
-        }
-    ],
-    "volumes": [
-        {
-            "name": "local-docs",
-            "hostPath": {
-                "path": "/home/stickt/python/local_docs",
-                "type": "Directory"
+        },
+        "volumeMounts": [
+            {
+                "name": "local-docs",
+                "mountPath": "/app/local_docs"
             }
-        }
-    ]
+        ],
+        "volumes": [
+            {
+                "name": "local-docs",
+                "hostPath": {
+                    "path": "/home/stickt/python/local_docs",
+                    "type": "Directory"
+                }
+            }
+        ]
+    }
 }

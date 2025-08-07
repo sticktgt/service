@@ -40,38 +40,6 @@
         "environment": {
             "type": "string"
         },
-        "image": {
-            "type": "string"
-        },
-        "command": {
-            "type": "string"
-        },
-        "args": {
-            "type": "string"
-        },
-        "schedule": {
-            "type": "string"
-        },
-        "startingDeadlineSeconds": {
-            "type": "integer"
-        },
-        "concurrencyPolicy": {
-            "type": "string",
-            "enum": [
-                "Allow",
-                "Forbid",
-                "Replace"
-            ]
-        },
-        "successfulJobsHistoryLimit": {
-            "type": "integer"
-        },
-        "failedJobsHistoryLimit": {
-            "type": "integer"
-        },
-        "backoffLimit": {
-            "type": "integer"
-        },
         "deploymentName": {
             "type": "string"
         },
@@ -89,72 +57,116 @@
                 "labels"
             ]
         },
-        "volumeMounts": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "mountPath": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "name",
-                    "mountPath"
-                ]
-            }
-        },
-        "volumes": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "emptyDir": {
-                        "type": "object",
-                        "properties": {
-                            "medium": {
-                                "type": "string"
-                            },
-                            "sizeLimit": {
-                                "type": "string"
-                            }
-                        },
-                        "additionalProperties": false
-                    }
-                },
-                "required": [
-                    "name"
-                ]
-            }
-        },
         "deploy": {
             "type": "object",
             "properties": {
+                "image": {
+                    "type": "string"
+                },
+                "pullPolicy": {
+                    "type": "string",
+                    "enum": [
+                        "Always",
+                        "IfNotPresent",
+                        "Never"
+                    ]
+                },
+                "schedule": {
+                    "type": "string"
+                },
+                "startingDeadlineSeconds": {
+                    "type": "integer"
+                },
+                "concurrencyPolicy": {
+                    "type": "string",
+                    "enum": [
+                        "Allow",
+                        "Forbid",
+                        "Replace"
+                    ]
+                },
+                "successfulJobsHistoryLimit": {
+                    "type": "integer"
+                },
+                "failedJobsHistoryLimit": {
+                    "type": "integer"
+                },
+                "backoffLimit": {
+                    "type": "integer"
+                },
                 "env": {
                     "type": "object",
                     "additionalProperties": true
+                },
+                "volumeMounts": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "mountPath": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "mountPath"
+                        ]
+                    }
+                },
+                "volumes": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "emptyDir": {
+                                "type": "object",
+                                "properties": {
+                                    "medium": {
+                                        "type": "string"
+                                    },
+                                    "sizeLimit": {
+                                        "type": "string"
+                                    }
+                                },
+                                "additionalProperties": false
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ]
+                    }
                 }
             },
             "required": [
-                "env"
+                "env",
+                "schedule",
+                "image"
             ]
         },
         "code": {
             "type": "object",
             "properties": {
+                "command": {
+                    "type": "string"
+                },
+                "args": {
+                    "type": "string"
+                },
                 "env": {
                     "type": "object",
                     "additionalProperties": true
                 }
             },
             "required": [
-                "env"
+                "env",
+                "command",
+                "args"
             ]
         }
     },
@@ -166,10 +178,6 @@
         "sourceMetafileName",
         "namespace",
         "environment",
-        "schedule",
-        "image",
-        "command",
-        "args",
         "deploy",
         "code"
     ],
