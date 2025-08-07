@@ -36,7 +36,7 @@
             "sources": {
                 "use_local": {
                     "value": "true"
-                },
+                    },
                 "use_s3": {
                     "value": "true"
                 }
